@@ -20,7 +20,7 @@
 |------|----------------|-----------|
 | 1 | Người dùng | Từ màn hình UC006, chọn 1 chỉ số (VD: Nhịp tim) hoặc chọn "Xem chi tiết". |
 | 2 | Hệ thống | Hiển thị màn hình "Chi tiết Nhịp tim" với khoảng thời gian mặc định (24 giờ gần nhất). |
-| 3 | Hệ thống | Truy vấn dữ liệu đã được tổng hợp (từ `vitals_5min`, `vitals_hourly`, `vitals_daily`) tương ứng với khoảng thời gian. |
+| 3 | Hệ thống | Truy vấn dữ liệu đã được tổng hợp tương ứng với khoảng thời gian (dữ liệu 5 phút, theo giờ, theo ngày). |
 | 4 | Hệ thống | Hiển thị:<br>- Biểu đồ đường (line chart)<br>- Giá trị min/max/avg<br>- Số lần vượt ngưỡng cảnh báo trong khoảng thời gian đó. |
 | 5 | Người dùng | Thay đổi khoảng thời gian (1h, 24h, 7 ngày, 30 ngày, tuỳ chỉnh from/to). |
 | 6 | Hệ thống | Nạp lại dữ liệu và cập nhật biểu đồ + thống kê theo khoảng thời gian mới. |
@@ -57,9 +57,9 @@
 ## Business Rules
 
 - **BR-007-01**: Mặc định hiển thị 24 giờ gần nhất khi vào màn hình chi tiết lần đầu.
-- **BR-007-02**: Sử dụng dữ liệu từ các bảng tổng hợp (`vitals_5min`, `vitals_hourly`, `vitals_daily`) để tối ưu hiệu năng.
+- **BR-007-02**: Sử dụng dữ liệu từ các bảng tổng hợp (theo 5 phút, theo giờ, theo ngày) để tối ưu hiệu năng.
 - **BR-007-03**: Chỉ cho phép chọn khoảng thời gian tối đa 1 năm trong 1 lần truy vấn.
-- **BR-007-04**: Tôn trọng quyền truy cập của caregiver (chỉ xem bệnh nhân mà họ được gán trong `user_relationships`). 
+- **BR-007-04**: Tôn trọng quyền truy cập của caregiver (chỉ xem bệnh nhân mà họ được gán quyền giám sát). 
 
 ---
 

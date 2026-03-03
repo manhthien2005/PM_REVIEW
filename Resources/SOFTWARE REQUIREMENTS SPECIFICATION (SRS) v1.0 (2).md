@@ -270,6 +270,42 @@ Hình 4.1 : Biểu đồ use case tổng quan
 
 ## **4.5 Quy trình nghiệp vụ**
 
+Hệ thống HealthGuard vận hành dựa trên các quy trình nghiệp vụ chính sau:
+
+### 4.5.1 Quy trình giám sát sức khỏe liên tục
+
+1. Thiết bị IoT thu thập dữ liệu sinh trắc (nhịp tim, SpO₂, gia tốc, thân nhiệt) mỗi 1 phút.
+2. Dữ liệu được truyền qua MQTT/HTTP đến Mobile Backend Server.
+3. Server kiểm tra dữ liệu so với ngưỡng y khoa đã cấu hình.
+4. Nếu chỉ số vượt ngưỡng cảnh báo → gửi thông báo đến người dùng và người chăm sóc.
+5. Dữ liệu được lưu trữ vào PostgreSQL + TimescaleDB để phục vụ xem lịch sử và phân tích.
+
+### 4.5.2 Quy trình phát hiện và xử lý té ngã
+
+1. Mô-đun AI phân tích dữ liệu gia tốc và nhịp tim liên tục.
+2. Khi phát hiện mẫu hình té ngã (confidence > 85%) → kích hoạt trạng thái "Cảnh báo ngã" trên Server.
+3. Mobile App rung + phát âm thanh + hiển thị đếm ngược 30 giây để bệnh nhân xác nhận an toàn.
+4. Nếu bệnh nhân nhấn "TÔI KHÔNG SAO" → hủy cảnh báo, ghi log false alarm.
+5. Nếu không phản hồi trong 30 giây → tự động gửi SOS kèm vị trí GPS đến tất cả Emergency Contacts.
+6. Người chăm sóc nhận SOS, xem vị trí trên bản đồ, và xử lý sự cố.
+7. Sau khi xử lý → bệnh nhân hoặc người chăm sóc xác nhận an toàn để kết thúc Emergency Mode.
+
+### 4.5.3 Quy trình đánh giá rủi ro sức khỏe
+
+1. Hệ thống tự động đánh giá rủi ro mỗi 6 giờ hoặc khi người dùng yêu cầu.
+2. Mô hình AI tính toán Risk Score (0-100) dựa trên tổ hợp: HRV, SpO₂, nhịp tim, lịch sử huyết áp, tiền sử bệnh lý.
+3. Kết quả được phân loại: LOW (0-33) / MEDIUM (34-66) / HIGH (67-84) / CRITICAL (85-100).
+4. Hệ thống cung cấp giải thích XAI (Explainable AI) cho các yếu tố ảnh hưởng chính.
+5. Nếu rủi ro HIGH/CRITICAL → tự động gửi thông báo đến người chăm sóc.
+6. Luôn hiển thị disclaimer: "Đây là công cụ hỗ trợ, không thay thế chẩn đoán y khoa".
+
+### 4.5.4 Quy trình gửi SOS thủ công
+
+1. Bệnh nhân bấm và giữ nút SOS trong 3 giây trên ứng dụng.
+2. Popup xác nhận → bệnh nhân chọn "Có".
+3. Hệ thống lấy vị trí GPS và gửi thông báo đến tất cả Emergency Contacts qua đa kênh (Push + SMS + Email).
+4. App chuyển sang chế độ Emergency Mode cho đến khi bệnh nhân/người chăm sóc xác nhận an toàn.
+
 ## **4.6 Đặc tả use case** {#4.6-đặc-tả-use-case}
 
 ### [**4.6.1 Đăng nhập**](?tab=t.8ac5kkffr7ju) {#4.6.1-đăng-nhập}
@@ -298,7 +334,7 @@ Hình 4.1 : Biểu đồ use case tổng quan
   * Admin Backend và Mobile Backend sử dụng JWT secret key riêng biệt, hoàn toàn độc lập.  
   * Admin token: issuer `iss="healthguard-admin"`, expiry 8 giờ, role: `ADMIN`.  
   * Mobile token: issuer `iss="healthguard-mobile"`, access token expiry 30 ngày, refresh token expiry 90 ngày (rotation — mỗi lần refresh tạo cặp token mới, invalidate token cũ), roles: `PATIENT`, `CAREGIVER`.  
-* Mật khẩu: Hash bằng bcrypt (Admin BE) / passlib+bcrypt (Mobile BE), độ dài tối thiểu 6 ký tự.  
+* Mật khẩu: Hash bằng bcrypt (Admin BE) / passlib+bcrypt (Mobile BE), độ dài tối thiểu 8 ký tự.  
 * Tuân thủ: Đảm bảo các nguyên tắc cơ bản về bảo vệ dữ liệu cá nhân (tương đương HIPAA ở mức độ học thuật).
 
 ## **5.4 Thuộc tính chất lượng phần mềm** {#5.4-thuộc-tính-chất-lượng-phần-mềm}

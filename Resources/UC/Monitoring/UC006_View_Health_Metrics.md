@@ -21,7 +21,7 @@
 | 1 | Người dùng | Truy cập màn hình "Sức khỏe" |
 | 2 | Hệ thống | Hiển thị các chỉ số hiện tại:<br>- Nhịp tim (BPM)<br>- SpO₂ (%)<br>- Huyết áp (mmHg)<br>- Nhiệt độ (°C)<br>Với màu sắc: Xanh (OK), Vàng (Cảnh báo), Đỏ (Nguy hiểm) |
 | 3 | Hệ thống | Hiển thị biểu đồ xu hướng 1 giờ gần nhất |
-| 4 | Hệ thống | Cập nhật dữ liệu real-time (mỗi 2-3 giây) |
+| 4 | Hệ thống | Cập nhật dữ liệu mỗi khi nhận được dữ liệu mới từ thiết bị (chu kỳ thu thập: 1 phút/lần theo SRS HG-FUNC-01, giao diện tự động refresh khi có data mới) |
 | 5 | Hệ thống | Gửi thông báo nếu phát hiện chỉ số bất thường |
 
 ---
@@ -68,8 +68,8 @@
 ## Yêu cầu phi chức năng
 
 - **Performance**: 
-  - Độ trễ hiển thị < 2 giây (HG-FUNC-02)
-  - Cập nhật real-time mỗi 2-3 giây
+   - Độ trễ hiển thị < 5 giây kể từ khi Server nhận dữ liệu (SRS HG-FUNC-02)
+  - Giao diện cập nhật tự động mỗi khi có dữ liệu mới (chu kỳ thiết bị gửi: 1 phút)
 - **Usability**: 
   - Responsive (mobile + web)
   - Font chữ lớn, tương phản cao cho người già

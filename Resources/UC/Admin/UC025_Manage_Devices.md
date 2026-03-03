@@ -7,9 +7,9 @@
 | **Mã UC** | UC025 |
 | **Tên UC** | Quản lý thiết bị IoT |
 | **Tác nhân chính** | Quản trị viên |
-| **Mô tả** | Quản trị viên quản lý danh sách thiết bị IoT trong hệ thống: xem, tìm kiếm, khoá/mở khoá, gán/bỏ gán cho người dùng. |
+| **Mô tả** | Quản trị viên quản lý danh sách thiết bị IoT trong hệ thống: xem, tìm kiếm, khoá/mở khoá, gán/bỏ gán cho người dùng. **Lưu ý**: UC này dành cho Admin quản trị tập trung; việc user tự pair thiết bị xem tại UC040. |
 | **Trigger** | Quản trị viên truy cập mục "Quản lý thiết bị" trên Admin Dashboard. |
-| **Tiền điều kiện** | - Admin đã đăng nhập.<br>- Hệ thống đã có ít nhất một thiết bị được đăng ký (trong bảng `devices`). |
+| **Tiền điều kiện** | - Admin đã đăng nhập.<br>- Hệ thống đã có ít nhất một thiết bị được đăng ký. |
 | **Hậu điều kiện** | Danh sách thiết bị và trạng thái gán người dùng được cập nhật, thay đổi được ghi log. |
 
 ---

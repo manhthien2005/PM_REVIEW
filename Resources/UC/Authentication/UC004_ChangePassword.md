@@ -18,18 +18,14 @@
 
 | Bước | Người thực hiện | Hành động |
 |------|----------------|-----------|
-| 1 | Người dùng | Truy cập phần "Cài đặt" > "Bảo mật" |
-| 2 | Hệ thống | Hiển thị tùy chọn "Đổi mật khẩu" |
-| 3 | Người dùng | Chọn "Đổi mật khẩu" |
-| 4 | Hệ thống | Hiển thị form đổi mật khẩu |
-| 5 | Người dùng | Nhập mật khẩu hiện tại, mật khẩu mới, xác nhận mật khẩu mới |
-| 6 | Người dùng | Nhấn "Cập nhật mật khẩu" |
-| 7 | Hệ thống | Xác thực mật khẩu hiện tại |
-| 8 | Hệ thống | Kiểm tra mật khẩu mới hợp lệ |
-| 9 | Hệ thống | Cập nhật mật khẩu mới vào database |
-| 10 | Hệ thống | Vô hiệu hóa tất cả session cũ (trừ session hiện tại) |
-| 11 | Hệ thống | Gửi email thông báo thay đổi mật khẩu thành công |
-| 12 | Hệ thống | Hiển thị "Đổi mật khẩu thành công" |
+| 1 | Người dùng | Truy cập "Cài đặt" > "Bảo mật" > "Đổi mật khẩu" |
+| 2 | Hệ thống | Hiển thị form đổi mật khẩu |
+| 3 | Người dùng | Nhập mật khẩu hiện tại, mật khẩu mới (≥ 8 ký tự), xác nhận mật khẩu mới |
+| 4 | Người dùng | Nhấn "Cập nhật mật khẩu" |
+| 5 | Hệ thống | Xác thực mật khẩu hiện tại và kiểm tra mật khẩu mới hợp lệ |
+| 6 | Hệ thống | Cập nhật mật khẩu mới, vô hiệu hóa tất cả session cũ (trừ session hiện tại) |
+| 7 | Hệ thống | Gửi email thông báo thay đổi mật khẩu thành công |
+| 8 | Hệ thống | Hiển thị "Đổi mật khẩu thành công" |
 
 ---
 
@@ -51,7 +47,7 @@
 ### 8.b - Mật khẩu mới không đủ mạnh
 | Bước | Người thực hiện | Hành động |
 |------|----------------|-----------|
-| 8.b.1 | Hệ thống | Hiển thị "Mật khẩu phải có ít nhất 6 ký tự" |
+| 8.b.1 | Hệ thống | Hiển thị "Mật khẩu phải có ít nhất 8 ký tự" |
 | 8.b.2 | Người dùng | Nhập mật khẩu mạnh hơn |
 
 ### 8.c - Mật khẩu xác nhận không khớp
@@ -71,7 +67,7 @@
 ## Business Rules
 
 - **BR-001**: Mật khẩu mới phải khác mật khẩu hiện tại
-- **BR-002**: Mật khẩu mới tối thiểu 6 ký tự
+- **BR-002**: Mật khẩu mới tối thiểu 8 ký tự
 - **BR-003**: Phải nhập đúng mật khẩu hiện tại mới được đổi
 - **BR-004**: Giới hạn 3 lần nhập sai mật khẩu hiện tại trong 1 phiên
 - **BR-005**: Sau khi đổi mật khẩu, tất cả session cũ (web, mobile) bị đăng xuất (trừ session hiện tại)
@@ -85,7 +81,7 @@
 | Trường | Kiểu | Bắt buộc | Validation |
 |--------|------|----------|------------|
 | Mật khẩu hiện tại | String | Có | Phải khớp với mật khẩu trong DB |
-| Mật khẩu mới | String | Có | Tối thiểu 6 ký tự, khác mật khẩu hiện tại |
+| Mật khẩu mới | String | Có | Tối thiểu 8 ký tự, khác mật khẩu hiện tại |
 | Xác nhận mật khẩu mới | String | Có | Phải khớp với mật khẩu mới |
 
 ---

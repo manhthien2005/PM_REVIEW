@@ -7,7 +7,7 @@
 | **Mã UC** | UC008 |
 | **Tên UC** | Xem lịch sử chỉ số sức khỏe |
 | **Tác nhân chính** | Bệnh nhân, Người chăm sóc |
-| **Mô tả** | Người dùng xem lại lịch sử các chỉ số sức khỏe trong khoảng thời gian dài (ngày, tuần, tháng) để theo dõi xu hướng. |
+| **Mô tả** | Người dùng xem lại lịch sử các chỉ số sức khỏe trong khoảng thời gian dài (ngày, tuần, tháng) để theo dõi xu hướng. **Phân biệt với UC007**: UC007 tập trung drill-down chi tiết một chỉ số cụ thể, UC008 cho phép xem xu hướng tổng hợp nhiều chỉ số, so sánh qua các ngày và phát hiện pattern dài hạn. |
 | **Trigger** | Người dùng chọn chức năng "Lịch sử sức khỏe" từ màn hình chính hoặc từ UC006. |
 | **Tiền điều kiện** | - Người dùng đã đăng nhập.<br>- Có ít nhất một khoảng thời gian đã được ghi nhận dữ liệu. |
 | **Hậu điều kiện** | Người dùng xem được biểu đồ và thống kê lịch sử chỉ số sức khỏe theo khoảng thời gian đã chọn. |
@@ -21,7 +21,7 @@
 | 1 | Người dùng | Truy cập màn hình "Lịch sử sức khỏe". |
 | 2 | Hệ thống | Hiển thị bộ lọc: Khoảng thời gian (7 ngày, 30 ngày, 3 tháng, tùy chọn from/to), loại chỉ số (Nhịp tim, SpO₂, Huyết áp, Nhiệt độ). |
 | 3 | Người dùng | Chọn khoảng thời gian và chỉ số cần xem. |
-| 4 | Hệ thống | Truy vấn dữ liệu từ các bảng tổng hợp (`vitals_hourly`, `vitals_daily`). |
+| 4 | Hệ thống | Truy vấn dữ liệu từ các bảng tổng hợp (theo giờ, theo ngày). |
 | 5 | Hệ thống | Hiển thị biểu đồ xu hướng (line chart/area chart) cho chỉ số đã chọn kèm các giá trị min/max/avg theo từng ngày/giờ. |
 | 6 | Người dùng | Cuộn và quan sát xu hướng, có thể chuyển đổi giữa các chỉ số. |
 
@@ -56,8 +56,8 @@
 ## Business Rules
 
 - **BR-008-01**: Mặc định hiển thị lịch sử 7 ngày gần nhất.
-- **BR-008-02**: Nếu chọn khoảng > 30 ngày, hệ thống sử dụng `vitals_daily` để hiển thị (không dùng dữ liệu thô).
-- **BR-008-03**: Caregiver chỉ được xem lịch sử của bệnh nhân mà họ có quan hệ trong `user_relationships` với `can_view_vitals = true`.
+- **BR-008-02**: Nếu chọn khoảng > 30 ngày, hệ thống sử dụng dữ liệu tổng hợp theo ngày để hiển thị (không dùng dữ liệu thô).
+- **BR-008-03**: Caregiver chỉ được xem lịch sử của bệnh nhân mà họ có quyền giám sát và được cấp quyền xem chỉ số sức khỏe.
 - **BR-008-04**: Không hiển thị dữ liệu vượt ngoài thời gian retention đã cấu hình (VD: > 1 năm có thể không còn dữ liệu chi tiết). 
 
 ---

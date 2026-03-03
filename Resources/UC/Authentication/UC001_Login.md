@@ -46,9 +46,13 @@
 
 ## Business Rules
 
-- **BR-001**: Mật khẩu phải được hash bằng bcrypt (chi tiết implementation trong Technical Spec)
-- **BR-002**: JWT token có thời hạn 24 giờ
-- **BR-003**: Giới hạn 5 lần đăng nhập sai trong 15 phút, sau đó khóa tạm thời IP
+- **BR-001**: Mật khẩu phải được hash (chi tiết implementation trong Technical Spec)
+- **BR-002**: JWT token expiry theo platform:
+  - Admin Web: access token 8 giờ, role: `ADMIN`
+  - Mobile App: access token 30 ngày, refresh token 90 ngày (rotation — mỗi lần refresh tạo cặp token mới, invalidate token cũ), roles: `PATIENT`, `CAREGIVER`
+- **BR-003**: Admin Backend và Mobile Backend sử dụng JWT secret key riêng biệt, hoàn toàn độc lập
+- **BR-004**: Giới hạn 5 lần đăng nhập sai trong 15 phút, sau đó khóa tạm thời IP
+- **BR-005**: Mật khẩu tối thiểu 8 ký tự
 
 ---
 

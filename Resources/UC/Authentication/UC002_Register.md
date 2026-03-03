@@ -39,7 +39,7 @@
 ### 5.b - Mật khẩu không đủ mạnh
 | Bước | Người thực hiện | Hành động |
 |------|----------------|-----------|
-| 5.b.1 | Hệ thống | Hiển thị "Mật khẩu phải có ít nhất 6 ký tự" |
+| 5.b.1 | Hệ thống | Hiển thị "Mật khẩu phải có ít nhất 8 ký tự" |
 | 5.b.2 | Người dùng | Nhập lại mật khẩu mạnh hơn |
 
 ### 5.c - Chưa chấp nhận điều khoản
@@ -53,7 +53,7 @@
 ## Business Rules
 
 - **BR-001**: Email phải là duy nhất trong hệ thống
-- **BR-002**: Mật khẩu tối thiểu 6 ký tự
+- **BR-002**: Mật khẩu tối thiểu 8 ký tự
 - **BR-003**: Người dùng phải chấp nhận điều khoản trước khi đăng ký
 - **BR-004**: Email xác thực có hiệu lực 24 giờ
 
@@ -65,7 +65,7 @@
 | Trường | Kiểu | Bắt buộc | Validation |
 |--------|------|----------|------------|
 | Email | String | Có | Format email hợp lệ, chưa tồn tại |
-| Mật khẩu | String | Có | Tối thiểu 6 ký tự |
+| Mật khẩu | String | Có | Tối thiểu 8 ký tự |
 | Họ tên | String | Có | 1-100 ký tự |
 | Số điện thoại | String | Có | 10-11 số, bắt đầu bằng 0 |
 | Ngày sinh | Date | Có | Trong quá khứ |
@@ -80,4 +80,4 @@
 - **Usability**: 
   - Real-time validation khi người dùng nhập
   - Hiển thị độ mạnh của mật khẩu
-- **Privacy**: Tuân thủ GDPR - thu thập đồng ý xử lý dữ liệu
+- **Privacy**: Tuân thủ các nguyên tắc bảo vệ dữ liệu cá nhân (tương đương HIPAA ở mức độ học thuật) - thu thập đồng ý xử lý dữ liệu
