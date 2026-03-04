@@ -39,7 +39,7 @@ health_system/
 │   │   ├── api/                 # API routes
 │   │   │   ├── router.py        # Main router aggregator (6 LOC)
 │   │   │   └── routes/          # Route modules
-│   │   │       ├── auth.py      # ✅ Auth routes (216 LOC)
+│   │       ├── auth.py      # ✅ Auth routes (260 LOC)
 │   │   │       └── health.py    # Health check (5 LOC)
 │   │   ├── core/                # Config, security, dependencies
 │   │   │   ├── config.py        # Settings (30 LOC)
@@ -56,10 +56,10 @@ health_system/
 │   │   ├── schemas/             # Pydantic schemas
 │   │   │   └── auth.py          # Auth schemas (35 LOC)
 │   │   ├── services/            # Business logic
-│   │   │   └── auth_service.py  # ✅ AuthService (764 LOC)
+│   │   │   └── auth_service.py  # ✅ AuthService (779 LOC)
 │   │   ├── utils/               # Helpers
-│   │   │   ├── jwt.py           # JWT utils (112 LOC)
-│   │   │   ├── email_service.py # Email sending (141 LOC)
+│   │   │   ├── jwt.py           # JWT utils (121 LOC)
+│   │   │   ├── email_service.py # Email sending (190 LOC)
 │   │   │   ├── rate_limiter.py  # Rate limiter (61 LOC)
 │   │   │   ├── password.py      # Bcrypt (8 LOC)
 │   │   │   └── datetime_helper.py # TZ helper (8 LOC)
@@ -89,8 +89,8 @@ health_system/
 > **SRS Ref**: UC001-UC004 | **JIRA**: EP04-Login, EP05-Register, EP12-Password  
 > **Review Status**: ✅ Reviewed — 82/100 (2026-03-04) | [Detail](AUTH_LOGIN_review_v2.md)
 
-| Feature                   | API Endpoint                         | Status | Note                                                   |
-| ------------------------- | ------------------------------------ | ------ | ------------------------------------------------------ |
+| Feature                   | API Endpoint                         | Status  | Note                                                   |
+| ------------------------- | ------------------------------------ | ------- | ------------------------------------------------------ |
 | Login (Patient/Caregiver) | `POST /api/auth/login`               | ✅ Done | JWT issuer: `healthguard-mobile`, 30d + refresh token  |
 | Self-register             | `POST /api/auth/register`            | ✅ Done | `is_verified=false`, email verification with deep link |
 | Email Verification        | `POST /api/auth/verify-email`        | ✅ Done | Deep link: `healthguard://verify-email?token=xxx`      |
@@ -101,6 +101,7 @@ health_system/
 | Refresh Token             | `POST /api/auth/refresh`             | ✅ Done | Refresh access token mechanism                         |
 
 **Known Issues**:
+
 - 🔴 CORS `allow_origins=["*"]` — security risk
 - 🔴 Refresh token rotation not implemented
 - 🟡 Rate limiter in-memory (needs Redis)
@@ -113,8 +114,8 @@ health_system/
 > **SRS Ref**: UC040, UC041, UC042 | **JIRA**: EP07-Device  
 > **Review Status**: ⬜ Not implemented
 
-| Feature         | API Endpoint                           | Status      |
-| --------------- | -------------------------------------- | ----------- |
+| Feature         | API Endpoint                           | Status       |
+| --------------- | -------------------------------------- | ------------ |
 | Register device | `POST /api/mobile/devices/register`    | ⬜ Not built |
 | List devices    | `GET /api/mobile/devices`              | ⬜ Not built |
 | Unbind device   | `POST /api/mobile/devices/{id}/unbind` | ⬜ Not built |
@@ -129,8 +130,8 @@ health_system/
 > **SRS Ref**: N/A | **JIRA**: EP01-Database, EP03-MobileBE, EP06-Ingestion  
 > **Review Status**: ⬜ Pending (partially working — FastAPI + Auth infra done)
 
-| Feature               | Status      | Note                                |
-| --------------------- | ----------- | ----------------------------------- |
+| Feature               | Status       | Note                                |
+| --------------------- | ------------ | ----------------------------------- |
 | FastAPI project setup | ✅ Done      | SQLAlchemy + PostgreSQL, Clean Arch |
 | CORS middleware       | ⚠️ Done      | `allow_origins=["*"]` — needs fix   |
 | Logging               | ✅ Done      | Audit logs for auth actions         |
@@ -148,8 +149,8 @@ health_system/
 > **SRS Ref**: UC006, UC007, UC008 | **JIRA**: EP08-Monitoring  
 > **Review Status**: ⬜ Not implemented
 
-| Feature             | API Endpoint                                                | Status      |
-| ------------------- | ----------------------------------------------------------- | ----------- |
+| Feature             | API Endpoint                                                | Status       |
+| ------------------- | ----------------------------------------------------------- | ------------ |
 | View latest vitals  | `GET /api/mobile/patients/{id}/vital-signs/latest`          | ⬜ Not built |
 | View metric detail  | `GET /api/mobile/patients/{id}/vital-signs/{metric}/detail` | ⬜ Not built |
 | View health history | `GET /api/mobile/patients/{id}/vital-signs/history`         | ⬜ Not built |
@@ -163,8 +164,8 @@ health_system/
 > **SRS Ref**: UC010, UC011, UC014, UC015 | **JIRA**: EP09-FallDetect, EP10-SOS  
 > **Review Status**: ⬜ Not implemented
 
-| Feature             | API Endpoint                                    | Status      |
-| ------------------- | ----------------------------------------------- | ----------- |
+| Feature             | API Endpoint                                    | Status       |
+| ------------------- | ----------------------------------------------- | ------------ |
 | Confirm fall (safe) | `POST /api/mobile/fall-events/{id}/confirm`     | ⬜ Not built |
 | Trigger SOS (auto)  | `POST /api/mobile/fall-events/{id}/trigger-sos` | ⬜ Not built |
 | Manual SOS          | `POST /api/mobile/sos/manual-trigger`           | ⬜ Not built |
@@ -183,8 +184,8 @@ health_system/
 > **SRS Ref**: UC030, UC031 | **JIRA**: EP11-Notification  
 > **Review Status**: ⬜ Not implemented
 
-| Feature                 | API Endpoint                                         | Status      |
-| ----------------------- | ---------------------------------------------------- | ----------- |
+| Feature                 | API Endpoint                                         | Status       |
+| ----------------------- | ---------------------------------------------------- | ------------ |
 | CRUD Emergency Contacts | `GET/POST/PUT/DELETE /api/mobile/emergency-contacts` | ⬜ Not built |
 | List alerts             | `GET /api/mobile/alerts`                             | ⬜ Not built |
 | Mark read               | `POST /api/mobile/alerts/{id}/read`                  | ⬜ Not built |
@@ -198,8 +199,8 @@ health_system/
 > **SRS Ref**: UC016, UC017 | **JIRA**: EP13-RiskScore  
 > **Review Status**: ⬜ Not implemented
 
-| Feature           | API Endpoint                                       | Status      |
-| ----------------- | -------------------------------------------------- | ----------- |
+| Feature           | API Endpoint                                       | Status       |
+| ----------------- | -------------------------------------------------- | ------------ |
 | Latest risk score | `GET /api/mobile/patients/{id}/risk-score/latest`  | ⬜ Not built |
 | Risk history      | `GET /api/mobile/patients/{id}/risk-score/history` | ⬜ Not built |
 | Risk detail       | `GET /api/mobile/risk-scores/{id}`                 | ⬜ Not built |
@@ -212,8 +213,8 @@ health_system/
 > **SRS Ref**: UC020, UC021 | **JIRA**: EP14-Sleep  
 > **Review Status**: ⬜ Not implemented
 
-| Feature             | API Endpoint                                  | Status      |
-| ------------------- | --------------------------------------------- | ----------- |
+| Feature             | API Endpoint                                  | Status       |
+| ------------------- | --------------------------------------------- | ------------ |
 | Latest sleep report | `GET /api/mobile/patients/{id}/sleep/latest`  | ⬜ Not built |
 | Sleep history       | `GET /api/mobile/patients/{id}/sleep/history` | ⬜ Not built |
 
@@ -221,9 +222,10 @@ health_system/
 
 ## Update History
 
-| Date       | Version | Changes                                                                                    |
-| ---------- | ------- | ------------------------------------------------------------------------------------------ |
-| 04/03/2026 | v2.0    | CHECK scan: Trello→JIRA, accurate LOC, 7/8 modules confirmed NOT implemented, tree updated |
-| 04/03/2026 | v1.2    | AUTH 82/100, Forgot/Reset/Change PWD UI, jwt_decode dependency, 15 tests                   |
-| 04/03/2026 | v1.1    | AUTH after review v3 (78/100), deep link integration, rate limiting, audit logging         |
-| 03/03/2026 | v1.0    | Initial creation based on Sprint 1-4                                                       |
+| Date       | Version | Changes                                                                                                |
+| ---------- | ------- | ------------------------------------------------------------------------------------------------------ |
+| 04/03/2026 | v2.1    | CHECK scan: Updated LOC for auth.py (260), auth_service.py (779), jwt.py (121), email_service.py (190) |
+| 04/03/2026 | v2.0    | CHECK scan: Trello→JIRA, accurate LOC, 7/8 modules confirmed NOT implemented, tree updated             |
+| 04/03/2026 | v1.2    | AUTH 82/100, Forgot/Reset/Change PWD UI, jwt_decode dependency, 15 tests                               |
+| 04/03/2026 | v1.1    | AUTH after review v3 (78/100), deep link integration, rate limiting, audit logging                     |
+| 03/03/2026 | v1.0    | Initial creation based on Sprint 1-4                                                                   |

@@ -3,11 +3,13 @@
 > Sprint 1 | JIRA: EP04-Login, EP05-Register, EP12-Password | UC: UC001-UC004
 
 ## Purpose & Technique
+
 - Login/Register/Forgot/Reset/Change Password for Patient & Caregiver roles
 - JWT auth (issuer: `healthguard-mobile`, access 30d + refresh token), bcrypt via passlib
 - Email verification via deep link (`healthguard://verify-email?token=xxx`), rate limiting (in-memory)
 
 ## API Index
+
 | Endpoint                      | Method | Note                             |
 | ----------------------------- | ------ | -------------------------------- |
 | /api/auth/register            | POST   | Self-register, is_verified=false |
@@ -20,17 +22,18 @@
 | /api/auth/change-password     | POST   | Requires JWT, verify current pwd |
 
 ## File Index
+
 | Path                                                       | Role                           |
 | ---------------------------------------------------------- | ------------------------------ |
-| backend/app/api/routes/auth.py                             | Auth routes (216 LOC)          |
-| backend/app/services/auth_service.py                       | AuthService class (764 LOC)    |
+| backend/app/api/routes/auth.py                             | Auth routes (260 LOC)          |
+| backend/app/services/auth_service.py                       | AuthService class (779 LOC)    |
 | backend/app/schemas/auth.py                                | Pydantic schemas (35 LOC)      |
 | backend/app/models/user_model.py                           | User SQLAlchemy model (20 LOC) |
 | backend/app/models/audit_log_model.py                      | AuditLog model (18 LOC)        |
 | backend/app/repositories/user_repository.py                | UserRepository (66 LOC)        |
 | backend/app/repositories/audit_log_repository.py           | AuditLogRepository (45 LOC)    |
-| backend/app/utils/jwt.py                                   | JWT utils (112 LOC)            |
-| backend/app/utils/email_service.py                         | Email service (141 LOC)        |
+| backend/app/utils/jwt.py                                   | JWT utils (121 LOC)            |
+| backend/app/utils/email_service.py                         | Email service (190 LOC)        |
 | backend/app/utils/password.py                              | Password hashing (8 LOC)       |
 | backend/app/utils/rate_limiter.py                          | Rate limiter (61 LOC)          |
 | backend/app/core/config.py                                 | Settings config (30 LOC)       |
@@ -54,12 +57,14 @@
 | lib/features/auth/widgets/auth_text_field.dart             | Custom text field (60 LOC)     |
 
 ## Known Issues
+
 - 🔴 CORS: `allow_origins=["*"]` — security risk, must restrict
 - 🔴 Refresh token rotation not implemented
 - � Rate limiter is in-memory — needs Redis migration for production
 - 🟡 Swagger UI not explicitly enabled in docs config
 
 ## Cross-References
+
 | Type           | Ref                                    |
 | -------------- | -------------------------------------- |
 | DB Tables      | users, audit_logs                      |
@@ -67,6 +72,7 @@
 | Related Module | REVIEW_ADMIN/summaries/AUTH_summary.md |
 
 ## Review
+
 | Date       | Score  | Detail                  |
 | ---------- | ------ | ----------------------- |
-| 2026-03-04 | 82/100 | AUTH_LOGIN_review_v2.md |
+| 2026-03-04 | 84/100 | AUTH_LOGIN_review_v2.md |

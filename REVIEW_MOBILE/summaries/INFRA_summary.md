@@ -3,17 +3,20 @@
 > Sprint 1-2 | JIRA: EP01-Database, EP03-MobileBE, EP06-Ingestion | UC: N/A
 
 ## Purpose & Technique
+
 - FastAPI + SQLAlchemy backend setup, PostgreSQL + TimescaleDB connection
 - Data ingestion via HTTP (`POST /api/mobile/telemetry/ingest`) and MQTT (Mosquitto)
 - Clean Architecture: Route → Service → Repository, JWT auth, rate limiting
 
 ## API Index
+
 | Endpoint                     | Method | Note                          |
 | ---------------------------- | ------ | ----------------------------- |
 | /health                      | GET    | Health check (200 OK)         |
 | /api/mobile/telemetry/ingest | POST   | HTTP data ingestion (planned) |
 
 ## File Index
+
 | Path                                  | Role                            |
 | ------------------------------------- | ------------------------------- |
 | backend/app/main.py                   | FastAPI entry point (17 LOC)    |
@@ -25,8 +28,8 @@
 | backend/app/db/memory_db.py           | In-memory DB for tests (3 LOC)  |
 | backend/app/models/user_model.py      | User model (20 LOC)             |
 | backend/app/models/audit_log_model.py | AuditLog model (18 LOC)         |
-| backend/app/utils/jwt.py              | JWT utils (112 LOC)             |
-| backend/app/utils/email_service.py    | Email sending (141 LOC)         |
+| backend/app/utils/jwt.py              | JWT utils (121 LOC)             |
+| backend/app/utils/email_service.py    | Email sending (190 LOC)         |
 | backend/app/utils/password.py         | Bcrypt hashing (8 LOC)          |
 | backend/app/utils/rate_limiter.py     | In-memory rate limiter (61 LOC) |
 | backend/app/utils/datetime_helper.py  | TZ-aware datetime (8 LOC)       |
@@ -35,12 +38,14 @@
 | backend/run.py                        | Server start script             |
 
 ## Known Issues
+
 - 🔴 CORS: `allow_origins=["*"]` — must restrict to mobile app origins
 - 🔴 Data ingestion (MQTT/HTTP) NOT implemented — no telemetry route or service
 - 🟡 Rate limiter in-memory — needs Redis for production
 - 🟡 Swagger UI not explicitly enabled
 
 ## Cross-References
+
 | Type           | Ref                                         |
 | -------------- | ------------------------------------------- |
 | DB Tables      | users, audit_logs (only tables used so far) |
