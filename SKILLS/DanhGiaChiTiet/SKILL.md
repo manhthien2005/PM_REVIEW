@@ -7,7 +7,7 @@ date_added: "2026-03-03"
 date_updated: "2026-03-04"
 ---
 
-# 🔬 Skill: Detailed Feature Review (DanhGiaChiTiet)
+# Skill: Detailed Feature Review (DanhGiaChiTiet)
 
 ## Purpose
 
@@ -21,7 +21,7 @@ Automatically activates when the user wants to:
 - Check acceptance criteria execution from a JIRA Story
 - Evaluate specific implementation details (e.g., Auth, Monitoring, Emergency)
 
-## ⚡ Context Loading Protocol (MANDATORY)
+## Context Loading Protocol (MANDATORY)
 
 > [!IMPORTANT]
 > The Agent MUST strictly follow this 3-tier loading protocol to optimize token limits and ensure accuracy.
@@ -60,69 +60,89 @@ Automatically activates when the user wants to:
 **Step 3:** Use JIRA Stories (from JIRA Index → CSV) to cross-check acceptance criteria.
 **Step 4:** SRS/Use Case Verification from the summary.
 
-## 📁 Output File Protocol (MANDATORY)
+## Output File Protocol (MANDATORY)
 
 ### File Naming Convention
 The review file MUST follow this naming pattern:
 ```
-{CHỨC_NĂNG}_{MODULE}_review.md
+{FEATURE}_{MODULE}_review.md
 ```
-- **CHỨC_NĂNG**: Tên chức năng user yêu cầu review, UPPERCASE, dấu cách → `_` (ví dụ: `AUTH_LOGIN`, `DEVICE_CONNECT`)
-- **MODULE**: Tên module từ MASTER_INDEX, UPPERCASE (ví dụ: `AUTH`, `DEVICE`, `MONITORING`)
-- Nếu chức năng trùng tên module (review toàn bộ module) → chỉ cần `{MODULE}_review.md`
+- **FEATURE**: The feature name requested for review, UPPERCASE, spaces → `_` (e.g., `AUTH_LOGIN`, `DEVICE_CONNECT`)
+- **MODULE**: Module name from MASTER_INDEX, UPPERCASE (e.g., `AUTH`, `DEVICE`, `MONITORING`)
+- If the feature name matches the module name (reviewing the entire module) → use `{MODULE}_review.md` only
 
 ### Output Location
-- Admin project → `PM_REVIEW/REVIEW_ADMIN/{tên_file}`
-- Mobile project → `PM_REVIEW/REVIEW_MOBILE/{tên_file}`
+- Admin project → `PM_REVIEW/REVIEW_ADMIN/{filename}`
+- Mobile project → `PM_REVIEW/REVIEW_MOBILE/{filename}`
 
 ### Examples
-| User yêu cầu                                             | File output                              |
-| -------------------------------------------------------- | ---------------------------------------- |
-| "Review chức năng Login, module AUTH, dự án Admin"       | `REVIEW_ADMIN/AUTH_LOGIN_review.md`      |
-| "Review module AUTH, dự án Admin"                        | `REVIEW_ADMIN/AUTH_review.md`            |
-| "Review chức năng Device Connect, module DEVICE, Mobile" | `REVIEW_MOBILE/DEVICE_CONNECT_review.md` |
+| User Request                                           | File Output                              |
+| ------------------------------------------------------ | ---------------------------------------- |
+| "Review Login feature, AUTH module, Admin project"     | `REVIEW_ADMIN/AUTH_LOGIN_review.md`      |
+| "Review AUTH module, Admin project"                    | `REVIEW_ADMIN/AUTH_review.md`            |
+| "Review Device Connect feature, DEVICE module, Mobile" | `REVIEW_MOBILE/DEVICE_CONNECT_review.md` |
 
-## 🔄 Re-review Protocol (Khi review lần 2+)
+## Re-review Protocol (2nd review and beyond)
 
 > [!IMPORTANT]
-> Trước khi bắt đầu review, AI PHẢI kiểm tra xem đã có file review cũ hay chưa. Nếu có → thực hiện so sánh.
+> Before starting a review, the AI MUST check if a previous review file already exists. If found → perform comparison.
 
-### Bước 1: Tìm file review cũ
-1. Xác định tên file theo **Output File Protocol** ở trên.
-2. Kiểm tra file đó có tồn tại tại `REVIEW_ADMIN/` hoặc `REVIEW_MOBILE/` hay không.
+### Step 1: Find previous review file
+1. Determine the filename using the **Output File Protocol** above.
+2. Check if the file exists in `REVIEW_ADMIN/` or `REVIEW_MOBILE/`.
 
-### Bước 2: Đọc file review cũ (nếu tồn tại)
-3. Đọc file review cũ và trích xuất:
-   - **Điểm cũ**: Tổng điểm + điểm từng tiêu chí.
-   - **Nhược điểm cũ**: Danh sách tất cả nhược điểm.
-   - **Khuyến nghị cũ**: Danh sách khuyến nghị hành động.
-   - **Ngày đánh giá cũ**: Từ phần "Thông tin chung".
-   - **Lần đánh giá cũ**: Từ phần "Thông tin chung" (nếu có).
+### Step 2: Read previous review file (if exists)
+3. Read the old review file and extract:
+   - **Old score**: Total score + score per criterion.
+   - **Old weaknesses**: List of all weaknesses.
+   - **Old recommendations**: List of action recommendations.
+   - **Old review date**: From the "Thông tin chung" section.
+   - **Old review count**: From the "Thông tin chung" section (if present).
 
-### Bước 3: Thực hiện review mới bình thường
-4. Thực hiện review theo Evaluation Process ở trên (Step 1–4).
+### Step 3: Perform new review as normal
+4. Execute the review following the Evaluation Process above (Step 1–4).
 
-### Bước 4: So sánh & đánh giá thay đổi
-5. So sánh kết quả mới với dữ liệu trích xuất từ file cũ:
-   - Điểm tăng/giảm từng tiêu chí.
-   - Nhược điểm nào đã được **khắc phục** (có trong cũ, không còn trong mới).
-   - Nhược điểm nào **vẫn tồn tại** (có trong cả cũ và mới).
-   - Nhược điểm nào **mới phát sinh** (không có trong cũ, xuất hiện trong mới).
+### Step 4: Compare and evaluate changes
+5. Compare new results with data extracted from the old file:
+   - Score increase/decrease per criterion.
+   - Weaknesses that have been **fixed** (present in old, absent in new).
+   - Weaknesses that **still exist** (present in both old and new).
+   - Weaknesses that are **newly introduced** (absent in old, present in new).
 
-### Bước 5: Ghi đè file cũ
-6. **GHI ĐÈ** file review cũ bằng báo cáo mới hoàn chỉnh, bao gồm section "🔄 SO SÁNH VỚI LẦN ĐÁNH GIÁ TRƯỚC" (theo template `references/report-template.md`).
-7. Tăng số **Lần đánh giá** lên 1.
+### Step 5: Overwrite old file
+6. **OVERWRITE** the old review file with the complete new report, including the "🔄 SO SÁNH VỚI LẦN ĐÁNH GIÁ TRƯỚC" section (per template `references/report-template.md`).
+7. Increment the **Lần đánh giá** counter by 1.
 
-### ⚠️ Lưu ý
-- Nếu **KHÔNG tìm thấy file cũ** → đây là lần review đầu tiên → KHÔNG thêm section so sánh, set `Lần đánh giá: 1`.
-- Nếu **CÓ file cũ** → BẮT BUỘC phải thêm section so sánh, tăng `Lần đánh giá`.
+### Important Notes
+- If **NO previous file found** → this is the first review → do NOT add comparison section, set `Lần đánh giá: 1`.
+- If **previous file found** → MUST add comparison section and increment `Lần đánh giá`.
 
 ## Output Formatting
 
 **MANDATORY:** You must use the Vietnamese markdown reporting template located at `references/report-template.md`. You must not deviate from this template.
 
-## After Review: Update MASTER_INDEX
-When the review process concludes, you must modify the corresponding module row in `MASTER_INDEX.md`:
-- Set `Review Status` → ✅ Done (or accordingly)
-- Set `Score` → XX/100
-- Set `Last Review` → [Current date]
+## After Review: Update MASTER_INDEX (MANDATORY)
+
+When the review process concludes, you **MUST** modify the corresponding module row in `MASTER_INDEX.md`:
+
+1. Set `Review Status` → ✅ Done
+2. Set `Score` → XX/100
+3. Set `Quality` → Determined by score (see `references/evaluation-criteria.md` → Score Classification):
+   - **76–100** → ✅ Pass
+   - **51–75** → ⚠️ Needs Fix
+   - **0–50** → ❌ Fail
+4. Set `Review File` → Relative link to the review output file (e.g., `[View](REVIEW_ADMIN/AUTH_review.md)`)
+5. Set `Last Review` → Current date (ISO format)
+
+## Reference Documents
+
+| Name             | Path                                                | When to read                                   |
+| ---------------- | --------------------------------------------------- | ---------------------------------------------- |
+| **MASTER INDEX** | `PM_REVIEW/MASTER_INDEX.md`                         | **ALWAYS**                                     |
+| Admin Structure  | `PM_REVIEW/REVIEW_ADMIN/Project_Structure.md`       | When reviewing Admin                           |
+| Mobile Structure | `PM_REVIEW/REVIEW_MOBILE/Project_Structure.md`      | When reviewing Mobile                          |
+| Admin Summaries  | `PM_REVIEW/REVIEW_ADMIN/summaries/*.md`             | Based on module                                |
+| Mobile Summaries | `PM_REVIEW/REVIEW_MOBILE/summaries/*.md`            | Based on module                                |
+| Use Cases (UC)   | `PM_REVIEW/Resources/UC/**/*.md`                    | When explicit detail is missing from summaries |
+| **JIRA Index**   | `PM_REVIEW/Resources/TASK/JIRA/README.md`           | **ALWAYS** — Quick lookup for Epics/Stories    |
+| JIRA Full CSV    | `PM_REVIEW/Resources/TASK/JIRA/JIRA_IMPORT_ALL.csv` | Only when need full Story details              |

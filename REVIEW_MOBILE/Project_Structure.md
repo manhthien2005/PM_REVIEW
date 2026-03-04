@@ -1,286 +1,229 @@
-# 📋 PROJECT STRUCTURE - MOBILE APP (health_system)
+# PROJECT STRUCTURE - MOBILE APP (health_system)
 
-> **Dự án**: HealthGuard Mobile App  
+> **Project**: HealthGuard Mobile App  
 > **Tech Stack**: Flutter / Dart (Frontend) + FastAPI / SQLAlchemy / Python (Backend)  
-> **Mục đích**: Ứng dụng di động cho Bệnh nhân (Patient) và Người chăm sóc (Caregiver)  
-> **Cập nhật lần cuối**: 04/03/2026  
-> **Review Progress**: 1/9 modules completed (AUTH: 82/100)
+> **Purpose**: Mobile app for Patient and Caregiver health monitoring  
+> **Last Updated**: 04/03/2026  
+> **Review Progress**: 1/8 modules completed (AUTH: 82/100)
 
 ---
 
-## 🏗️ Tổng Quan Kiến Trúc
+## Architecture Overview
 
 ```
 health_system/
 ├── lib/                         # Flutter Mobile App
-│   ├── main.dart                # App entry point
-│   ├── app.dart                 # App configuration + Deep link handler (AppLinks)
-│   ├── core/                    # Core utilities, constants, themes
-│   │   ├── constants/           # App colors, sizes, strings
-│   │   ├── error/               # Error handling
-│   │   ├── network/             # API client
-│   │   ├── routes/              # App routing (AppRouter)
-│   │   ├── theme/               # App theme
-│   │   └── utils/               # Validators, helpers
+│   ├── main.dart                # App entry point (3 LOC)
+│   ├── app.dart                 # App config + Deep link handler (AppLinks)
+│   ├── core/                    # Core utilities
+│   │   ├── constants/           # App colors, sizes, strings (4 files)
+│   │   ├── error/               # Error handling (1 file)
+│   │   ├── network/             # API client (3 files)
+│   │   ├── routes/              # App routing - AppRouter (1 file)
+│   │   ├── theme/               # App theme (1 file)
+│   │   └── utils/               # Validators, helpers (2 files)
 │   ├── features/                # Feature modules (Clean Architecture)
-│   │   ├── auth/                # ✅ Đăng nhập, đăng ký, xác thực email (78/100)
-│   │   ├── device/              # ⬜ Quản lý thiết bị IoT
-│   │   ├── emergency/           # ⬜ SOS, phát hiện té ngã
-│   │   ├── health_monitoring/   # ⬜ Theo dõi sức khỏe real-time
-│   │   ├── home/                # ⬜ Màn hình chính
-│   │   ├── profile/             # ⬜ Hồ sơ cá nhân
-│   │   └── sleep_analysis/      # ⬜ Phân tích giấc ngủ
-│   └── shared/                  # Shared widgets, models, services
+│   │   ├── auth/                # ✅ Login, Register, Verify, Password (16 files)
+│   │   ├── device/              # ⬜ Empty — not implemented
+│   │   ├── emergency/           # ⬜ Empty — not implemented
+│   │   ├── health_monitoring/   # ⬜ Empty — not implemented
+│   │   ├── home/                # ⬜ Dashboard screen only (1 file)
+│   │   ├── profile/             # ⬜ Empty — not implemented
+│   │   └── sleep_analysis/      # ⬜ Empty — not implemented
+│   └── shared/                  # Shared widgets, models (5 files)
+│       ├── models/              # Shared data models (1 file)
+│       └── widgets/             # Reusable widgets (4 files)
 │
 ├── backend/                     # Mobile Backend (FastAPI + SQLAlchemy)
 │   ├── app/
 │   │   ├── api/                 # API routes
-│   │   │   ├── router.py        # Main router aggregator
-│   │   │   └── routes/          # Route modules (auth.py, health.py)
+│   │   │   ├── router.py        # Main router aggregator (6 LOC)
+│   │   │   └── routes/          # Route modules
+│   │   │       ├── auth.py      # ✅ Auth routes (216 LOC)
+│   │   │       └── health.py    # Health check (5 LOC)
 │   │   ├── core/                # Config, security, dependencies
-│   │   ├── db/                  # Database connection, session
-│   │   ├── models/              # SQLAlchemy models (User, AuditLog, etc.)
-│   │   ├── repositories/        # Data access layer (UserRepository, AuditLogRepository)
-│   │   ├── schemas/             # Pydantic schemas (request/response)
-│   │   ├── services/            # Business logic layer (AuthService, etc.)
-│   │   ├── utils/               # Helper functions (jwt.py, email_service.py, rate_limiter.py)
-│   │   └── main.py              # FastAPI entry point
-│   ├── tests/                   # Unit tests (test_auth_service.py - 16 tests)
+│   │   │   ├── config.py        # Settings (30 LOC)
+│   │   │   └── dependencies.py  # Auth deps (70 LOC)
+│   │   ├── db/                  # Database connection
+│   │   │   ├── database.py      # SQLAlchemy session (12 LOC)
+│   │   │   └── memory_db.py     # Test DB (3 LOC)
+│   │   ├── models/              # SQLAlchemy models
+│   │   │   ├── user_model.py    # User (20 LOC)
+│   │   │   └── audit_log_model.py # AuditLog (18 LOC)
+│   │   ├── repositories/        # Data access layer
+│   │   │   ├── user_repository.py      # UserRepo (66 LOC)
+│   │   │   └── audit_log_repository.py # AuditLogRepo (45 LOC)
+│   │   ├── schemas/             # Pydantic schemas
+│   │   │   └── auth.py          # Auth schemas (35 LOC)
+│   │   ├── services/            # Business logic
+│   │   │   └── auth_service.py  # ✅ AuthService (764 LOC)
+│   │   ├── utils/               # Helpers
+│   │   │   ├── jwt.py           # JWT utils (112 LOC)
+│   │   │   ├── email_service.py # Email sending (141 LOC)
+│   │   │   ├── rate_limiter.py  # Rate limiter (61 LOC)
+│   │   │   ├── password.py      # Bcrypt (8 LOC)
+│   │   │   └── datetime_helper.py # TZ helper (8 LOC)
+│   │   └── main.py              # FastAPI entry point (17 LOC)
+│   ├── tests/                   # Unit tests
+│   │   └── test_auth_service.py # 15 auth tests
 │   ├── .env                     # Environment variables
-│   ├── requirements.txt         # Python dependencies
+│   ├── requirements.txt         # Dependencies (8 main + 3 test)
 │   └── run.py                   # Start server script
 │
 ├── android/                     # Android platform config
 │   └── app/src/main/AndroidManifest.xml  # Deep link intent filters
 ├── ios/                         # iOS platform config
 │   └── Runner/Info.plist        # Deep link CFBundleURLTypes
-├── test/                        # Unit/widget tests (Flutter)
-├── pubspec.yaml                 # Flutter dependencies (provider 6.1.5, http 1.1.0, flutter_secure_storage 9.2.2, app_links 6.4.1, jwt_decode 0.3.1)
+├── assets/images/               # App image assets (5 files)
+├── test/                        # Flutter tests (1 file)
+├── pubspec.yaml                 # Flutter deps: provider 6.1.5, http 1.1.0, flutter_secure_storage 9.2.2, app_links 6.3.3, jwt_decode 0.3.1
 └── pubspec.lock
 ```
 
 ---
 
-## 🔧 Chức Năng Theo Module
+## Modules by Feature
 
-### 1. [AUTH] Xác thực (Sprint 1)
+### 1. [AUTH] Authentication (Sprint 1)
 
-> **SRS Ref**: UC001-UC004 | **Trello**: Sprint 1 - Cards 3, 4, 5, 6  
-> **Review Status**: ✅ Đã đánh giá - 82/100 (2026-03-04) | [Xem chi tiết](AUTH_LOGIN_review_v4.md)
+> **SRS Ref**: UC001-UC004 | **JIRA**: EP04-Login, EP05-Register, EP12-Password  
+> **Review Status**: ✅ Reviewed — 82/100 (2026-03-04) | [Detail](AUTH_LOGIN_review_v2.md)
 
-| Chức năng                 | API Endpoint                         | Trạng thái | Ghi chú                                                                             |
-| ------------------------- | ------------------------------------ | ---------- | ----------------------------------------------------------------------------------- |
-| Login (Patient/Caregiver) | `POST /api/auth/login`               | ✅ Done    | JWT issuer: `healthguard-mobile`, expiry 30 ngày + refresh token, is_verified check |
-| Self-register             | `POST /api/auth/register`            | ✅ Done    | `is_verified=false`, email verification với deep link                               |
-| Email Verification        | `POST /api/auth/verify-email`        | ✅ Done    | Deep link: `healthguard://verify-email?token=xxx`, auto-verify + manual fallback    |
-| Resend Verification       | `POST /api/auth/resend-verification` | ✅ Done    | Rate limit 3/15min                                                                  |
-| Forgot Password           | `POST /api/auth/forgot-password`     | ✅ Done    | Deep link: `healthguard://reset-password?token=xxx`, UI screens complete            |
-| Reset Password            | `POST /api/auth/reset-password`      | ✅ Done    | Token 15 phút, one-time use, JWT validation client-side                             |
-| Change Password           | `POST /api/auth/change-password`     | ✅ Done    | Require JWT, UI screen complete                                                     |
-| Refresh Token             | `POST /api/auth/refresh`             | ✅ Done    | Refresh access token mechanism                                                      |
-
-**Files liên quan**:
-
-- **Backend**: `backend/app/api/routes/auth.py` (261 LOC), `backend/app/services/auth_service.py` (780 LOC)
-- **Mobile**: `lib/features/auth/screens/` (10 screens: login, register, verify_email, debug_verify, email_verification, forgot_password, reset_password, debug_reset_password, change_password, start)
-- **Deep Link Config**: `android/app/src/main/AndroidManifest.xml` (intent filters), `ios/Runner/Info.plist` (CFBundleURLTypes)
-- **Tests**: `backend/tests/test_auth_service.py` (15 unit tests)
-- **Dependencies**: `jwt_decode: ^0.3.1` for client-side JWT validation
-
-**Improvements Made (v4 Review)**:
-
-- ✅ Forgot/Reset/Change Password UI screens complete
-- ✅ JWT token validation trên client-side (jwt_decode package)
-- ✅ Debug screens cho manual token input
-- ✅ Timezone-aware datetime comparison fixed
-- ✅ Comprehensive error messages
-- ✅ 15 unit tests covering all auth flows
+| Feature                   | API Endpoint                         | Status | Note                                                   |
+| ------------------------- | ------------------------------------ | ------ | ------------------------------------------------------ |
+| Login (Patient/Caregiver) | `POST /api/auth/login`               | ✅ Done | JWT issuer: `healthguard-mobile`, 30d + refresh token  |
+| Self-register             | `POST /api/auth/register`            | ✅ Done | `is_verified=false`, email verification with deep link |
+| Email Verification        | `POST /api/auth/verify-email`        | ✅ Done | Deep link: `healthguard://verify-email?token=xxx`      |
+| Resend Verification       | `POST /api/auth/resend-verification` | ✅ Done | Rate limit 3/15min                                     |
+| Forgot Password           | `POST /api/auth/forgot-password`     | ✅ Done | Deep link: `healthguard://reset-password?token=xxx`    |
+| Reset Password            | `POST /api/auth/reset-password`      | ✅ Done | Token 15min, one-time use                              |
+| Change Password           | `POST /api/auth/change-password`     | ✅ Done | Require JWT, verify current pwd                        |
+| Refresh Token             | `POST /api/auth/refresh`             | ✅ Done | Refresh access token mechanism                         |
 
 **Known Issues**:
-
-- 🔴 CORS configuration `allow_origins=["*"]` (security risk)
-- 🔴 Refresh token rotation chưa implement
-- 🟡 Rate limiter in-memory (cần migrate Redis)
-- 🟡 API documentation chưa enable Swagger UI
-
----
-
-### 2. [DEVICE] Quản lý thiết bị IoT (Sprint 2)
-
-> **SRS Ref**: UC040, UC042 | **Trello**: Sprint 2 - Cards 1, 2
-
-| Chức năng       | API Endpoint                           | Trạng thái       | Ghi chú                           |
-| --------------- | -------------------------------------- | ---------------- | --------------------------------- |
-| Register device | `POST /api/mobile/devices/register`    | ⬜ Chưa đánh giá | QR scan hoặc manual input         |
-| List devices    | `GET /api/mobile/devices`              | ⬜ Chưa đánh giá | Devices của user (từ JWT)         |
-| Unbind device   | `POST /api/mobile/devices/{id}/unbind` | ⬜ Chưa đánh giá |                                   |
-| Device status   | `GET /api/mobile/devices/{id}/status`  | ⬜ Chưa đánh giá | Online/offline (5 phút threshold) |
-
-**Files liên quan**:
-
-- **Backend**: `backend/app/api/devices/`, `backend/app/services/device_service.py`
-- **Mobile**: `lib/features/device/`
+- 🔴 CORS `allow_origins=["*"]` — security risk
+- 🔴 Refresh token rotation not implemented
+- 🟡 Rate limiter in-memory (needs Redis)
+- 🟡 Swagger UI not explicitly enabled
 
 ---
 
-### 3. [INFRA] Data Ingestion Service (Sprint 2)
+### 2. [DEVICE] IoT Device Management (Sprint 2)
 
-> **SRS Ref**: N/A | **Trello**: Sprint 2 - Card 3
+> **SRS Ref**: UC040, UC041, UC042 | **JIRA**: EP07-Device  
+> **Review Status**: ⬜ Not implemented
 
-| Chức năng        | API Endpoint                        | Trạng thái       | Ghi chú                                  |
-| ---------------- | ----------------------------------- | ---------------- | ---------------------------------------- |
-| HTTP Data Ingest | `POST /api/mobile/telemetry/ingest` | ⬜ Chưa đánh giá | Vital signs + motion data                |
-| MQTT Subscriber  | N/A (Service)                       | ⬜ Chưa đánh giá | Eclipse Mosquitto                        |
-| Data Validation  | N/A (Internal)                      | ⬜ Chưa đánh giá | HR: 40-200, SpO2: 70-100%, Temp: 35-42°C |
+| Feature         | API Endpoint                           | Status      |
+| --------------- | -------------------------------------- | ----------- |
+| Register device | `POST /api/mobile/devices/register`    | ⬜ Not built |
+| List devices    | `GET /api/mobile/devices`              | ⬜ Not built |
+| Unbind device   | `POST /api/mobile/devices/{id}/unbind` | ⬜ Not built |
+| Device status   | `GET /api/mobile/devices/{id}/status`  | ⬜ Not built |
 
-**Files liên quan**:
-
-- **Backend**: `backend/app/services/telemetry_service.py`, `backend/app/utils/`
-
----
-
-### 4. [MONITORING] Theo dõi sức khỏe (Sprint 2)
-
-> **SRS Ref**: UC006, UC007, UC008 | **Trello**: Sprint 2 - Cards 4, 5, 6
-
-| Chức năng           | API Endpoint                                                | Trạng thái       | Ghi chú                    |
-| ------------------- | ----------------------------------------------------------- | ---------------- | -------------------------- |
-| View latest vitals  | `GET /api/mobile/patients/{id}/vital-signs/latest`          | ⬜ Chưa đánh giá | Real-time, auto-refresh 5s |
-| View metric detail  | `GET /api/mobile/patients/{id}/vital-signs/{metric}/detail` | ⬜ Chưa đánh giá | Stats: min/max/avg/std     |
-| View health history | `GET /api/mobile/patients/{id}/vital-signs/history`         | ⬜ Chưa đánh giá | Continuous aggregates      |
-
-**Files liên quan**:
-
-- **Backend**: `backend/app/api/vitals/`, `backend/app/services/vitals_service.py`
-- **Mobile**: `lib/features/health_monitoring/`
+> ⚠️ Both `lib/features/device/` and backend route files are **empty directories**
 
 ---
 
-### 5. [EMERGENCY] Phát hiện té ngã & SOS (Sprint 3)
+### 3. [INFRA] Backend Setup + Data Ingestion (Sprint 1-2)
 
-> **SRS Ref**: UC010, UC011, UC014, UC015 | **Trello**: Sprint 3 - Cards 2, 3, 4, 5
+> **SRS Ref**: N/A | **JIRA**: EP01-Database, EP03-MobileBE, EP06-Ingestion  
+> **Review Status**: ⬜ Pending (partially working — FastAPI + Auth infra done)
 
-| Chức năng           | API Endpoint                                    | Trạng thái       | Ghi chú                         |
-| ------------------- | ----------------------------------------------- | ---------------- | ------------------------------- |
-| Confirm fall (safe) | `POST /api/mobile/fall-events/{id}/confirm`     | ⬜ Chưa đánh giá | User xác nhận an toàn           |
-| Trigger SOS (auto)  | `POST /api/mobile/fall-events/{id}/trigger-sos` | ⬜ Chưa đánh giá | Auto sau 30s countdown          |
-| Manual SOS          | `POST /api/mobile/sos/manual-trigger`           | ⬜ Chưa đánh giá | Giữ nút 3s, cancel trong 5 phút |
-| Cancel SOS          | `POST /api/mobile/sos/{id}/cancel`              | ⬜ Chưa đánh giá | Trong 5 phút                    |
-| Active SOS list     | `GET /api/mobile/sos/active`                    | ⬜ Chưa đánh giá | Cho caregiver                   |
-| SOS detail          | `GET /api/mobile/sos/{id}`                      | ⬜ Chưa đánh giá |                                 |
-| Respond to SOS      | `POST /api/mobile/sos/{id}/respond`             | ⬜ Chưa đánh giá | Acknowledged/Resolved           |
-| Resolve SOS         | `POST /api/mobile/sos/{id}/resolve`             | ⬜ Chưa đánh giá |                                 |
-
-**Files liên quan**:
-
-- **Backend**: `backend/app/api/emergency/`, `backend/app/services/sos_service.py`
-- **Mobile**: `lib/features/emergency/`
+| Feature               | Status      | Note                                |
+| --------------------- | ----------- | ----------------------------------- |
+| FastAPI project setup | ✅ Done      | SQLAlchemy + PostgreSQL, Clean Arch |
+| CORS middleware       | ⚠️ Done      | `allow_origins=["*"]` — needs fix   |
+| Logging               | ✅ Done      | Audit logs for auth actions         |
+| Environment variables | ✅ Done      | DB_URL, SECRET_KEY, SMTP via .env   |
+| Health check          | ✅ Done      | `GET /health` endpoint              |
+| JWT Security          | ✅ Done      | Issuer validation, access + refresh |
+| Rate Limiting         | ✅ Done      | In-memory (needs Redis migration)   |
+| HTTP Data Ingest      | ⬜ Not built | No telemetry route/service exists   |
+| MQTT Subscriber       | ⬜ Not built | No MQTT implementation exists       |
 
 ---
 
-### 6. [NOTIFICATION] Thông báo & Liên hệ khẩn cấp (Sprint 3)
+### 4. [MONITORING] Health Metrics (Sprint 2)
 
-> **SRS Ref**: UC030, UC031 | **Trello**: Sprint 3 - Cards 1, 6
+> **SRS Ref**: UC006, UC007, UC008 | **JIRA**: EP08-Monitoring  
+> **Review Status**: ⬜ Not implemented
 
-| Chức năng               | API Endpoint                                         | Trạng thái       | Ghi chú                        |
-| ----------------------- | ---------------------------------------------------- | ---------------- | ------------------------------ |
-| CRUD Emergency Contacts | `GET/POST/PUT/DELETE /api/mobile/emergency-contacts` | ⬜ Chưa đánh giá | Priority 1-5                   |
-| List alerts             | `GET /api/mobile/alerts`                             | ⬜ Chưa đánh giá | Filter by type/severity/unread |
-| Mark read               | `POST /api/mobile/alerts/{id}/read`                  | ⬜ Chưa đánh giá |                                |
-| Acknowledge alert       | `POST /api/mobile/alerts/{id}/acknowledge`           | ⬜ Chưa đánh giá |                                |
-| Notification settings   | `GET/PUT /api/mobile/notification-settings`          | ⬜ Chưa đánh giá |                                |
+| Feature             | API Endpoint                                                | Status      |
+| ------------------- | ----------------------------------------------------------- | ----------- |
+| View latest vitals  | `GET /api/mobile/patients/{id}/vital-signs/latest`          | ⬜ Not built |
+| View metric detail  | `GET /api/mobile/patients/{id}/vital-signs/{metric}/detail` | ⬜ Not built |
+| View health history | `GET /api/mobile/patients/{id}/vital-signs/history`         | ⬜ Not built |
 
-**Files liên quan**:
+> ⚠️ Both `lib/features/health_monitoring/` and backend are **empty**
 
-- **Backend**: `backend/app/api/notifications/`, `backend/app/services/notification_service.py`
-- **Mobile**: `lib/features/` (shared across modules)
+---
+
+### 5. [EMERGENCY] Fall Detection & SOS (Sprint 3)
+
+> **SRS Ref**: UC010, UC011, UC014, UC015 | **JIRA**: EP09-FallDetect, EP10-SOS  
+> **Review Status**: ⬜ Not implemented
+
+| Feature             | API Endpoint                                    | Status      |
+| ------------------- | ----------------------------------------------- | ----------- |
+| Confirm fall (safe) | `POST /api/mobile/fall-events/{id}/confirm`     | ⬜ Not built |
+| Trigger SOS (auto)  | `POST /api/mobile/fall-events/{id}/trigger-sos` | ⬜ Not built |
+| Manual SOS          | `POST /api/mobile/sos/manual-trigger`           | ⬜ Not built |
+| Cancel SOS          | `POST /api/mobile/sos/{id}/cancel`              | ⬜ Not built |
+| Active SOS list     | `GET /api/mobile/sos/active`                    | ⬜ Not built |
+| SOS detail          | `GET /api/mobile/sos/{id}`                      | ⬜ Not built |
+| Respond to SOS      | `POST /api/mobile/sos/{id}/respond`             | ⬜ Not built |
+| Resolve SOS         | `POST /api/mobile/sos/{id}/resolve`             | ⬜ Not built |
+
+> ⚠️ Both `lib/features/emergency/` and backend are **empty**
+
+---
+
+### 6. [NOTIFICATION] Alerts & Emergency Contacts (Sprint 3)
+
+> **SRS Ref**: UC030, UC031 | **JIRA**: EP11-Notification  
+> **Review Status**: ⬜ Not implemented
+
+| Feature                 | API Endpoint                                         | Status      |
+| ----------------------- | ---------------------------------------------------- | ----------- |
+| CRUD Emergency Contacts | `GET/POST/PUT/DELETE /api/mobile/emergency-contacts` | ⬜ Not built |
+| List alerts             | `GET /api/mobile/alerts`                             | ⬜ Not built |
+| Mark read               | `POST /api/mobile/alerts/{id}/read`                  | ⬜ Not built |
+| Acknowledge alert       | `POST /api/mobile/alerts/{id}/acknowledge`           | ⬜ Not built |
+| Notification settings   | `GET/PUT /api/mobile/notification-settings`          | ⬜ Not built |
 
 ---
 
 ### 7. [ANALYSIS] Risk Scoring & AI (Sprint 4)
 
-> **SRS Ref**: UC016, UC017 | **Trello**: Sprint 4 - Cards 1, 2
+> **SRS Ref**: UC016, UC017 | **JIRA**: EP13-RiskScore  
+> **Review Status**: ⬜ Not implemented
 
-| Chức năng         | API Endpoint                                       | Trạng thái       | Ghi chú                  |
-| ----------------- | -------------------------------------------------- | ---------------- | ------------------------ |
-| Latest risk score | `GET /api/mobile/patients/{id}/risk-score/latest`  | ⬜ Chưa đánh giá | Cache 1h, XGBoost model  |
-| Risk history      | `GET /api/mobile/patients/{id}/risk-score/history` | ⬜ Chưa đánh giá |                          |
-| Risk detail       | `GET /api/mobile/risk-scores/{id}`                 | ⬜ Chưa đánh giá | SHAP explainer           |
-| AI Risk Scoring   | `POST /ai/risk-scoring` (internal)                 | ⬜ Chưa đánh giá | 22 features, score 0-100 |
-
-**Files liên quan**:
-
-- **Backend**: `backend/app/api/analysis/`, `backend/app/services/risk_service.py`
-- **Mobile**: `lib/features/` (risk report screens)
+| Feature           | API Endpoint                                       | Status      |
+| ----------------- | -------------------------------------------------- | ----------- |
+| Latest risk score | `GET /api/mobile/patients/{id}/risk-score/latest`  | ⬜ Not built |
+| Risk history      | `GET /api/mobile/patients/{id}/risk-score/history` | ⬜ Not built |
+| Risk detail       | `GET /api/mobile/risk-scores/{id}`                 | ⬜ Not built |
+| AI Risk Scoring   | `POST /ai/risk-scoring` (internal)                 | ⬜ Not built |
 
 ---
 
-### 8. [SLEEP] Phân tích giấc ngủ (Sprint 4)
+### 8. [SLEEP] Sleep Analysis (Sprint 4)
 
-> **SRS Ref**: UC020, UC021 | **Trello**: Sprint 4 - Cards 3, 4
+> **SRS Ref**: UC020, UC021 | **JIRA**: EP14-Sleep  
+> **Review Status**: ⬜ Not implemented
 
-| Chức năng           | API Endpoint                | Trạng thái | Ghi chú |
-| ------------------- | --------------------------- | ---------- | ------- |
-| Latest sleep report | `GET /api/mobile/patients/{ |
+| Feature             | API Endpoint                                  | Status      |
+| ------------------- | --------------------------------------------- | ----------- |
+| Latest sleep report | `GET /api/mobile/patients/{id}/sleep/latest`  | ⬜ Not built |
+| Sleep history       | `GET /api/mobile/patients/{id}/sleep/history` | ⬜ Not built |
 
-> **Review Status**: ✅ Partial (Auth module reviewed)
+> ⚠️ `lib/features/sleep_analysis/` and backend are **empty**
 
-| Chức năng             | Trạng thái | Ghi chú                                                                |
-| --------------------- | ---------- | ---------------------------------------------------------------------- |
-| FastAPI project setup | ✅ Done    | SQLAlchemy + PostgreSQL, Clean Architecture (Route→Service→Repository) |
-| CORS middleware       | ⚠️ Done    | Configured in main.py (allow_origins=["*"] - cần fix)                  |
-| Logging               | ✅ Done    | Audit logs cho auth actions (IP, user agent, details)                  |
-| Environment variables | ✅ Done    | DB_URL, SECRET_KEY (validated), SMTP config                            |
-| Health check          | ✅ Done    | `GET /health` endpoint                                                 |
-| Auto-generated docs   | ⚠️ Done    | FastAPI Swagger available but not explicitly enabled in docs           |
-| JWT Security          | ✅ Done    | Issuer validation, access + refresh tokens, client-side validation     |
-| Rate Limiting         | ✅ Done    | In-memory (login: 5/15min, resend: 3/15min) - cần migrate Redis        |
+## Update History
 
-**Files liên quan**:
-
-- **Backend**: `backend/app/core/config.py`, `backend/app/db/database.py`, `backend/app/main.py`
-- **Security**: `backend/app/utils/jwt.py`, `backend/app/utils/rate_limiter.py`
-- **Tests**: `backend/tests/test_auth_service.py` (15 comprehensive unit tests)
-  | Chức năng | Trạng thái | Ghi chú |
-  |-----------|------------|---------|
-  | FastAPI project setup | ⬜ Chưa đánh giá | SQLAlchemy + PostgreSQL |
-  | CORS middleware | ⬜ Chưa đánh giá | Allow Mobile App origins |
-  | Logging | ⬜ Chưa đánh giá | File + console |
-  | Environment variables | ⬜ Chưa đánh giá | DB_URL, JWT_SECRET (chung), PORT |
-  | Health check | ⬜ Chưa đánh giá | `GET /health`|
-  | Auto-generated docs | ⬜ Chưa đánh giá | FastAPI Swagger at`/docs` |
-
-**Files liên quan**:
-
-- **Backend**: `backend/app/core/`, `backend/app/db/`, `backend/app/main.py`
-
----
-
-## 📝 Hướng Dẫn Sử Dụng
-
-### Đánh giá tổng quan
-
-Gọi: `@tongquan Project_Structure REVIEW_MOBILE`
-
-### Đánh giá chức năng cụ thể
-
-Gọi: `@danhgiachitiet [Tên chức năng]`
-
-**Ví dụ**:
-
-- `@danhgiachitiet AUTH Login (Patient/Caregiver)`
-- `@danhgiachitiet DEVICE Quản lý thiết bị IoT`
-- `@danhgiachitiet EMERGENCY Phát hiện té ngã & SOS`
-- `@danhgiachitiet MONITORING Theo dõi sức khỏe`
-- `@danhgiachitiet SLEEP Phân tích giấc ngủ`
-
----
-
-## 🔄 Lịch Sử Cập Nhật
-
-| Ngày       | Phiên bản | Nội dung                                                                                                            |
-| ---------- | --------- | ------------------------------------------------------------------------------------------------------------------- |
-| 04/03/2026 | v1.2      | Cập nhật AUTH 82/100, Forgot/Reset/Change Password UI complete, jwt_decode dependency, 15 tests, CORS/docs warnings |
-| 04/03/2026 | v1.1      | Cập nhật trạng thái AUTH sau review v3 (78/100), thêm chi tiết deep link integration, rate limiting, audit logging  |
-| 03/03/2026 | v1.0      | Khởi tạo Project Structure dựa trên Sprint 1-4                                                                      |
-| 03/03/2026 | v1.0      | Khởi tạo Project Structure dựa trên Sprint 1-4                                                                      |
+| Date       | Version | Changes                                                                                    |
+| ---------- | ------- | ------------------------------------------------------------------------------------------ |
+| 04/03/2026 | v2.0    | CHECK scan: Trello→JIRA, accurate LOC, 7/8 modules confirmed NOT implemented, tree updated |
+| 04/03/2026 | v1.2    | AUTH 82/100, Forgot/Reset/Change PWD UI, jwt_decode dependency, 15 tests                   |
+| 04/03/2026 | v1.1    | AUTH after review v3 (78/100), deep link integration, rate limiting, audit logging         |
+| 03/03/2026 | v1.0    | Initial creation based on Sprint 1-4                                                       |

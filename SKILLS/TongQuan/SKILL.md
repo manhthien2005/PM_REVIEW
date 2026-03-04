@@ -7,7 +7,7 @@ date_added: "2026-03-03"
 date_updated: "2026-03-04"
 ---
 
-# 🔍 Skill: Project Overview Assessment (TongQuan)
+# Skill: Project Overview Assessment (TongQuan)
 
 ## Purpose
 
@@ -21,7 +21,7 @@ Automatically activates when the user wants to:
 - Review progress against JIRA sprints (Epics & Stories)
 - Report the project status to stakeholders
 
-## ⚡ Context Loading Protocol (MANDATORY)
+## Context Loading Protocol (MANDATORY)
 
 > [!IMPORTANT]
 > The Agent MUST strictly follow this 3-tier loading protocol to optimize token limits and prevent getting lost in context.
@@ -55,64 +55,86 @@ Automatically activates when the user wants to:
 **Step 3:** Evaluate against 6 Criteria: SRS Compliance, Architecture, Consistency, Progress vs JIRA, Code Quality, Security. **READ `references/evaluation-criteria.md` for specific check details.**
 **Step 4:** Cross-check with JIRA Stories from the JIRA Index.
 
-## 📁 Output File Protocol (MANDATORY)
+## Output File Protocol (MANDATORY)
 
 ### File Naming Convention
 The review file MUST follow this naming pattern:
 ```
-TONGQUAN_{DỰ_ÁN}_review.md
+TONGQUAN_{PROJECT}_review.md
 ```
-- **DỰ_ÁN**: Tên dự án, UPPERCASE (ví dụ: `ADMIN`, `MOBILE`)
-- Nếu đánh giá cả hai dự án → tạo 2 file riêng biệt hoặc `TONGQUAN_ALL_review.md`
+- **PROJECT**: Project name, UPPERCASE (e.g., `ADMIN`, `MOBILE`)
+- If reviewing both projects → create 2 separate files or `TONGQUAN_ALL_review.md`
 
 ### Output Location
 - Admin project → `PM_REVIEW/REVIEW_ADMIN/TONGQUAN_ADMIN_review.md`
 - Mobile project → `PM_REVIEW/REVIEW_MOBILE/TONGQUAN_MOBILE_review.md`
 
 ### Examples
-| User yêu cầu                     | File output                               |
-| -------------------------------- | ----------------------------------------- |
-| "Đánh giá tổng quan dự án Admin" | `REVIEW_ADMIN/TONGQUAN_ADMIN_review.md`   |
-| "Đánh giá tổng quan Mobile"      | `REVIEW_MOBILE/TONGQUAN_MOBILE_review.md` |
+| User Request                            | File Output                               |
+| --------------------------------------- | ----------------------------------------- |
+| "Overview assessment for Admin project" | `REVIEW_ADMIN/TONGQUAN_ADMIN_review.md`   |
+| "Overview assessment for Mobile"        | `REVIEW_MOBILE/TONGQUAN_MOBILE_review.md` |
 
-## 🔄 Re-review Protocol (Khi review lần 2+)
+## Re-review Protocol (2nd review and beyond)
 
 > [!IMPORTANT]
-> Trước khi bắt đầu review, AI PHẢI kiểm tra xem đã có file review cũ hay chưa. Nếu có → thực hiện so sánh.
+> Before starting a review, the AI MUST check if a previous review file already exists. If found → perform comparison.
 
-### Bước 1: Tìm file review cũ
-1. Xác định tên file theo **Output File Protocol** ở trên.
-2. Kiểm tra file đó có tồn tại tại `REVIEW_ADMIN/` hoặc `REVIEW_MOBILE/` hay không.
+### Step 1: Find previous review file
+1. Determine the filename using the **Output File Protocol** above.
+2. Check if the file exists in `REVIEW_ADMIN/` or `REVIEW_MOBILE/`.
 
-### Bước 2: Đọc file review cũ (nếu tồn tại)
-3. Đọc file review cũ và trích xuất:
-   - **Điểm cũ**: Tổng điểm + điểm từng tiêu chí.
-   - **Nhược điểm cũ**: Danh sách tất cả nhược điểm.
-   - **Khuyến nghị cũ**: Danh sách khuyến nghị hành động.
-   - **Ngày đánh giá cũ**: Từ phần "Thông tin chung".
-   - **Lần đánh giá cũ**: Từ phần "Thông tin chung" (nếu có).
+### Step 2: Read previous review file (if exists)
+3. Read the old review file and extract:
+   - **Old score**: Total score + score per criterion.
+   - **Old weaknesses**: List of all weaknesses.
+   - **Old recommendations**: List of action recommendations.
+   - **Old review date**: From the "Thông tin chung" section.
+   - **Old review count**: From the "Thông tin chung" section (if present).
 
-### Bước 3: Thực hiện review mới bình thường
-4. Thực hiện review theo Evaluation Process ở trên (Step 1–4).
+### Step 3: Perform new review as normal
+4. Execute the review following the Evaluation Process above (Step 1–4).
 
-### Bước 4: So sánh & đánh giá thay đổi
-5. So sánh kết quả mới với dữ liệu trích xuất từ file cũ:
-   - Điểm tăng/giảm từng tiêu chí.
-   - Nhược điểm nào đã được **khắc phục** (có trong cũ, không còn trong mới).
-   - Nhược điểm nào **vẫn tồn tại** (có trong cả cũ và mới).
-   - Nhược điểm nào **mới phát sinh** (không có trong cũ, xuất hiện trong mới).
+### Step 4: Compare and evaluate changes
+5. Compare new results with data extracted from the old file:
+   - Score increase/decrease per criterion.
+   - Weaknesses that have been **fixed** (present in old, absent in new).
+   - Weaknesses that **still exist** (present in both old and new).
+   - Weaknesses that are **newly introduced** (absent in old, present in new).
 
-### Bước 5: Ghi đè file cũ
-6. **GHI ĐÈ** file review cũ bằng báo cáo mới hoàn chỉnh, bao gồm section "🔄 SO SÁNH VỚI LẦN ĐÁNH GIÁ TRƯỚC" (theo template `references/report-template.md`).
-7. Tăng số **Lần đánh giá** lên 1.
+### Step 5: Overwrite old file
+6. **OVERWRITE** the old review file with the complete new report, including the "🔄 SO SÁNH VỚI LẦN ĐÁNH GIÁ TRƯỚC" section (per template `references/report-template.md`).
+7. Increment the **Lần đánh giá** counter by 1.
 
-### ⚠️ Lưu ý
-- Nếu **KHÔNG tìm thấy file cũ** → đây là lần review đầu tiên → KHÔNG thêm section so sánh, set `Lần đánh giá: 1`.
-- Nếu **CÓ file cũ** → BẮT BUỘC phải thêm section so sánh, tăng `Lần đánh giá`.
+### Important Notes
+- If **NO previous file found** → this is the first review → do NOT add comparison section, set `Lần đánh giá: 1`.
+- If **previous file found** → MUST add comparison section and increment `Lần đánh giá`.
 
 ## Output Formatting
 
 **MANDATORY:** You must use the Vietnamese markdown reporting template located at `references/report-template.md`. You must not deviate from this template.
+
+## After Review: Update MASTER_INDEX (MANDATORY)
+
+When the overview review concludes, you **MUST** update `MASTER_INDEX.md`:
+
+1. Set `Review Status` → ✅ Done (for each module assessed)
+2. Set `Score` → XX/100 (if individual module scores are given)
+3. Set `Quality` → Determined by score (see `DanhGiaChiTiet/references/evaluation-criteria.md` → Score Classification):
+   - **76–100** → ✅ Pass
+   - **51–75** → ⚠️ Needs Fix
+   - **0–50** → ❌ Fail
+4. Set `Review File` → Link to the overview review file (e.g., `[View](REVIEW_ADMIN/TONGQUAN_ADMIN_review.md)`)
+5. Set `Last Review` → Current date (ISO format)
+
+## Edge Cases
+
+| Scenario                                     | Action                                                                            |
+| -------------------------------------------- | --------------------------------------------------------------------------------- |
+| Summary file does not exist for a module     | Note as "Missing summary" in the report, skip detailed assessment for that module |
+| Source code folder is empty / not built      | Mark as "⬜ Not built" in report, score = N/A                                      |
+| MASTER_INDEX row missing for a module        | Add the row with available info                                                   |
+| Previous review file is corrupted/unreadable | Treat as first review, set `Lần đánh giá: 1`                                      |
 
 ## Reference Documents
 

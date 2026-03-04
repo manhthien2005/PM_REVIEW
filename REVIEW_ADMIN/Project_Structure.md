@@ -49,13 +49,13 @@ HealthGuard/
 ### 1. [AUTH] Xác thực & Phân quyền (Sprint 1)
 > **SRS Ref**: UC001-UC004 | **Trello**: Sprint 1 - Cards 3, 4, 5, 6
 
-| Chức năng | API Endpoint | Trạng thái | Ghi chú |
-|-----------|-------------|------------|---------|
-| Login (Admin) | `POST /api/auth/login` | ⬜ Chưa đánh giá | JWT issuer: `healthguard-admin`, expiry 8h |
-| Tạo user (bởi Admin) | `POST /api/users` | ⬜ Chưa đánh giá | Require ADMIN JWT, `is_verified=true` |
-| Forgot Password | `POST /api/auth/forgot-password` | ⬜ Chưa đánh giá | Token 15 phút, rate limit 3/15min |
-| Reset Password | `POST /api/auth/reset-password` | ⬜ Chưa đánh giá | Token one-time use |
-| Change Password | `POST /api/auth/change-password` | ⬜ Chưa đánh giá | Require JWT, rate limit 5/15min |
+| Chức năng            | API Endpoint                     | Trạng thái      | Ghi chú                                    |
+| -------------------- | -------------------------------- | --------------- | ------------------------------------------ |
+| Login (Admin)        | `POST /api/auth/login`           | ⬜ Chưa đánh giá | JWT issuer: `healthguard-admin`, expiry 8h |
+| Tạo user (bởi Admin) | `POST /api/users`                | ⬜ Chưa đánh giá | Require ADMIN JWT, `is_verified=true`      |
+| Forgot Password      | `POST /api/auth/forgot-password` | ⬜ Chưa đánh giá | Token 15 phút, rate limit 3/15min          |
+| Reset Password       | `POST /api/auth/reset-password`  | ⬜ Chưa đánh giá | Token one-time use                         |
+| Change Password      | `POST /api/auth/change-password` | ⬜ Chưa đánh giá | Require JWT, rate limit 5/15min            |
 
 **Files liên quan**:
 - `backend/src/controllers/auth.controller.ts`
@@ -69,14 +69,14 @@ HealthGuard/
 ### 2. [ADMIN] Quản lý Users (Sprint 4)
 > **SRS Ref**: UC022 | **Trello**: Sprint 4 - Card 5
 
-| Chức năng | API Endpoint | Trạng thái | Ghi chú |
-|-----------|-------------|------------|---------|
-| List users | `GET /api/admin/users` | ⬜ Chưa đánh giá | Search, filter, paginate |
-| Create user | `POST /api/admin/users` | ⬜ Chưa đánh giá | ADMIN role only |
-| User detail | `GET /api/admin/users/{id}` | ⬜ Chưa đánh giá | |
-| Update user | `PUT /api/admin/users/{id}` | ⬜ Chưa đánh giá | |
-| Delete user | `DELETE /api/admin/users/{id}` | ⬜ Chưa đánh giá | Soft delete |
-| Lock/Unlock | `POST /api/admin/users/{id}/lock` | ⬜ Chưa đánh giá | Audit log |
+| Chức năng   | API Endpoint                      | Trạng thái      | Ghi chú                  |
+| ----------- | --------------------------------- | --------------- | ------------------------ |
+| List users  | `GET /api/admin/users`            | ⬜ Chưa đánh giá | Search, filter, paginate |
+| Create user | `POST /api/admin/users`           | ⬜ Chưa đánh giá | ADMIN role only          |
+| User detail | `GET /api/admin/users/{id}`       | ⬜ Chưa đánh giá |                          |
+| Update user | `PUT /api/admin/users/{id}`       | ⬜ Chưa đánh giá |                          |
+| Delete user | `DELETE /api/admin/users/{id}`    | ⬜ Chưa đánh giá | Soft delete              |
+| Lock/Unlock | `POST /api/admin/users/{id}/lock` | ⬜ Chưa đánh giá | Audit log                |
 
 **Files liên quan**:
 - `backend/src/controllers/user.controller.ts`
@@ -88,13 +88,13 @@ HealthGuard/
 ### 3. [ADMIN] Quản lý Devices (Sprint 4)
 > **SRS Ref**: UC025 | **Trello**: Sprint 4 - Card 6
 
-| Chức năng | API Endpoint | Trạng thái | Ghi chú |
-|-----------|-------------|------------|---------|
-| List devices | `GET /api/admin/devices` | ⬜ Chưa đánh giá | |
-| Device detail | `GET /api/admin/devices/{id}` | ⬜ Chưa đánh giá | |
-| Update device | `PUT /api/admin/devices/{id}` | ⬜ Chưa đánh giá | |
+| Chức năng     | API Endpoint                          | Trạng thái      | Ghi chú        |
+| ------------- | ------------------------------------- | --------------- | -------------- |
+| List devices  | `GET /api/admin/devices`              | ⬜ Chưa đánh giá |                |
+| Device detail | `GET /api/admin/devices/{id}`         | ⬜ Chưa đánh giá |                |
+| Update device | `PUT /api/admin/devices/{id}`         | ⬜ Chưa đánh giá |                |
 | Assign device | `POST /api/admin/devices/{id}/assign` | ⬜ Chưa đánh giá | Assign to user |
-| Lock device | `POST /api/admin/devices/{id}/lock` | ⬜ Chưa đánh giá | |
+| Lock device   | `POST /api/admin/devices/{id}/lock`   | ⬜ Chưa đánh giá |                |
 
 **Files liên quan**:
 - `backend/src/controllers/device.controller.ts`
@@ -106,10 +106,10 @@ HealthGuard/
 ### 4. [ADMIN] Cấu hình hệ thống (Sprint 4)
 > **SRS Ref**: UC024 | **Trello**: Sprint 4 - Card 7
 
-| Chức năng | API Endpoint | Trạng thái | Ghi chú |
-|-----------|-------------|------------|---------|
-| Get settings | `GET /api/admin/settings` | ⬜ Chưa đánh giá | Vital thresholds, AI config |
-| Update settings | `PUT /api/admin/settings` | ⬜ Chưa đánh giá | Cache on startup |
+| Chức năng       | API Endpoint              | Trạng thái      | Ghi chú                     |
+| --------------- | ------------------------- | --------------- | --------------------------- |
+| Get settings    | `GET /api/admin/settings` | ⬜ Chưa đánh giá | Vital thresholds, AI config |
+| Update settings | `PUT /api/admin/settings` | ⬜ Chưa đánh giá | Cache on startup            |
 
 **Files liên quan**:
 - `backend/src/controllers/settings.controller.ts`
@@ -121,10 +121,10 @@ HealthGuard/
 ### 5. [ADMIN] Xem System Logs (Sprint 4)
 > **SRS Ref**: UC026 | **Trello**: Sprint 4 - Card 8
 
-| Chức năng | API Endpoint | Trạng thái | Ghi chú |
-|-----------|-------------|------------|---------|
-| View logs | `GET /api/admin/logs` | ⬜ Chưa đánh giá | Filter, paginate |
-| Export CSV | `GET /api/admin/logs/export` | ⬜ Chưa đánh giá | |
+| Chức năng  | API Endpoint                 | Trạng thái      | Ghi chú          |
+| ---------- | ---------------------------- | --------------- | ---------------- |
+| View logs  | `GET /api/admin/logs`        | ⬜ Chưa đánh giá | Filter, paginate |
+| Export CSV | `GET /api/admin/logs/export` | ⬜ Chưa đánh giá |                  |
 
 **Files liên quan**:
 - `backend/src/controllers/logs.controller.ts`
@@ -136,15 +136,15 @@ HealthGuard/
 ### 6. [INFRA] Infrastructure Setup (Sprint 1)
 > **SRS Ref**: N/A | **Trello**: Sprint 1 - Cards 1, 2A
 
-| Chức năng | Trạng thái | Ghi chú |
-|-----------|------------|---------|
-| Database + TimescaleDB setup | ⬜ Chưa đánh giá | SQL SCRIPTS/ là source of truth |
-| Express + TypeScript project | ⬜ Chưa đánh giá | Prisma ORM |
-| CORS middleware | ⬜ Chưa đánh giá | Allow Admin Web origin |
-| Logging (file + console) | ⬜ Chưa đánh giá | |
-| Environment variables | ⬜ Chưa đánh giá | DB_URL, JWT_SECRET, PORT |
-| Health check endpoint | ⬜ Chưa đánh giá | `GET /health` |
-| Swagger docs | ⬜ Chưa đánh giá | swagger-jsdoc + swagger-ui-express |
+| Chức năng                    | Trạng thái      | Ghi chú                            |
+| ---------------------------- | --------------- | ---------------------------------- |
+| Database + TimescaleDB setup | ⬜ Chưa đánh giá | SQL SCRIPTS/ là source of truth    |
+| Express + TypeScript project | ⬜ Chưa đánh giá | Prisma ORM                         |
+| CORS middleware              | ⬜ Chưa đánh giá | Allow Admin Web origin             |
+| Logging (file + console)     | ⬜ Chưa đánh giá |                                    |
+| Environment variables        | ⬜ Chưa đánh giá | DB_URL, JWT_SECRET, PORT           |
+| Health check endpoint        | ⬜ Chưa đánh giá | `GET /health`                      |
+| Swagger docs                 | ⬜ Chưa đánh giá | swagger-jsdoc + swagger-ui-express |
 
 **Files liên quan**:
 - `backend/src/config/`
@@ -154,23 +154,8 @@ HealthGuard/
 
 ---
 
-## 📝 Hướng Dẫn Sử Dụng
-
-### Đánh giá tổng quan
-Gọi: `@tongquan Project_Structure REVIEW_ADMIN`
-
-### Đánh giá chức năng cụ thể
-Gọi: `@danhgiachitiet [Tên chức năng]`
-
-**Ví dụ**:
-- `@danhgiachitiet AUTH Login (Admin)`
-- `@danhgiachitiet ADMIN Quản lý Users`
-- `@danhgiachitiet INFRA Infrastructure Setup`
-
----
-
 ## 🔄 Lịch Sử Cập Nhật
 
-| Ngày | Phiên bản | Nội dung |
-|------|-----------|----------|
-| 03/03/2026 | v1.0 | Khởi tạo Project Structure dựa trên Sprint 1-4 |
+| Ngày       | Phiên bản | Nội dung                                       |
+| ---------- | --------- | ---------------------------------------------- |
+| 03/03/2026 | v1.0      | Khởi tạo Project Structure dựa trên Sprint 1-4 |

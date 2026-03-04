@@ -1,104 +1,72 @@
-# 🔬 MODULE SUMMARY: AUTH (Mobile)
+# AUTH (Mobile)
 
-> **Module**: AUTH — Authentication  
-> **Project**: Mobile App (health_system/)  
-> **Sprint**: Sprint 1  
-> **Trello Cards**: Card 3 (Login), Card 4 (Register), Card 5 (Forgot Password), Card 6 (Change Password)  
-> **UC References**: UC001, UC002, UC003, UC004
+> Sprint 1 | JIRA: EP04-Login, EP05-Register, EP12-Password | UC: UC001-UC004
 
----
+## Purpose & Technique
+- Login/Register/Forgot/Reset/Change Password for Patient & Caregiver roles
+- JWT auth (issuer: `healthguard-mobile`, access 30d + refresh token), bcrypt via passlib
+- Email verification via deep link (`healthguard://verify-email?token=xxx`), rate limiting (in-memory)
 
-## 📋 SRS Requirements (Extracted)
+## API Index
+| Endpoint                      | Method | Note                             |
+| ----------------------------- | ------ | -------------------------------- |
+| /api/auth/register            | POST   | Self-register, is_verified=false |
+| /api/auth/verify-email        | POST   | Deep link token verification     |
+| /api/auth/resend-verification | POST   | Rate limit 3/15min               |
+| /api/auth/login               | POST   | JWT + refresh token              |
+| /api/auth/refresh             | POST   | Refresh access token             |
+| /api/auth/forgot-password     | POST   | Reset token 15min, deep link     |
+| /api/auth/reset-password      | POST   | One-time use token               |
+| /api/auth/change-password     | POST   | Requires JWT, verify current pwd |
 
-### Functional Requirements
+## File Index
+| Path                                                       | Role                           |
+| ---------------------------------------------------------- | ------------------------------ |
+| backend/app/api/routes/auth.py                             | Auth routes (216 LOC)          |
+| backend/app/services/auth_service.py                       | AuthService class (764 LOC)    |
+| backend/app/schemas/auth.py                                | Pydantic schemas (35 LOC)      |
+| backend/app/models/user_model.py                           | User SQLAlchemy model (20 LOC) |
+| backend/app/models/audit_log_model.py                      | AuditLog model (18 LOC)        |
+| backend/app/repositories/user_repository.py                | UserRepository (66 LOC)        |
+| backend/app/repositories/audit_log_repository.py           | AuditLogRepository (45 LOC)    |
+| backend/app/utils/jwt.py                                   | JWT utils (112 LOC)            |
+| backend/app/utils/email_service.py                         | Email service (141 LOC)        |
+| backend/app/utils/password.py                              | Password hashing (8 LOC)       |
+| backend/app/utils/rate_limiter.py                          | Rate limiter (61 LOC)          |
+| backend/app/core/config.py                                 | Settings config (30 LOC)       |
+| backend/app/core/dependencies.py                           | Auth dependencies (70 LOC)     |
+| backend/tests/test_auth_service.py                         | Unit tests (15 tests)          |
+| lib/features/auth/screens/login_screen.dart                | Login UI (242 LOC)             |
+| lib/features/auth/screens/register_screen.dart             | Register UI (168 LOC)          |
+| lib/features/auth/screens/verify_email_screen.dart         | Verify email UI (322 LOC)      |
+| lib/features/auth/screens/forgot_password_screen.dart      | Forgot pwd UI (171 LOC)        |
+| lib/features/auth/screens/reset_password_screen.dart       | Reset pwd UI (461 LOC)         |
+| lib/features/auth/screens/change_password_screen.dart      | Change pwd UI (241 LOC)        |
+| lib/features/auth/screens/start_screen.dart                | Start/splash screen (179 LOC)  |
+| lib/features/auth/screens/email_verification_screen.dart   | Email verify UI (167 LOC)      |
+| lib/features/auth/screens/debug_verify_screen.dart         | Debug verify (244 LOC)         |
+| lib/features/auth/screens/debug_reset_password_screen.dart | Debug reset (228 LOC)          |
+| lib/features/auth/providers/auth_provider.dart             | Auth state mgmt (137 LOC)      |
+| lib/features/auth/repositories/auth_repository.dart        | API calls (110 LOC)            |
+| lib/features/auth/services/token_storage_service.dart      | Secure storage (25 LOC)        |
+| lib/features/auth/models/auth_response_model.dart          | Response model (54 LOC)        |
+| lib/features/auth/models/user_model.dart                   | User model (9 LOC)             |
+| lib/features/auth/widgets/auth_text_field.dart             | Custom text field (60 LOC)     |
 
-- **Login**: Patient/Caregiver login via email+password → JWT (`iss="healthguard-mobile"`, expiry **30 days** + refresh token, roles: PATIENT/CAREGIVER)
-- **Register**: Self-registration → `is_verified=false`, email verification required (JWT token, 24h expiry)
-- **Forgot Password**: Reset token (15min), rate limit 3/15min, one-time use, deep link: `app://reset-password?token=xxx`
-- **Change Password**: Require JWT, verify current password, rate limit 5/15min, email notification
+## Known Issues
+- 🔴 CORS: `allow_origins=["*"]` — security risk, must restrict
+- 🔴 Refresh token rotation not implemented
+- � Rate limiter is in-memory — needs Redis migration for production
+- 🟡 Swagger UI not explicitly enabled in docs config
 
-### Non-Functional Requirements
+## Cross-References
+| Type           | Ref                                    |
+| -------------- | -------------------------------------- |
+| DB Tables      | users, audit_logs                      |
+| UC Files       | BA/UC/Authentication/UC001-UC004       |
+| Related Module | REVIEW_ADMIN/summaries/AUTH_summary.md |
 
-- **Security**: JWT + refresh token, bcrypt/passlib, TLS, rate limiting
-- **Usability**: Large fonts, high contrast for elderly users (SRS §5.4)
-- **Audit**: Log all login attempts
-
----
-
-## 📌 Trello Checklist (Pre-Extracted)
-
-### Card 3 — Login (Mobile BE Dev)
-
-- [ ] `POST /api/auth/login` — Req: `{email, password}`, Res: `{access_token, refresh_token, token_type, user: {id, email, role, full_name}}`
-- [ ] bcrypt/passlib password verification
-- [ ] JWT: `iss="healthguard-mobile"`, roles PATIENT/CAREGIVER, expiry 30 days
-- [ ] Implement refresh token mechanism
-- [ ] Rate limiting: 5 attempts/15min per IP
-- [ ] Check `is_active` flag, update `last_login_at`
-- [ ] Log to `audit_logs`
-- [ ] Unit tests
-
-### Card 3 — Login (Mobile FE Dev)
-
-- [ ] Login screen (Flutter)
-- [ ] Form validation, call API, store JWT + refresh token (secure storage)
-- [ ] Navigate to dashboard, error handling, show/hide password, loading indicator
-
-### Card 4 — Register (Mobile BE Dev)
-
-- [ ] `POST /api/auth/register` — self-register for Patient/Caregiver
-- [ ] Create user with `is_verified=false`
-- [ ] Email verification token (JWT, 24h)
-- [ ] Send verification email (SMTP, mockable)
-- [ ] Validate: email format, uniqueness, password min 6 chars
-
-### Card 5 — Forgot Password (Mobile BE Dev)
-
-- [ ] `POST /api/auth/forgot-password` + `POST /api/auth/reset-password`
-- [ ] Deep link: `app://reset-password?token=xxx`
-- [ ] Token 15min, rate limit 3/15min, one-time use
-
-### Card 6 — Change Password (Mobile BE Dev)
-
-- [ ] `POST /api/auth/change-password` (require JWT)
-- [ ] Verify current password, validate new, email notification, rate limit 5/15min
-
----
-
-## 📂 Source Code Files
-
-### Backend (`health_system/backend/app/`)
-
-| File Path                  | Role                                |
-| -------------------------- | ----------------------------------- |
-| `api/auth/`                | Auth API routes                     |
-| `services/auth_service.py` | Auth business logic                 |
-| `core/`                    | Config, security, dependencies      |
-| `schemas/`                 | Pydantic schemas (request/response) |
-
-### Mobile (`health_system/lib/features/auth/`)
-
-| File Path        | Role                                                  |
-| ---------------- | ----------------------------------------------------- |
-| `features/auth/` | Auth feature module (9 children — Clean Architecture) |
-
----
-
-## 🔗 Cross-References
-
-| Type                 | Reference                                                                                                        |
-| -------------------- | ---------------------------------------------------------------------------------------------------------------- |
-| SRS Section          | §4.6.1-§4.6.4, §5.3 (Security — JWT independent secret, mobile issuer, refresh token rotation, token revocation) |
-| Use Case Files       | `BA/UC/Authentication/UC001-UC004`                                                                               |
-| DB Tables            | `users`, `audit_logs`                                                                                            |
-| Related Admin Module | `REVIEW_ADMIN/summaries/AUTH_summary.md`                                                                         |
-
----
-
-## 📊 Review Notes
-
-| Key            | Value                                                                |
-| -------------- | -------------------------------------------------------------------- |
-| Review Date    | 2026-03-04                                                           |
-| Score          | 78/100 (+18 từ review trước)                                         |
-| Reviewer Notes | Xem chi tiết: [AUTH_LOGIN_review_v3.md](../ AUTH_LOGIN_review_v3.md) |
+## Review
+| Date       | Score  | Detail                  |
+| ---------- | ------ | ----------------------- |
+| 2026-03-04 | 82/100 | AUTH_LOGIN_review_v2.md |
