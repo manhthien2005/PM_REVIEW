@@ -121,9 +121,10 @@ SELECT
     MIN(blood_pressure_dia) AS min_bp_dia,
     COUNT(*) AS sample_count
 FROM vitals
-GROUP BY bucket, device_id;
+GROUP BY bucket, device_id
+WITH NO DATA;
 
-COMMENT ON MATERIALIZED VIEW vitals_5min IS 'Continuous aggregate: vitals theo 5 phút (dùng cho charts trong app)';
+COMMENT ON VIEW vitals_5min IS 'Continuous aggregate: vitals theo 5 phút (dùng cho charts trong app)';
 
 -- Hourly aggregates (for history view)
 CREATE MATERIALIZED VIEW IF NOT EXISTS vitals_hourly
@@ -143,9 +144,10 @@ SELECT
     MIN(blood_pressure_dia) AS min_bp_dia,
     COUNT(*) AS sample_count
 FROM vitals
-GROUP BY bucket, device_id;
+GROUP BY bucket, device_id
+WITH NO DATA;
 
-COMMENT ON MATERIALIZED VIEW vitals_hourly IS 'Continuous aggregate: vitals theo giờ (dùng cho lịch sử 1 tuần, 1 tháng)';
+COMMENT ON VIEW vitals_hourly IS 'Continuous aggregate: vitals theo giờ (dùng cho lịch sử 1 tuần, 1 tháng)';
 
 -- Daily aggregates (for long-term trends)
 CREATE MATERIALIZED VIEW IF NOT EXISTS vitals_daily
@@ -165,9 +167,10 @@ SELECT
     MIN(blood_pressure_dia) AS min_bp_dia,
     COUNT(*) AS sample_count
 FROM vitals
-GROUP BY bucket, device_id;
+GROUP BY bucket, device_id
+WITH NO DATA;
 
-COMMENT ON MATERIALIZED VIEW vitals_daily IS 'Continuous aggregate: vitals theo ngày (dùng cho trends dài hạn)';
+COMMENT ON VIEW vitals_daily IS 'Continuous aggregate: vitals theo ngày (dùng cho trends dài hạn)';
 
 -- Print confirmation
 DO $$
