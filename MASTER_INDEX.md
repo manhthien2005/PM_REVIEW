@@ -63,6 +63,19 @@
 
 ---
 
+## SKILLS INDEX
+
+| #   | Skill              | Path                               | Purpose                                                  |
+| --- | ------------------ | ---------------------------------- | -------------------------------------------------------- |
+| 1   | **CHECK**          | `PM_REVIEW/SKILLS/CHECK/`          | Quick module summary scan & update                       |
+| 2   | **TongQuan**       | `PM_REVIEW/SKILLS/TongQuan/`       | Overview review of project modules                       |
+| 3   | **DanhGiaChiTiet** | `PM_REVIEW/SKILLS/DanhGiaChiTiet/` | Detailed code review per module                          |
+| 4   | **SRS_AGENT**      | `PM_REVIEW/SKILLS/SRS_AGENT/`      | SRS analysis and requirement tracing                     |
+| 5   | **UC_AUDIT**       | `PM_REVIEW/SKILLS/UC_AUDIT/`       | Batch audit UCs, cross-check UC↔SQL↔JIRA                 |
+| 6   | **TEST_CASE_GEN**  | `PM_REVIEW/SKILLS/TEST_CASE_GEN/`  | Generate test cases from UC/SRS/SQL/API; execute & track |
+
+---
+
 ## HOW TO USE THIS INDEX
 
 ### For TongQuan (Overview Review)
