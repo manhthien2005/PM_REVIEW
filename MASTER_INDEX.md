@@ -1,6 +1,6 @@
 # MASTER INDEX — HealthGuard Project Review
 
-> **Last Updated**: 2026-03-04  
+> **Last Updated**: 2026-03-05  
 > **Purpose**: AI navigation map — READ THIS FIRST before any review task  
 > **Usage**: AI reads this file → identifies target module → reads only the relevant summary file
 
@@ -21,14 +21,14 @@
 
 ## MODULE INDEX — ADMIN (HealthGuard/)
 
-| #   | Module                                                                      | Sprint | UC Refs     | Summary File                                                            | Review Status | Score  | Quality     | Review File                         | Last Review |
-| --- | --------------------------------------------------------------------------- | ------ | ----------- | ----------------------------------------------------------------------- | ------------- | ------ | ----------- | ----------------------------------- | ----------- |
-| 1   | **AUTH** — Login, Register, Forgot/Reset/Change Password                    | S1     | UC001-UC004 | [AUTH_summary.md](REVIEW_ADMIN/summaries/AUTH_summary.md)               | ✅ Done        | 58/100 | ⚠️ Needs Fix | [View](REVIEW_ADMIN/AUTH_review.md) | 2026-03-03  |
-| 2   | **ADMIN_USERS** — CRUD Users, Lock/Unlock                                   | S4     | UC022       | [ADMIN_USERS_summary.md](REVIEW_ADMIN/summaries/ADMIN_USERS_summary.md) | ⬜ Pending     | —      | —           | —                                   | —           |
-| 3   | **DEVICES** — List, Detail, Update, Assign, Lock Devices                    | S4     | UC025       | [DEVICES_summary.md](REVIEW_ADMIN/summaries/DEVICES_summary.md)         | ⬜ Pending     | —      | —           | —                                   | —           |
-| 4   | **CONFIG** — System Settings (Thresholds, AI config)                        | S4     | UC024       | [CONFIG_summary.md](REVIEW_ADMIN/summaries/CONFIG_summary.md)           | ⬜ Pending     | —      | —           | —                                   | —           |
-| 5   | **LOGS** — View/Export System Logs                                          | S4     | UC026       | [LOGS_summary.md](REVIEW_ADMIN/summaries/LOGS_summary.md)               | ⬜ Pending     | —      | —           | —                                   | —           |
-| 6   | **INFRA** — DB Setup, Express Project, CORS, Logging, Health Check, Swagger | S1     | N/A         | [INFRA_summary.md](REVIEW_ADMIN/summaries/INFRA_summary.md)             | ⬜ Pending     | —      | —           | —                                   | —           |
+| #   | Module                                                                      | Sprint | UC Refs     | Summary File                                                            | Review Status | Score  | Quality      | Review File                         | Last Review |
+| --- | --------------------------------------------------------------------------- | ------ | ----------- | ----------------------------------------------------------------------- | ------------- | ------ | ------------ | ----------------------------------- | ----------- |
+| 1   | **AUTH** — Login, Register, Forgot/Reset/Change Password, Email Verify       | S1     | UC001-UC004 | [AUTH_summary.md](REVIEW_ADMIN/summaries/AUTH_summary.md)               | ✅ Done       | 80/100 | ✅ Pass      | [View](REVIEW_ADMIN/AUTH_review.md) | 2026-03-05  |
+| 2   | **ADMIN_USERS** — CRUD Users, Lock/Unlock                                   | S4     | UC022       | [ADMIN_USERS_summary.md](REVIEW_ADMIN/summaries/ADMIN_USERS_summary.md) | ⬜ Pending    | —      | —            | —                                   | —           |
+| 3   | **DEVICES** — List, Detail, Update, Assign, Lock Devices                    | S4     | UC025       | [DEVICES_summary.md](REVIEW_ADMIN/summaries/DEVICES_summary.md)         | ⬜ Not built  | —      | —            | —                                   | —           |
+| 4   | **CONFIG** — System Settings (Thresholds, AI config)                        | S4     | UC024       | [CONFIG_summary.md](REVIEW_ADMIN/summaries/CONFIG_summary.md)           | ⬜ Not built  | —      | —            | —                                   | —           |
+| 5   | **LOGS** — View/Export System Logs                                          | S4     | UC026       | [LOGS_summary.md](REVIEW_ADMIN/summaries/LOGS_summary.md)               | ⬜ Not built  | —      | —            | —                                   | —           |
+| 6   | **INFRA** — DB Setup, Express Project, CORS, Health Check, Swagger          | S1     | N/A         | [INFRA_summary.md](REVIEW_ADMIN/summaries/INFRA_summary.md)             | ⬜ Pending    | —      | —            | —                                   | —           |
 
 ---
 
@@ -49,17 +49,16 @@
 
 ## REFERENCE FILES
 
-| Type             | Path                                                                        | Lines | Description                                       |
-| ---------------- | --------------------------------------------------------------------------- | ----- | ------------------------------------------------- |
-| **SRS Index**    | `PM_REVIEW/Resources/SRS_INDEX.md`                                          | ~130  | **AI quick-reference** — read BEFORE full SRS     |
-| SRS (Full)       | `PM_REVIEW/Resources/SOFTWARE REQUIREMENTS SPECIFICATION (SRS) v1.0 (2).md` | 382   | Full SRS document — read only when detail missing |
-| JIRA Index       | `PM_REVIEW/Resources/TASK/JIRA/README.md`                                   | 73    | 16 Epics, 61 Stories — AI quick lookup            |
-| JIRA CSV         | `PM_REVIEW/Resources/TASK/JIRA/JIRA_IMPORT_ALL.csv`                         | —     | Full CSV for Jira import                          |
-| Admin Structure  | `PM_REVIEW/REVIEW_ADMIN/Project_Structure.md`                               | 177   | Admin project module map                          |
-| Mobile Structure | `PM_REVIEW/REVIEW_MOBILE/Project_Structure.md`                              | ~230  | Mobile project module map                         |
-| Use Cases        | `PM_REVIEW/Resources/UC/`                                                   | —     | Detailed use case specs per module                |
-| SQL Scripts      | `PM_REVIEW/SQL SCRIPTS/`                                                    | —     | Database schema directory                         |
-| DB Summary       | `PM_REVIEW/SQL SCRIPTS/README.md`                                           | 513   | Database overview, tables, and architecture       |
+| Type             | Path                                                                        | Lines | Description                                 |
+| ---------------- | --------------------------------------------------------------------------- | ----- | ------------------------------------------- |
+| SRS              | `PM_REVIEW/Resources/SOFTWARE REQUIREMENTS SPECIFICATION (SRS) v1.0 (2).md` | 346   | Full SRS document                           |
+| JIRA Index       | `PM_REVIEW/Resources/TASK/JIRA/README.md`                                   | 137   | 16 Epics, 61 Stories — AI quick lookup      |
+| JIRA CSV         | `PM_REVIEW/Resources/TASK/JIRA/JIRA_IMPORT_ALL.csv`                         | —     | Full CSV for Jira import                    |
+| Admin Structure  | `PM_REVIEW/REVIEW_ADMIN/Project_Structure.md`                               | ~160  | Admin project module map                    |
+| Mobile Structure | `PM_REVIEW/REVIEW_MOBILE/Project_Structure.md`                              | ~230  | Mobile project module map                   |
+| Use Cases        | `BA/UC/`                                                                    | —     | Detailed use case specs per module          |
+| SQL Scripts      | `PM_REVIEW/SQL SCRIPTS/`                                                    | —     | Database schema directory                   |
+| DB Summary       | `PM_REVIEW/SQL SCRIPTS/README.md`                                           | 513   | Database overview, tables, and architecture |
 
 ---
 
@@ -103,9 +102,9 @@
 
 ## Update History
 
-| Date       | Version | Changes                                                                      |
-| ---------- | ------- | ---------------------------------------------------------------------------- |
-| 2026-03-05 | v2.2    | Added SRS_INDEX.md to REFERENCE FILES; updated AI rules to use SRS_INDEX     |
-| 2026-03-04 | v2.1    | Added Quality Status + Review File columns; score classification (≥76 Pass)  |
-| 2026-03-04 | v2.0    | CHECK scan: Trello→JIRA, MOBILE 7/8 modules confirmed NOT built, AUTH 82/100 |
-| 2026-03-03 | v1.0    | Initial creation with 14 module summaries                                    |
+| Date       | Version | Changes                                                                                     |
+| ---------- | ------- | ------------------------------------------------------------------------------------------- |
+| 2026-03-05 | v2.2    | CHECK ADMIN: corrected routes, folder structure, Trello→JIRA, summaries → new template      |
+| 2026-03-04 | v2.1    | Added Quality Status + Review File columns; score classification (≥76 Pass)                 |
+| 2026-03-04 | v2.0    | CHECK scan: Trello→JIRA, MOBILE 7/8 modules confirmed NOT built, AUTH 82/100               |
+| 2026-03-03 | v1.0    | Initial creation with 14 module summaries                                                   |

@@ -1,84 +1,38 @@
-# 🔬 MODULE SUMMARY: ADMIN_USERS (Admin)
+# ADMIN_USERS (Admin)
 
-> **Module**: ADMIN_USERS — User Management  
-> **Project**: Admin Website (HealthGuard/)  
-> **Sprint**: Sprint 4  
-> **Trello Cards**: Sprint 4, Card 5  
-> **UC References**: UC022
+> Sprint 4 | JIRA: EP15-AdminManage | UC: UC022
 
----
+## Purpose & Technique
+- Admin can manage all system users: list (search/filter/paginate), create, view detail, update, soft-delete, lock/unlock
+- All mutations require ADMIN JWT; soft-delete requires admin password confirmation; lock is toggle (cannot lock self)
+- All admin actions logged to `audit_logs` table
 
-## 📋 SRS Requirements (Extracted)
+## API Index
+| Endpoint               | Method | Note                                    |
+| ---------------------- | ------ | --------------------------------------- |
+| /api/users             | GET    | List users; search, filter, paginate    |
+| /api/users             | POST   | Create user (ADMIN only)                |
+| /api/users/{id}        | GET    | User detail                             |
+| /api/users/{id}        | PUT    | Update user (email not changeable)      |
+| /api/users/{id}        | DELETE | Soft delete; requires admin password    |
+| /api/users/{id}/lock   | PATCH  | Toggle lock/unlock; cannot lock self    |
 
-### Functional Requirements
-- Admin can manage all users in the system (CRUD + Lock/Unlock)
-- Search, filter, and paginate user list
-- Soft delete (not hard delete)
-- All admin actions must be logged to `audit_logs`
-- Only ADMIN role can access user management
+## File Index
+| Path                                              | Role                               |
+| ------------------------------------------------- | ---------------------------------- |
+| backend/src/controllers/userController.ts         | All user route handlers (15KB)     |
+| backend/src/services/userService.ts               | User CRUD + lock business logic (11.3KB) |
+| backend/src/routes/userRoutes.ts                  | Route definitions (0.6KB)          |
+| frontend/src/pages/admin/UserManagementPage.tsx   | User management UI page (15KB)     |
+| frontend/src/components/users/UserTable.tsx       | Table with search/pagination (10.8KB) |
+| frontend/src/components/users/UserFormModal.tsx   | Add/Edit user modal (21.3KB)       |
+| frontend/src/components/users/DeleteConfirmModal.tsx | Delete confirmation (4.5KB)    |
+| frontend/src/components/users/LockConfirmModal.tsx| Lock confirmation modal (3.2KB)    |
+| frontend/src/services/userService.ts              | Frontend user API calls (2.6KB)    |
+| frontend/src/types/user.ts                        | User TypeScript types (1.9KB)      |
 
-### Non-Functional Requirements
-- **Security**: ADMIN role-only access, audit trail for all mutations
-- **Usability**: Dashboard with table view, search, filters, pagination
-
----
-
-## 📌 Trello Checklist (Pre-Extracted)
-
-### Card 5 — Manage Users (Admin BE Dev)
-- [ ] `GET /api/admin/users` — list, search, filter, paginate
-- [ ] `POST /api/admin/users` — create user
-- [ ] `GET /api/admin/users/{id}` — user detail
-- [ ] `PUT /api/admin/users/{id}` — update user
-- [ ] `DELETE /api/admin/users/{id}` — soft delete
-- [ ] `POST /api/admin/users/{id}/lock` — lock/unlock user
-- [ ] Permission check: ADMIN role only
-- [ ] Audit log: record all actions
-
-### Card 5 — Manage Users (Admin FE Dev)
-- [ ] "Manage Users" page: table with search, filters, pagination
-- [ ] Add/Edit user modals
-- [ ] Delete confirmation dialog
-- [ ] Lock/Unlock toggle
-
-### Acceptance Criteria
-- [ ] CRUD operations work correctly
-- [ ] Search/filter/pagination functional
-- [ ] Permission enforced (ADMIN only)
-- [ ] Audit logs generated for all mutations
-
----
-
-## 📂 Source Code Files
-
-### Backend (`HealthGuard/backend/src/`)
-| File Path | Role |
-|-----------|------|
-| `controllers/user.controller.ts` | Route handlers for user CRUD |
-| `services/user.service.ts` | Business logic for user management |
-| `middleware/auth.middleware.ts` | JWT + role check (shared with AUTH) |
-
-### Frontend (`HealthGuard/frontend/src/`)
-| File Path | Role |
-|-----------|------|
-| `pages/ManageUsers.tsx` | User management page |
-
----
-
-## 🔗 Cross-References
-
-| Type | Reference |
-|------|-----------|
-| SRS Section | §2.3 (User types), §4.1 (Actors — Admin role) |
-| Use Case Files | `BA/UC/Admin/UC022_ManageUsers.md` |
-| DB Tables | `users`, `audit_logs` |
-| Trello | Sprint 4, Card 5 |
-
----
-
-## 📊 Review Notes
-| Key | Value |
-|-----|-------|
-| Review Date | — |
-| Score | —/100 |
-| Reviewer Notes | — |
+## Cross-References
+| Type      | Ref                                  |
+| --------- | ------------------------------------ |
+| DB Tables | users, audit_logs                    |
+| UC Files  | BA/UC/Admin/UC022_ManageUsers.md     |
