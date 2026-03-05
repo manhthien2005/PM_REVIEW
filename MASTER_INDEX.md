@@ -36,14 +36,14 @@
 
 | #   | Module                                                      | Sprint | UC Refs     | Summary File                                                               | Review Status | Score  | Quality | Review File                                   | Last Review |
 | --- | ----------------------------------------------------------- | ------ | ----------- | -------------------------------------------------------------------------- | ------------- | ------ | ------- | --------------------------------------------- | ----------- |
-| 1   | **AUTH** — Login, Register, Forgot/Reset/Change Password    | S1     | UC001-UC004 | [AUTH_summary.md](REVIEW_MOBILE/summaries/AUTH_summary.md)                 | ✅ Done       | 84/100 | ✅ Pass | [View](REVIEW_MOBILE/AUTH_LOGIN_review_v2.md) | 2026-03-04  |
-| 2   | **DEVICE** — Connect, List, Unbind, Status                  | S2     | UC040-UC042 | [DEVICE_summary.md](REVIEW_MOBILE/summaries/DEVICE_summary.md)             | ⬜ Not built  | —      | —       | —                                             | —           |
-| 3   | **INFRA** — FastAPI Setup, Data Ingestion (MQTT/HTTP)       | S1-S2  | N/A         | [INFRA_summary.md](REVIEW_MOBILE/summaries/INFRA_summary.md)               | ⬜ Partial    | —      | —       | —                                             | —           |
-| 4   | **MONITORING** — View Vitals, Detail, History               | S2     | UC006-UC008 | [MONITORING_summary.md](REVIEW_MOBILE/summaries/MONITORING_summary.md)     | ⬜ Not built  | —      | —       | —                                             | —           |
-| 5   | **EMERGENCY** — Fall Detection, SOS (Manual/Auto), Response | S3     | UC010-UC015 | [EMERGENCY_summary.md](REVIEW_MOBILE/summaries/EMERGENCY_summary.md)       | ⬜ Not built  | —      | —       | —                                             | —           |
-| 6   | **NOTIFICATION** — Emergency Contacts, Alerts, Settings     | S3     | UC030-UC031 | [NOTIFICATION_summary.md](REVIEW_MOBILE/summaries/NOTIFICATION_summary.md) | ⬜ Not built  | —      | —       | —                                             | —           |
-| 7   | **ANALYSIS** — Risk Score, XAI Explainer                    | S4     | UC016-UC017 | [ANALYSIS_summary.md](REVIEW_MOBILE/summaries/ANALYSIS_summary.md)         | ⬜ Not built  | —      | —       | —                                             | —           |
-| 8   | **SLEEP** — Sleep Analysis, Sleep Report                    | S4     | UC020-UC021 | [SLEEP_summary.md](REVIEW_MOBILE/summaries/SLEEP_summary.md)               | ⬜ Not built  | —      | —       | —                                             | —           |
+| 1   | **AUTH** — Login, Register, Forgot/Reset/Change Password    | S1     | UC001-UC004 | [AUTH_summary.md](REVIEW_MOBILE/summaries/AUTH_summary.md)                 | ✅ Done        | 84/100 | ✅ Pass  | [View](REVIEW_MOBILE/AUTH_LOGIN_review_v2.md) | 2026-03-04  |
+| 2   | **DEVICE** — Connect, List, Unbind, Status                  | S2     | UC040-UC042 | [DEVICE_summary.md](REVIEW_MOBILE/summaries/DEVICE_summary.md)             | ⬜ Not built   | —      | —       | —                                             | —           |
+| 3   | **INFRA** — FastAPI Setup, Data Ingestion (MQTT/HTTP)       | S1-S2  | N/A         | [INFRA_summary.md](REVIEW_MOBILE/summaries/INFRA_summary.md)               | ⬜ Partial     | —      | —       | —                                             | —           |
+| 4   | **MONITORING** — View Vitals, Detail, History               | S2     | UC006-UC008 | [MONITORING_summary.md](REVIEW_MOBILE/summaries/MONITORING_summary.md)     | ⬜ Not built   | —      | —       | —                                             | —           |
+| 5   | **EMERGENCY** — Fall Detection, SOS (Manual/Auto), Response | S3     | UC010-UC015 | [EMERGENCY_summary.md](REVIEW_MOBILE/summaries/EMERGENCY_summary.md)       | ⬜ Not built   | —      | —       | —                                             | —           |
+| 6   | **NOTIFICATION** — Emergency Contacts, Alerts, Settings     | S3     | UC030-UC031 | [NOTIFICATION_summary.md](REVIEW_MOBILE/summaries/NOTIFICATION_summary.md) | ⬜ Not built   | —      | —       | —                                             | —           |
+| 7   | **ANALYSIS** — Risk Score, XAI Explainer                    | S4     | UC016-UC017 | [ANALYSIS_summary.md](REVIEW_MOBILE/summaries/ANALYSIS_summary.md)         | ⬜ Not built   | —      | —       | —                                             | —           |
+| 8   | **SLEEP** — Sleep Analysis, Sleep Report                    | S4     | UC020-UC021 | [SLEEP_summary.md](REVIEW_MOBILE/summaries/SLEEP_summary.md)               | ⬜ Not built   | —      | —       | —                                             | —           |
 
 ---
 
@@ -80,7 +80,7 @@
 
 ### Rules for AI
 
-- **NEVER read full SRS** unless specifically asked — use summary files instead
+- **Read `SRS_INDEX.md` first** for system-level context — read full SRS only when specific detail is missing
 - **NEVER read all JIRA CSV** — use JIRA Index (`JIRA/README.md`) for Epic lookup
 - **ALWAYS start from this index** — do not browse the filesystem blindly
 - **Read source code progressively**: outline first → key functions → full file only if needed

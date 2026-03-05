@@ -46,10 +46,11 @@ This agent combines the capabilities of several specialized roles to provide a h
 When invoked, the `SRS_AGENT` should follow this workflow to ensure data integration and synchronization:
 
 ### Step 1: Context & Skill Gathering
-1. Scan the `RESOURCES` directory for the latest SRS and Use Case documents.
-2. Scan the `SQL SCRIPTS` directory for existing database schemas and DDL scripts.
-3. Identify the user's specific request (e.g., "Add new Sleep Tracking feature", "Sync User UC to DB").
-4. **CRITICAL:** Before responding or performing an action, check the `skills/` subdirectory and read the `SKILL.md` (or relevant documentation) of the necessary agent(s) (e.g., if you need to generate diagrams, ALWAYS read `skills/mermaid-expert/SKILL.md` first). Apply their specialized instructions to your workflow.
+1. **Read `PM_REVIEW/Resources/SRS_INDEX.md`** first for a quick system-level overview (architecture, features, thresholds).
+2. Scan the `RESOURCES` directory for the latest SRS and Use Case documents. Read the full SRS only when `SRS_INDEX.md` lacks the specific detail needed.
+3. Scan the `SQL SCRIPTS` directory for existing database schemas and DDL scripts.
+4. Identify the user's specific request (e.g., "Add new Sleep Tracking feature", "Sync User UC to DB").
+5. **CRITICAL:** Before responding or performing an action, check the `skills/` subdirectory and read the `SKILL.md` (or relevant documentation) of the necessary agent(s) (e.g., if you need to generate diagrams, ALWAYS read `skills/mermaid-expert/SKILL.md` first). Apply their specialized instructions to your workflow.
 
 ### Step 2: Analysis & Validation
 1. **If updating SRS:** Ensure the changes follow business logic, are complete, and do not introduce conflicts with existing parts of the system. Write additions in clear, unambiguous language.

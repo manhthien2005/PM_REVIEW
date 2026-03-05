@@ -32,7 +32,8 @@ Automatically activates when the user wants to:
 
 ### Tier 2: Load Context (Read ONE summary)
 3. **Read the corresponding summary file** (e.g.: `summaries/AUTH_summary.md`).
-4. **DO NOT read the full SRS, DO NOT read the full JIRA CSV.** Instead, read `PM_REVIEW/Resources/TASK/JIRA/README.md` (JIRA Index) to quickly locate the relevant Epic/Stories.
+4. **Read `PM_REVIEW/Resources/SRS_INDEX.md`** for system-level context (thresholds, architecture, feature mapping).
+5. **DO NOT read the full SRS, DO NOT read the full JIRA CSV.** Instead, read `PM_REVIEW/Resources/TASK/JIRA/README.md` (JIRA Index) to quickly locate the relevant Epic/Stories.
 
 ### Tier 3: Prepare Integrated Skills
 5. **CRITICAL:** Before evaluating, read the internal bundled skills under `skills/` to inherit their constraints:
@@ -139,6 +140,7 @@ When the review process concludes, you **MUST** modify the corresponding module 
 | Name             | Path                                                | When to read                                   |
 | ---------------- | --------------------------------------------------- | ---------------------------------------------- |
 | **MASTER INDEX** | `PM_REVIEW/MASTER_INDEX.md`                         | **ALWAYS**                                     |
+| **SRS Index**    | `PM_REVIEW/Resources/SRS_INDEX.md`                  | **ALWAYS** — System-level context              |
 | Admin Structure  | `PM_REVIEW/REVIEW_ADMIN/Project_Structure.md`       | When reviewing Admin                           |
 | Mobile Structure | `PM_REVIEW/REVIEW_MOBILE/Project_Structure.md`      | When reviewing Mobile                          |
 | Admin Summaries  | `PM_REVIEW/REVIEW_ADMIN/summaries/*.md`             | Based on module                                |
