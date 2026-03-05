@@ -2,28 +2,28 @@
 
 ## Bảng đặc tả Use Case
 
-| Thuộc tính | Nội dung |
-|------------|----------|
-| **Mã UC** | UC031 |
-| **Tên UC** | Quản lý thông báo |
-| **Tác nhân chính** | Bệnh nhân, Người chăm sóc |
-| **Mô tả** | Người dùng quản lý trung tâm thông báo của mình: xem danh sách thông báo, đánh dấu đã đọc, cấu hình loại thông báo muốn nhận. |
-| **Trigger** | Người dùng mở màn hình "Thông báo" hoặc "Cài đặt thông báo". |
-| **Tiền điều kiện** | Người dùng đã đăng nhập. |
-| **Hậu điều kiện** | Trạng thái đọc/tham số cấu hình thông báo của người dùng được cập nhật. |
+| Thuộc tính         | Nội dung                                                                                                                      |
+| ------------------ | ----------------------------------------------------------------------------------------------------------------------------- |
+| **Mã UC**          | UC031                                                                                                                         |
+| **Tên UC**         | Quản lý thông báo                                                                                                             |
+| **Tác nhân chính** | Bệnh nhân, Người chăm sóc                                                                                                     |
+| **Mô tả**          | Người dùng quản lý trung tâm thông báo của mình: xem danh sách thông báo, đánh dấu đã đọc, cấu hình loại thông báo muốn nhận. |
+| **Trigger**        | Người dùng mở màn hình "Thông báo" hoặc "Cài đặt thông báo".                                                                  |
+| **Tiền điều kiện** | Người dùng đã đăng nhập.                                                                                                      |
+| **Hậu điều kiện**  | Trạng thái đọc/tham số cấu hình thông báo của người dùng được cập nhật.                                                       |
 
 ---
 
 ## Luồng chính (Main Flow) - Xem & đánh dấu thông báo
 
-| Bước | Người thực hiện | Hành động |
-|------|----------------|-----------|
-| 1 | Người dùng | Mở màn "Thông báo". |
-| 2 | Hệ thống | Truy vấn bảng `alerts` theo `user_id`, sắp xếp mới nhất trước. |
-| 3 | Hệ thống | Hiển thị danh sách thông báo với: tiêu đề, thời gian, mức độ (low/medium/high/critical), trạng thái đọc/chưa đọc. |
-| 4 | Người dùng | Chạm vào một thông báo để xem chi tiết. |
-| 5 | Hệ thống | Hiển thị chi tiết `message`, dữ liệu snapshot (`data`), và các hành động liên quan (VD: mở màn hình bệnh nhân, xem bản đồ, v.v.). |
-| 6 | Hệ thống | Đánh dấu thông báo đó là "đã đọc" (`read_at` được set). |
+| Bước | Người thực hiện | Hành động                                                                                                                         |
+| ---- | --------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| 1    | Người dùng      | Mở màn "Thông báo".                                                                                                               |
+| 2    | Hệ thống        | Truy vấn danh sách thông báo của người dùng, sắp xếp mới nhất trước.                                                              |
+| 3    | Hệ thống        | Hiển thị danh sách thông báo với: tiêu đề, thời gian, mức độ (low/medium/high/critical), trạng thái đọc/chưa đọc.                 |
+| 4    | Người dùng      | Chạm vào một thông báo để xem chi tiết.                                                                                           |
+| 5    | Hệ thống        | Hiển thị chi tiết `message`, dữ liệu snapshot (`data`), và các hành động liên quan (VD: mở màn hình bệnh nhân, xem bản đồ, v.v.). |
+| 6    | Hệ thống        | Đánh dấu thông báo đó là "đã đọc" (`read_at` được set).                                                                           |
 
 ---
 
@@ -31,26 +31,33 @@
 
 ### 3.a - Lọc theo mức độ
 
-| Bước | Người thực hiện | Hành động |
-|------|----------------|-----------|
-| 3.a.1 | Người dùng | Chọn filter: Tất cả / Chỉ critical / Chỉ chưa đọc. |
-| 3.a.2 | Hệ thống | Lọc danh sách dựa trên `severity` và `read_at`. |
+| Bước  | Người thực hiện | Hành động                                          |
+| ----- | --------------- | -------------------------------------------------- |
+| 3.a.1 | Người dùng      | Chọn filter: Tất cả / Chỉ critical / Chỉ chưa đọc. |
+| 3.a.2 | Hệ thống        | Lọc danh sách dựa trên `severity` và `read_at`.    |
 
 ### 6.a - Đánh dấu tất cả là đã đọc
 
-| Bước | Người thực hiện | Hành động |
-|------|----------------|-----------|
-| 6.a.1 | Người dùng | Chọn "Đánh dấu tất cả là đã đọc". |
-| 6.a.2 | Hệ thống | Cập nhật `read_at` cho tất cả alerts chưa đọc của user. |
+| Bước  | Người thực hiện | Hành động                                                          |
+| ----- | --------------- | ------------------------------------------------------------------ |
+| 6.a.1 | Người dùng      | Chọn "Đánh dấu tất cả là đã đọc".                                  |
+| 6.a.2 | Hệ thống        | Cập nhật trạng thái đã đọc cho tất cả thông báo chưa đọc của user. |
+
+### 5.a - Xác nhận đã xem thông báo quan trọng
+
+| Bước  | Người thực hiện | Hành động                                                                                        |
+| ----- | --------------- | ------------------------------------------------------------------------------------------------ |
+| 5.a.1 | Người dùng      | Nhấn "Xác nhận đã xem" trên thông báo mức critical/high                                          |
+| 5.a.2 | Hệ thống        | Ghi nhận thời điểm xác nhận (khác với thời điểm đọc — acknowledge = hành động chủ động xác nhận) |
 
 ### 1.a - Cấu hình loại thông báo muốn nhận
 
-| Bước | Người thực hiện | Hành động |
-|------|----------------|-----------|
-| 1.a.1 | Người dùng | Mở "Cài đặt thông báo". |
-| 1.a.2 | Hệ thống | Hiển thị các tuỳ chọn: nhận thông báo cho các loại `alert_type` (vital_abnormal, fall_detected, sos_triggered, high_risk_score, device_offline, low_battery). |
-| 1.a.3 | Người dùng | Bật/tắt từng loại theo nhu cầu (VD: cho phép low_battery chỉ ở mức push, không SMS). |
-| 1.a.4 | Hệ thống | Lưu cấu hình vào bảng settings của user (có thể là JSON hoặc bảng riêng). |
+| Bước  | Người thực hiện | Hành động                                                                                                                                                     |
+| ----- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1.a.1 | Người dùng      | Mở "Cài đặt thông báo".                                                                                                                                       |
+| 1.a.2 | Hệ thống        | Hiển thị các tuỳ chọn: nhận thông báo cho các loại `alert_type` (vital_abnormal, fall_detected, sos_triggered, high_risk_score, device_offline, low_battery). |
+| 1.a.3 | Người dùng      | Bật/tắt từng loại theo nhu cầu (VD: cho phép low_battery chỉ ở mức push, không SMS).                                                                          |
+| 1.a.4 | Hệ thống        | Lưu cấu hình vào bảng settings của user (có thể là JSON hoặc bảng riêng).                                                                                     |
 
 ---
 

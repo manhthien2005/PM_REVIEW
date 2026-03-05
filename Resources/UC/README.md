@@ -1,8 +1,8 @@
 # 📘 USE CASE SPECIFICATION - HEALTHGUARD SYSTEM
 
 > **Hệ thống**: HealthGuard - Giám sát và cảnh báo sức khỏe qua thiết bị IoT  
-> **Phiên bản**: 3.0  
-> **Ngày cập nhật**: 03/03/2026
+> **Phiên bản**: 4.0  
+> **Ngày cập nhật**: 05/03/2026
 
 ---
 
@@ -17,7 +17,9 @@ UC/
 │   ├── UC001_Login.md
 │   ├── UC002_Register.md
 │   ├── UC003_ForgotPassword.md
-│   └── UC004_ChangePassword.md
+│   ├── UC004_ChangePassword.md
+│   ├── UC005_Manage_Profile.md
+│   └── UC009_Logout.md
 │
 ├── Monitoring/                   # UC về giám sát sức khỏe
 │   ├── UC006_View_Health_Metrics.md
@@ -59,8 +61,8 @@ UC/
 ## 📊 TÌNH TRẠNG
 
 | Tổng UC | Đã hoàn thành | Còn thiếu | Đã xóa | Tiến độ |
-|---------|--------------|-----------|--------|---------|
-| 25 | 24 | 1 | 3 | 96% |
+| ------- | ------------- | --------- | ------ | ------- |
+| 26      | 26            | 0         | 3      | 100%    |
 
 ---
 
@@ -77,9 +79,9 @@ Mỗi file UC sử dụng format chuẩn UML (Fully Dressed Format):
 Mô tả các bước khi mọi thứ diễn ra bình thường (Happy Path)
 
 | Bước | Người thực hiện | Hành động |
-|------|----------------|-----------| 
-| 1 | Actor | ... |
-| 2 | System | ... |
+| ---- | --------------- | --------- |
+| 1    | Actor           | ...       |
+| 2    | System          | ...       |
 
 ### 3. **Luồng thay thế (Alternative Flows)**
 Các trường hợp ngoại lệ, lỗi, hoặc luồng khác:
@@ -98,15 +100,15 @@ Performance, Security, Usability, etc.
 
 ### **Core Features** (Phải implement):
 
-| UC | Tên | Platform | Trạng thái |
-|----|-----|----------|-----------|
-| **UC001** | Login | Mobile + Admin | ✅ Done |
-| **UC002** | Register | Mobile | ✅ Done |
-| **UC006** | View Health Metrics | Mobile | ✅ Done |
-| **UC010** | Confirm After Fall Alert | Mobile | ✅ Done |
-| **UC014** | Send Manual SOS | Mobile | ✅ Done |
-| **UC016** | View Risk Report | Mobile | ✅ Done |
-| **UC022** | Manage Users | Admin Web | ✅ Done |
+| UC        | Tên                      | Platform       | Trạng thái |
+| --------- | ------------------------ | -------------- | ---------- |
+| **UC001** | Login                    | Mobile + Admin | ✅ Done     |
+| **UC002** | Register                 | Mobile         | ✅ Done     |
+| **UC006** | View Health Metrics      | Mobile         | ✅ Done     |
+| **UC010** | Confirm After Fall Alert | Mobile         | ✅ Done     |
+| **UC014** | Send Manual SOS          | Mobile         | ✅ Done     |
+| **UC016** | View Risk Report         | Mobile         | ✅ Done     |
+| **UC022** | Manage Users             | Admin Web      | ✅ Done     |
 
 ---
 
@@ -114,24 +116,24 @@ Performance, Security, Usability, etc.
 
 ### Mobile App (Bệnh nhân + Người chăm sóc) → Mobile Backend (FastAPI)
 
-| Module | UCs |
-|--------|-----|
-| Authentication | UC001, UC002, UC003, UC004 |
-| Monitoring | UC006, UC007, UC008 |
-| Emergency | UC010, UC011, UC014, UC015 |
-| Analysis | UC016, UC017 |
-| Sleep | UC020, UC021 |
-| Notification | UC030, UC031 |
-| Device | UC040, UC041, UC042 |
-| **Tổng** | **20 UC** |
+| Module         | UCs                                      |
+| -------------- | ---------------------------------------- |
+| Authentication | UC001, UC002, UC003, UC004, UC005, UC009 |
+| Monitoring     | UC006, UC007, UC008                      |
+| Emergency      | UC010, UC011, UC014, UC015               |
+| Analysis       | UC016, UC017                             |
+| Sleep          | UC020, UC021                             |
+| Notification   | UC030, UC031                             |
+| Device         | UC040, UC041, UC042                      |
+| **Tổng**       | **22 UC**                                |
 
 ### Admin Web (Quản trị viên) → Admin Backend (Node.js)
 
-| Module | UCs |
-|--------|-----|
-| Authentication | UC001 (Admin login) |
-| Admin | UC022, UC024, UC025, UC026 |
-| **Tổng** | **5 UC** |
+| Module         | UCs                                       |
+| -------------- | ----------------------------------------- |
+| Authentication | UC001 (Admin login), UC009 (Admin logout) |
+| Admin          | UC022, UC024, UC025, UC026                |
+| **Tổng**       | **6 UC**                                  |
 
 > **Lưu ý**: UC001 phục vụ cả 2 platform nhưng logic xác thực khác nhau (Admin: JWT 8h, Mobile: access 30d + refresh 90d rotation).
 
@@ -243,20 +245,20 @@ Khi viết thêm UC mới:
 
 ## 📋 SO SÁNH VỚI TÀI LIỆU SRS
 
-| Phần SRS | Use Cases tương ứng |
-|----------|-------------------|
-| **HG-FUNC-01, 02, 03** (Giám sát chỉ số) | UC006, UC007, UC008 |
+| Phần SRS                                  | Use Cases tương ứng        |
+| ----------------------------------------- | -------------------------- |
+| **HG-FUNC-01, 02, 03** (Giám sát chỉ số)  | UC006, UC007, UC008        |
 | **HG-FUNC-04, 05, 06, 07** (Té ngã & SOS) | UC010, UC011, UC014, UC015 |
-| **HG-FUNC-08, 09** (Rủi ro & XAI) | UC016, UC017 |
-| **Xác thực** | UC001, UC002, UC003, UC004 |
-| **Quản trị** | UC022, UC024, UC025, UC026 |
-| **Giấc ngủ** | UC020, UC021 |
-| **Thông báo** | UC030, UC031 |
-| **Thiết bị** | UC040, UC041, UC042 |
+| **HG-FUNC-08, 09** (Rủi ro & XAI)         | UC016, UC017               |
+| **Xác thực**                              | UC001, UC002, UC003, UC004 |
+| **Quản trị**                              | UC022, UC024, UC025, UC026 |
+| **Giấc ngủ**                              | UC020, UC021               |
+| **Thông báo**                             | UC030, UC031               |
+| **Thiết bị**                              | UC040, UC041, UC042        |
 
 ---
 
-**Cập nhật lần cuối**: 03/03/2026  
-**Version**: 3.0  
-**Status**: ✅ 24/24 UC hoàn thành  
-**Next**: Viết UC quản lý hồ sơ cá nhân (UC mới)
+**Cập nhật lần cuối**: 05/03/2026  
+**Version**: 4.0  
+**Status**: ✅ 26/26 UC hoàn thành  
+**Next**: Không còn UC thiếu

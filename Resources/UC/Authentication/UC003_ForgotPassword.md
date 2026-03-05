@@ -2,15 +2,15 @@
 
 ## Bảng đặc tả Use Case
 
-| Thuộc tính | Nội dung |
-|------------|----------|
-| **Mã UC** | UC003 |
-| **Tên UC** | Khôi phục mật khẩu khi quên |
-| **Tác nhân chính** | Bệnh nhân, Người chăm sóc |
-| **Mô tả** | Người dùng yêu cầu đặt lại mật khẩu thông qua email khi quên mật khẩu |
-| **Trigger** | Người dùng nhấn "Quên mật khẩu?" trên màn hình đăng nhập |
+| Thuộc tính         | Nội dung                                                                         |
+| ------------------ | -------------------------------------------------------------------------------- |
+| **Mã UC**          | UC003                                                                            |
+| **Tên UC**         | Khôi phục mật khẩu khi quên                                                      |
+| **Tác nhân chính** | Bệnh nhân, Người chăm sóc                                                        |
+| **Mô tả**          | Người dùng yêu cầu đặt lại mật khẩu thông qua email khi quên mật khẩu            |
+| **Trigger**        | Người dùng nhấn "Quên mật khẩu?" trên màn hình đăng nhập                         |
 | **Tiền điều kiện** | - Người dùng đã có tài khoản trong hệ thống<br>- Email đăng ký vẫn còn hoạt động |
-| **Hậu điều kiện** | - Mật khẩu mới được thiết lập<br>- Email thông báo thay đổi mật khẩu được gửi |
+| **Hậu điều kiện**  | - Mật khẩu mới được thiết lập<br>- Email thông báo thay đổi mật khẩu được gửi    |
 
 ---
 
@@ -18,93 +18,93 @@
 
 ### Phase 1 — Yêu cầu đặt lại mật khẩu
 
-| Bước | Người thực hiện | Hành động |
-|------|----------------|-----------|
-| 1 | Người dùng | Chọn "Quên mật khẩu?" trên màn hình đăng nhập |
-| 2 | Hệ thống | Hiển thị form nhập email |
-| 3 | Người dùng | Nhập email đã đăng ký và nhấn "Gửi yêu cầu" |
-| 4 | Hệ thống | Gửi email chứa link reset mật khẩu (có hiệu lực 15 phút) |
-| 5 | Hệ thống | Hiển thị "Đã gửi email hướng dẫn. Vui lòng kiểm tra hộp thư" |
+| Bước | Người thực hiện | Hành động                                                    |
+| ---- | --------------- | ------------------------------------------------------------ |
+| 1    | Người dùng      | Chọn "Quên mật khẩu?" trên màn hình đăng nhập                |
+| 2    | Hệ thống        | Hiển thị form nhập email                                     |
+| 3    | Người dùng      | Nhập email đã đăng ký và nhấn "Gửi yêu cầu"                  |
+| 4    | Hệ thống        | Gửi email chứa link reset mật khẩu (có hiệu lực 15 phút)     |
+| 5    | Hệ thống        | Hiển thị "Đã gửi email hướng dẫn. Vui lòng kiểm tra hộp thư" |
 
 ### Phase 2 — Đặt mật khẩu mới
 
-| Bước | Người thực hiện | Hành động |
-|------|----------------|-----------|
-| 6 | Người dùng | Mở email và nhấn vào link reset |
-| 7 | Hệ thống | Xác thực token và hiển thị form đặt mật khẩu mới |
-| 8 | Người dùng | Nhập mật khẩu mới (≥ 8 ký tự, khác mật khẩu cũ) và xác nhận |
-| 9 | Hệ thống | Cập nhật mật khẩu, vô hiệu hóa token, chuyển đến trang đăng nhập |
+| Bước | Người thực hiện | Hành động                                                        |
+| ---- | --------------- | ---------------------------------------------------------------- |
+| 6    | Người dùng      | Mở email và nhấn vào link reset                                  |
+| 7    | Hệ thống        | Xác thực token và hiển thị form đặt mật khẩu mới                 |
+| 8    | Người dùng      | Nhập mật khẩu mới (≥ 8 ký tự, khác mật khẩu cũ) và xác nhận      |
+| 9    | Hệ thống        | Cập nhật mật khẩu, vô hiệu hóa token, chuyển đến trang đăng nhập |
 
 ---
 
 ## Luồng thay thế (Alternative Flows)
 
 ### 5.a - Email không tồn tại trong hệ thống
-| Bước | Người thực hiện | Hành động |
-|------|----------------|-----------|
-| 5.a.1 | Hệ thống | Hiển thị "Đã gửi email hướng dẫn. Vui lòng kiểm tra hộp thư" (không để lộ email không tồn tại - bảo mật) |
-| 5.a.2 | Use case kết thúc | |
+| Bước  | Người thực hiện   | Hành động                                                                                                |
+| ----- | ----------------- | -------------------------------------------------------------------------------------------------------- |
+| 5.a.1 | Hệ thống          | Hiển thị "Đã gửi email hướng dẫn. Vui lòng kiểm tra hộp thư" (không để lộ email không tồn tại - bảo mật) |
+| 5.a.2 | Use case kết thúc |                                                                                                          |
 
 ### 6.a - Email không gửi được (lỗi SMTP)
-| Bước | Người thực hiện | Hành động |
-|------|----------------|-----------|
-| 6.a.1 | Hệ thống | Log lỗi và hiển thị "Có lỗi xảy ra. Vui lòng thử lại sau" |
-| 6.a.2 | Người dùng | Thử lại hoặc liên hệ hỗ trợ |
+| Bước  | Người thực hiện | Hành động                                                 |
+| ----- | --------------- | --------------------------------------------------------- |
+| 6.a.1 | Hệ thống        | Log lỗi và hiển thị "Có lỗi xảy ra. Vui lòng thử lại sau" |
+| 6.a.2 | Người dùng      | Thử lại hoặc liên hệ hỗ trợ                               |
 
 ### 9.a - Token đã hết hạn (> 15 phút)
-| Bước | Người thực hiện | Hành động |
-|------|----------------|-----------|
-| 9.a.1 | Hệ thống | Hiển thị "Link đã hết hạn. Vui lòng yêu cầu lại" |
-| 9.a.2 | Hệ thống | Cung cấp nút "Gửi lại yêu cầu" |
+| Bước  | Người thực hiện | Hành động                                        |
+| ----- | --------------- | ------------------------------------------------ |
+| 9.a.1 | Hệ thống        | Hiển thị "Link đã hết hạn. Vui lòng yêu cầu lại" |
+| 9.a.2 | Hệ thống        | Cung cấp nút "Gửi lại yêu cầu"                   |
 
 ### 9.b - Token không hợp lệ
-| Bước | Người thực hiện | Hành động |
-|------|----------------|-----------|
-| 9.b.1 | Hệ thống | Hiển thị "Link không hợp lệ" |
-| 9.b.2 | Hệ thống | Chuyển hướng về trang "Quên mật khẩu" |
+| Bước  | Người thực hiện | Hành động                             |
+| ----- | --------------- | ------------------------------------- |
+| 9.b.1 | Hệ thống        | Hiển thị "Link không hợp lệ"          |
+| 9.b.2 | Hệ thống        | Chuyển hướng về trang "Quên mật khẩu" |
 
-### 10.a - Mật khẩu mới giống mật khẩu cũ
-| Bước | Người thực hiện | Hành động |
-|------|----------------|-----------|
-| 10.a.1 | Hệ thống | Hiển thị "Mật khẩu mới không được giống mật khẩu cũ" |
-| 10.a.2 | Người dùng | Nhập mật khẩu khác |
+### 8.a - Mật khẩu mới giống mật khẩu cũ
+| Bước  | Người thực hiện | Hành động                                            |
+| ----- | --------------- | ---------------------------------------------------- |
+| 8.a.1 | Hệ thống        | Hiển thị "Mật khẩu mới không được giống mật khẩu cũ" |
+| 8.a.2 | Người dùng      | Nhập mật khẩu khác                                   |
 
-### 10.b - Mật khẩu xác nhận không khớp
-| Bước | Người thực hiện | Hành động |
-|------|----------------|-----------|
-| 10.b.1 | Hệ thống | Hiển thị "Mật khẩu xác nhận không khớp" |
-| 10.b.2 | Người dùng | Nhập lại |
+### 8.b - Mật khẩu xác nhận không khớp
+| Bước  | Người thực hiện | Hành động                               |
+| ----- | --------------- | --------------------------------------- |
+| 8.b.1 | Hệ thống        | Hiển thị "Mật khẩu xác nhận không khớp" |
+| 8.b.2 | Người dùng      | Nhập lại                                |
 
 ---
 
 ## Business Rules
 
-- **BR-001**: Link reset mật khẩu có hiệu lực 15 phút
-- **BR-002**: Token reset chỉ sử dụng được 1 lần
-- **BR-003**: Mật khẩu mới phải khác mật khẩu cũ
-- **BR-004**: Mật khẩu mới tối thiểu 8 ký tự
-- **BR-005**: Không để lộ thông tin email có tồn tại hay không (chống enumeration attack)
-- **BR-006**: Giới hạn 3 lần yêu cầu reset/15 phút cho cùng 1 email (chống abuse)
+- **BR-003-01**: Link reset mật khẩu có hiệu lực 15 phút
+- **BR-003-02**: Token reset chỉ sử dụng được 1 lần
+- **BR-003-03**: Mật khẩu mới phải khác mật khẩu cũ
+- **BR-003-04**: Mật khẩu mới tối thiểu 8 ký tự
+- **BR-003-05**: Không để lộ thông tin email có tồn tại hay không (chống enumeration attack)
+- **BR-003-06**: Giới hạn 3 lần yêu cầu reset/15 phút cho cùng 1 email (chống abuse)
 
 ---
 
 ## Data Requirements
 
 ### Input Data (Bước 3):
-| Trường | Kiểu | Bắt buộc | Validation |
-|--------|------|----------|------------|
-| Email | String | Có | Format email hợp lệ |
+| Trường | Kiểu   | Bắt buộc | Validation          |
+| ------ | ------ | -------- | ------------------- |
+| Email  | String | Có       | Format email hợp lệ |
 
 ### Input Data (Bước 10):
-| Trường | Kiểu | Bắt buộc | Validation |
-|--------|------|----------|------------|
-| Mật khẩu mới | String | Có | Tối thiểu 8 ký tự, khác mật khẩu cũ |
-| Xác nhận mật khẩu | String | Có | Phải khớp với mật khẩu mới |
+| Trường            | Kiểu   | Bắt buộc | Validation                          |
+| ----------------- | ------ | -------- | ----------------------------------- |
+| Mật khẩu mới      | String | Có       | Tối thiểu 8 ký tự, khác mật khẩu cũ |
+| Xác nhận mật khẩu | String | Có       | Phải khớp với mật khẩu mới          |
 
 ### URL Parameters (Bước 8):
-| Tham số | Kiểu | Description |
-|---------|------|-------------|
-| token | String | JWT token chứa user_id và expiry time |
+| Tham số | Kiểu   | Description                           |
+| ------- | ------ | ------------------------------------- |
+| token   | String | JWT token chứa user_id và expiry time |
 
 ---
 

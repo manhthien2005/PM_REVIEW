@@ -2,87 +2,87 @@
 
 ## Bảng đặc tả Use Case
 
-| Thuộc tính | Nội dung |
-|------------|----------|
-| **Mã UC** | UC004 |
-| **Tên UC** | Thay đổi mật khẩu |
-| **Tác nhân chính** | Bệnh nhân, Người chăm sóc |
-| **Mô tả** | Người dùng đã đăng nhập thay đổi mật khẩu của mình |
-| **Trigger** | Người dùng chọn "Đổi mật khẩu" trong phần Cài đặt tài khoản |
-| **Tiền điều kiện** | - Người dùng đã đăng nhập vào hệ thống<br>- Session còn hiệu lực |
-| **Hậu điều kiện** | - Mật khẩu được cập nhật<br>- Email thông báo thay đổi mật khẩu được gửi<br>- Tất cả session cũ (trừ session hiện tại) bị vô hiệu hóa |
+| Thuộc tính         | Nội dung                                                                                                                              |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------- |
+| **Mã UC**          | UC004                                                                                                                                 |
+| **Tên UC**         | Thay đổi mật khẩu                                                                                                                     |
+| **Tác nhân chính** | Bệnh nhân, Người chăm sóc                                                                                                             |
+| **Mô tả**          | Người dùng đã đăng nhập thay đổi mật khẩu của mình                                                                                    |
+| **Trigger**        | Người dùng chọn "Đổi mật khẩu" trong phần Cài đặt tài khoản                                                                           |
+| **Tiền điều kiện** | - Người dùng đã đăng nhập vào hệ thống<br>- Session còn hiệu lực                                                                      |
+| **Hậu điều kiện**  | - Mật khẩu được cập nhật<br>- Email thông báo thay đổi mật khẩu được gửi<br>- Tất cả session cũ (trừ session hiện tại) bị vô hiệu hóa |
 
 ---
 
 ## Luồng chính (Main Flow)
 
-| Bước | Người thực hiện | Hành động |
-|------|----------------|-----------|
-| 1 | Người dùng | Truy cập "Cài đặt" > "Bảo mật" > "Đổi mật khẩu" |
-| 2 | Hệ thống | Hiển thị form đổi mật khẩu |
-| 3 | Người dùng | Nhập mật khẩu hiện tại, mật khẩu mới (≥ 8 ký tự), xác nhận mật khẩu mới |
-| 4 | Người dùng | Nhấn "Cập nhật mật khẩu" |
-| 5 | Hệ thống | Xác thực mật khẩu hiện tại và kiểm tra mật khẩu mới hợp lệ |
-| 6 | Hệ thống | Cập nhật mật khẩu mới, vô hiệu hóa tất cả session cũ (trừ session hiện tại) |
-| 7 | Hệ thống | Gửi email thông báo thay đổi mật khẩu thành công |
-| 8 | Hệ thống | Hiển thị "Đổi mật khẩu thành công" |
+| Bước | Người thực hiện | Hành động                                                                   |
+| ---- | --------------- | --------------------------------------------------------------------------- |
+| 1    | Người dùng      | Truy cập "Cài đặt" > "Bảo mật" > "Đổi mật khẩu"                             |
+| 2    | Hệ thống        | Hiển thị form đổi mật khẩu                                                  |
+| 3    | Người dùng      | Nhập mật khẩu hiện tại, mật khẩu mới (≥ 8 ký tự), xác nhận mật khẩu mới     |
+| 4    | Người dùng      | Nhấn "Cập nhật mật khẩu"                                                    |
+| 5    | Hệ thống        | Xác thực mật khẩu hiện tại và kiểm tra mật khẩu mới hợp lệ                  |
+| 6    | Hệ thống        | Cập nhật mật khẩu mới, vô hiệu hóa tất cả session cũ (trừ session hiện tại) |
+| 7    | Hệ thống        | Gửi email thông báo thay đổi mật khẩu thành công                            |
+| 8    | Hệ thống        | Hiển thị "Đổi mật khẩu thành công"                                          |
 
 ---
 
 ## Luồng thay thế (Alternative Flows)
 
-### 7.a - Mật khẩu hiện tại không đúng
-| Bước | Người thực hiện | Hành động |
-|------|----------------|-----------|
-| 7.a.1 | Hệ thống | Hiển thị "Mật khẩu hiện tại không đúng" |
-| 7.a.2 | Hệ thống | Cho phép nhập lại (tối đa 3 lần/phiên) |
-| 7.a.3 | Nếu sai 3 lần | Đăng xuất người dùng và yêu cầu đăng nhập lại |
+### 5.a - Mật khẩu hiện tại không đúng
+| Bước  | Người thực hiện | Hành động                                     |
+| ----- | --------------- | --------------------------------------------- |
+| 5.a.1 | Hệ thống        | Hiển thị "Mật khẩu hiện tại không đúng"       |
+| 5.a.2 | Hệ thống        | Cho phép nhập lại (tối đa 3 lần/phiên)        |
+| 5.a.3 | Nếu sai 3 lần   | Đăng xuất người dùng và yêu cầu đăng nhập lại |
 
-### 8.a - Mật khẩu mới giống mật khẩu hiện tại
-| Bước | Người thực hiện | Hành động |
-|------|----------------|-----------|
-| 8.a.1 | Hệ thống | Hiển thị "Mật khẩu mới phải khác mật khẩu hiện tại" |
-| 8.a.2 | Người dùng | Nhập mật khẩu mới khác |
+### 5.b - Mật khẩu mới giống mật khẩu hiện tại
+| Bước  | Người thực hiện | Hành động                                           |
+| ----- | --------------- | --------------------------------------------------- |
+| 5.b.1 | Hệ thống        | Hiển thị "Mật khẩu mới phải khác mật khẩu hiện tại" |
+| 5.b.2 | Người dùng      | Nhập mật khẩu mới khác                              |
 
-### 8.b - Mật khẩu mới không đủ mạnh
-| Bước | Người thực hiện | Hành động |
-|------|----------------|-----------|
-| 8.b.1 | Hệ thống | Hiển thị "Mật khẩu phải có ít nhất 8 ký tự" |
-| 8.b.2 | Người dùng | Nhập mật khẩu mạnh hơn |
+### 5.c - Mật khẩu mới không đủ mạnh
+| Bước  | Người thực hiện | Hành động                                   |
+| ----- | --------------- | ------------------------------------------- |
+| 5.c.1 | Hệ thống        | Hiển thị "Mật khẩu phải có ít nhất 8 ký tự" |
+| 5.c.2 | Người dùng      | Nhập mật khẩu mạnh hơn                      |
 
-### 8.c - Mật khẩu xác nhận không khớp
-| Bước | Người thực hiện | Hành động |
-|------|----------------|-----------|
-| 8.c.1 | Hệ thống | Hiển thị "Mật khẩu xác nhận không khớp" |
-| 8.c.2 | Người dùng | Nhập lại |
+### 5.d - Mật khẩu xác nhận không khớp
+| Bước  | Người thực hiện | Hành động                               |
+| ----- | --------------- | --------------------------------------- |
+| 5.d.1 | Hệ thống        | Hiển thị "Mật khẩu xác nhận không khớp" |
+| 5.d.2 | Người dùng      | Nhập lại                                |
 
-### 11.a - Email không gửi được
-| Bước | Người thực hiện | Hành động |
-|------|----------------|-----------|
-| 11.a.1 | Hệ thống | Log lỗi nhưng vẫn hoàn thành việc đổi mật khẩu |
-| 11.a.2 | Hệ thống | Hiển thị warning "Đổi mật khẩu thành công nhưng không thể gửi email thông báo" |
+### 7.a - Email không gửi được
+| Bước  | Người thực hiện | Hành động                                                                      |
+| ----- | --------------- | ------------------------------------------------------------------------------ |
+| 7.a.1 | Hệ thống        | Log lỗi nhưng vẫn hoàn thành việc đổi mật khẩu                                 |
+| 7.a.2 | Hệ thống        | Hiển thị warning "Đổi mật khẩu thành công nhưng không thể gửi email thông báo" |
 
 ---
 
 ## Business Rules
 
-- **BR-001**: Mật khẩu mới phải khác mật khẩu hiện tại
-- **BR-002**: Mật khẩu mới tối thiểu 8 ký tự
-- **BR-003**: Phải nhập đúng mật khẩu hiện tại mới được đổi
-- **BR-004**: Giới hạn 3 lần nhập sai mật khẩu hiện tại trong 1 phiên
-- **BR-005**: Sau khi đổi mật khẩu, tất cả session cũ (web, mobile) bị đăng xuất (trừ session hiện tại)
-- **BR-006**: Email thông báo phải được gửi để cảnh báo về hoạt động thay đổi mật khẩu
+- **BR-004-01**: Mật khẩu mới phải khác mật khẩu hiện tại
+- **BR-004-02**: Mật khẩu mới tối thiểu 8 ký tự
+- **BR-004-03**: Phải nhập đúng mật khẩu hiện tại mới được đổi
+- **BR-004-04**: Giới hạn 3 lần nhập sai mật khẩu hiện tại trong 1 phiên
+- **BR-004-05**: Sau khi đổi mật khẩu, tất cả session cũ (web, mobile) bị đăng xuất (trừ session hiện tại)
+- **BR-004-06**: Email thông báo phải được gửi để cảnh báo về hoạt động thay đổi mật khẩu
 
 ---
 
 ## Data Requirements
 
 ### Input Data:
-| Trường | Kiểu | Bắt buộc | Validation |
-|--------|------|----------|------------|
-| Mật khẩu hiện tại | String | Có | Phải khớp với mật khẩu trong DB |
-| Mật khẩu mới | String | Có | Tối thiểu 8 ký tự, khác mật khẩu hiện tại |
-| Xác nhận mật khẩu mới | String | Có | Phải khớp với mật khẩu mới |
+| Trường                | Kiểu   | Bắt buộc | Validation                                |
+| --------------------- | ------ | -------- | ----------------------------------------- |
+| Mật khẩu hiện tại     | String | Có       | Phải khớp với mật khẩu trong DB           |
+| Mật khẩu mới          | String | Có       | Tối thiểu 8 ký tự, khác mật khẩu hiện tại |
+| Xác nhận mật khẩu mới | String | Có       | Phải khớp với mật khẩu mới                |
 
 ---
 

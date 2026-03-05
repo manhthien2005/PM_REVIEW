@@ -42,11 +42,13 @@ Source CSV: `JIRA_IMPORT_ALL.csv` (untouched, for JIRA import)
 | UC002 | EP05-Register   | UC015 | EP10-SOS       | UC024 | EP16-AdminConfig  |
 | UC003 | EP12-Password   | UC016 | EP13-RiskScore | UC025 | EP15-AdminManage  |
 | UC004 | EP12-Password   | UC017 | EP13-RiskScore | UC026 | EP16-AdminConfig  |
-| UC006 | EP08-Monitoring | UC020 | EP14-Sleep     | UC030 | EP11-Notification |
-| UC007 | EP08-Monitoring | UC021 | EP14-Sleep     | UC031 | EP11-Notification |
-| UC008 | EP08-Monitoring | —     | —              | UC040 | EP07-Device       |
-| UC010 | EP09-FallDetect | —     | —              | UC041 | EP07-Device       |
-| UC011 | EP10-SOS        | —     | —              | UC042 | EP07-Device       |
+| UC005 | ⚠️ Gap (no Epic) | UC020 | EP14-Sleep     | UC030 | EP11-Notification |
+| UC006 | EP08-Monitoring | UC021 | EP14-Sleep     | UC031 | EP11-Notification |
+| UC007 | EP08-Monitoring | —     | —              | UC040 | EP07-Device       |
+| UC008 | EP08-Monitoring | —     | —              | UC041 | EP07-Device       |
+| UC009 | ⚠️ Gap (no Epic) | —     | —              | UC042 | EP07-Device       |
+| UC010 | EP09-FallDetect | —     | —              | —     | —                 |
+| UC011 | EP10-SOS        | —     | —              | —     | —                 |
 
 ## Folder Structure
 

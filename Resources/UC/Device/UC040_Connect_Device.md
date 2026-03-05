@@ -2,28 +2,28 @@
 
 ## Bảng đặc tả Use Case
 
-| Thuộc tính | Nội dung |
-|------------|----------|
-| **Mã UC** | UC040 |
-| **Tên UC** | Kết nối thiết bị IoT với tài khoản |
-| **Tác nhân chính** | Bệnh nhân |
-| **Mô tả** | Bệnh nhân gán (pair) một thiết bị IoT (smartwatch/band) với tài khoản HealthGuard của mình để bắt đầu thu thập dữ liệu. |
-| **Trigger** | Người dùng chọn "Kết nối thiết bị" trong ứng dụng. |
-| **Tiền điều kiện** | - Người dùng đã đăng nhập.<br>- Thiết bị đã được tạo trước trong hệ thống (do Admin nhập hoặc auto-provision). |
-| **Hậu điều kiện** | Thiết bị được liên kết với tài khoản (`devices.user_id` được gán), hệ thống bắt đầu nhận dữ liệu cho user đó. |
+| Thuộc tính         | Nội dung                                                                                                                |
+| ------------------ | ----------------------------------------------------------------------------------------------------------------------- |
+| **Mã UC**          | UC040                                                                                                                   |
+| **Tên UC**         | Kết nối thiết bị IoT với tài khoản                                                                                      |
+| **Tác nhân chính** | Bệnh nhân                                                                                                               |
+| **Mô tả**          | Bệnh nhân gán (pair) một thiết bị IoT (smartwatch/band) với tài khoản HealthGuard của mình để bắt đầu thu thập dữ liệu. |
+| **Trigger**        | Người dùng chọn "Kết nối thiết bị" trong ứng dụng.                                                                      |
+| **Tiền điều kiện** | - Người dùng đã đăng nhập.<br>- Thiết bị đã được tạo trước trong hệ thống (do Admin nhập hoặc auto-provision).          |
+| **Hậu điều kiện**  | Thiết bị được liên kết với tài khoản (`devices.user_id` được gán), hệ thống bắt đầu nhận dữ liệu cho user đó.           |
 
 ---
 
 ## Luồng chính (Main Flow) - Nhập mã thiết bị
 
-| Bước | Người thực hiện | Hành động |
-|------|----------------|-----------|
-| 1 | Người dùng | Mở "Cài đặt" → "Thiết bị" → "Kết nối thiết bị mới". |
-| 2 | Hệ thống | Hiển thị form nhập mã thiết bị (device code/serial) hoặc quét QR. |
-| 3 | Người dùng | Nhập mã thiết bị hoặc quét QR code. |
-| 4 | Hệ thống | Kiểm tra thiết bị tồn tại trong `devices` và chưa gán cho user khác (hoặc cho phép chuyển quyền). |
-| 5 | Hệ thống | Nếu hợp lệ, gán thiết bị cho user hiện tại, cập nhật `user_id`, `registered_at`. |
-| 6 | Hệ thống | Hiển thị thông báo "Kết nối thiết bị thành công" và trạng thái thiết bị. |
+| Bước | Người thực hiện | Hành động                                                                                              |
+| ---- | --------------- | ------------------------------------------------------------------------------------------------------ |
+| 1    | Người dùng      | Mở "Cài đặt" → "Thiết bị" → "Kết nối thiết bị mới".                                                    |
+| 2    | Hệ thống        | Hiển thị form nhập mã thiết bị (device code/serial) hoặc quét QR.                                      |
+| 3    | Người dùng      | Nhập mã thiết bị hoặc quét QR code.                                                                    |
+| 4    | Hệ thống        | Kiểm tra thiết bị tồn tại trong hệ thống và chưa gán cho người dùng khác (hoặc cho phép chuyển quyền). |
+| 5    | Hệ thống        | Nếu hợp lệ, gán thiết bị cho tài khoản người dùng hiện tại và ghi nhận thời điểm kết nối.              |
+| 6    | Hệ thống        | Hiển thị thông báo "Kết nối thiết bị thành công" và trạng thái thiết bị.                               |
 
 ---
 
@@ -31,17 +31,17 @@
 
 ### 4.a - Thiết bị không tồn tại hoặc đã bị khoá
 
-| Bước | Người thực hiện | Hành động |
-|------|----------------|-----------|
-| 4.a.1 | Hệ thống | Không tìm thấy thiết bị hoặc `is_active = false`. |
-| 4.a.2 | Hệ thống | Hiển thị "Thiết bị không hợp lệ hoặc đã bị khoá. Vui lòng liên hệ hỗ trợ." |
+| Bước  | Người thực hiện | Hành động                                                                  |
+| ----- | --------------- | -------------------------------------------------------------------------- |
+| 4.a.1 | Hệ thống        | Không tìm thấy thiết bị hoặc `is_active = false`.                          |
+| 4.a.2 | Hệ thống        | Hiển thị "Thiết bị không hợp lệ hoặc đã bị khoá. Vui lòng liên hệ hỗ trợ." |
 
 ### 4.b - Thiết bị đang gán cho user khác
 
-| Bước | Người thực hiện | Hành động |
-|------|----------------|-----------|
-| 4.b.1 | Hệ thống | Phát hiện thiết bị đã có `user_id` khác. |
-| 4.b.2 | Hệ thống | Hiển thị thông báo và (tuỳ chính sách) đề xuất quy trình "chuyển quyền sở hữu" nếu được phép. |
+| Bước  | Người thực hiện | Hành động                                                                                     |
+| ----- | --------------- | --------------------------------------------------------------------------------------------- |
+| 4.b.1 | Hệ thống        | Phát hiện thiết bị đã có `user_id` khác.                                                      |
+| 4.b.2 | Hệ thống        | Hiển thị thông báo và (tuỳ chính sách) đề xuất quy trình "chuyển quyền sở hữu" nếu được phép. |
 
 ---
 
