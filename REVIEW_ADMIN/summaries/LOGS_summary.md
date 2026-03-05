@@ -1,74 +1,30 @@
-# 🔬 MODULE SUMMARY: LOGS (Admin)
+# LOGS (Admin)
 
-> **Module**: LOGS — System Logs Viewer  
-> **Project**: Admin Website (HealthGuard/)  
-> **Sprint**: Sprint 4  
-> **Trello Cards**: Sprint 4, Card 8  
-> **UC References**: UC026
+> Sprint 4 | JIRA: EP16-AdminConfig | UC: UC026
 
----
+## Purpose & Technique
+- Admin can view system audit logs with filtering (date range, user, action type, severity) and pagination
+- Export filtered logs to CSV
+- Data source: `audit_logs` table; optionally `system_metrics` for health data
 
-## 📋 SRS Requirements (Extracted)
+## API Index
+| Endpoint                  | Method | Note                          |
+| ------------------------- | ------ | ----------------------------- |
+| /api/admin/logs           | GET    | List logs; filter + paginate  |
+| /api/admin/logs/export    | GET    | Export filtered logs as CSV   |
 
-### Functional Requirements
-- Admin can view system logs (audit trail of all admin actions)
-- Filter logs by: date range, user, action type, severity
-- Paginate results
-- Export logs to CSV
+## File Index
+| Path                                         | Role               |
+| -------------------------------------------- | ------------------ |
+| backend/src/controllers/logs.controller.ts   | ⬜ Not built yet  |
+| backend/src/services/logs.service.ts         | ⬜ Not built yet  |
+| frontend/src/pages/SystemLogs.tsx            | ⬜ Not built yet  |
 
-### Data Source
-- `audit_logs` table — records all admin actions (login, CRUD, config changes)
-- `system_metrics` table — system health metrics (optional display)
+## Known Issues
+- 🔴 No source code exists — controller, service, route, and frontend page all unbuilt
 
----
-
-## 📌 Trello Checklist (Pre-Extracted)
-
-### Card 8 — View System Logs (Admin BE Dev)
-- [ ] `GET /api/admin/logs` — list logs with filter + paginate
-- [ ] `GET /api/admin/logs/export` — export CSV
-- [ ] Permission: ADMIN only
-
-### Card 8 — Admin FE Dev
-- [ ] Logs page with table
-- [ ] Filters: date range, user, action type
-- [ ] Pagination
-- [ ] Export CSV button
-
-### Acceptance Criteria
-- [ ] Logs display correctly with filters
-- [ ] Export CSV works
-- [ ] Permission enforced
-
----
-
-## 📂 Source Code Files
-
-### Backend (`HealthGuard/backend/src/`)
-| File Path | Role |
-|-----------|------|
-| `controllers/logs.controller.ts` | Log query + export endpoints |
-| `services/logs.service.ts` | Log querying + CSV generation |
-
-### Frontend (`HealthGuard/frontend/src/`)
-| File Path | Role |
-|-----------|------|
-| `pages/SystemLogs.tsx` | Logs viewer UI |
-
----
-
-## 🔗 Cross-References
-
-| Type | Reference |
-|------|-----------|
-| Use Case Files | `BA/UC/Admin/UC026_ViewSystemLogs.md` |
-| DB Tables | `audit_logs`, `system_metrics` |
-
----
-
-## 📊 Review Notes
-| Key | Value |
-|-----|-------|
-| Review Date | — |
-| Score | —/100 |
-| Reviewer Notes | — |
+## Cross-References
+| Type      | Ref                                    |
+| --------- | -------------------------------------- |
+| DB Tables | audit_logs, system_metrics             |
+| UC Files  | BA/UC/Admin/UC026_ViewSystemLogs.md    |

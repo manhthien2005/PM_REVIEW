@@ -1,79 +1,34 @@
-# 🔬 MODULE SUMMARY: DEVICES (Admin)
+# DEVICES (Admin)
 
-> **Module**: DEVICES — Device Management (Admin Side)  
-> **Project**: Admin Website (HealthGuard/)  
-> **Sprint**: Sprint 4  
-> **Trello Cards**: Sprint 4, Card 6  
-> **UC References**: UC025
+> Sprint 4 | JIRA: EP15-AdminManage | UC: UC025
 
----
+## Purpose & Technique
+- Admin can view, update, assign, and lock/unlock all IoT devices in the system
+- Device online status derived from `last_seen_at` (online if < 5 min ago)
+- ADMIN role required for all operations
 
-## 📋 SRS Requirements (Extracted)
+## API Index
+| Endpoint                          | Method | Note                  |
+| --------------------------------- | ------ | --------------------- |
+| /api/admin/devices                | GET    | List all devices      |
+| /api/admin/devices/{id}           | GET    | Device detail         |
+| /api/admin/devices/{id}           | PUT    | Update device metadata|
+| /api/admin/devices/{id}/assign    | POST   | Assign device to user |
+| /api/admin/devices/{id}/lock      | POST   | Lock/unlock device    |
 
-### Functional Requirements
-- Admin can view all devices in the system
-- Admin can view device details (status, assigned user, battery, etc.)
-- Admin can update device metadata
-- Admin can assign/reassign devices to users
-- Admin can lock/unlock devices
+## File Index
+| Path                                        | Role               |
+| ------------------------------------------ | ------------------ |
+| backend/src/controllers/device.controller.ts | ⬜ Not built yet  |
+| backend/src/services/device.service.ts       | ⬜ Not built yet  |
+| frontend/src/pages/ManageDevices.tsx         | ⬜ Not built yet  |
 
-### Non-Functional Requirements
-- **Security**: ADMIN role-only access
-- **Data**: Device status derived from `last_seen_at` (online if < 5min)
+## Known Issues
+- 🔴 No source code exists — controller, service, route, and frontend page all unbuilt
 
----
-
-## 📌 Trello Checklist (Pre-Extracted)
-
-### Card 6 — Manage Devices (Admin BE Dev)
-- [ ] `GET /api/admin/devices` — list all devices
-- [ ] `GET /api/admin/devices/{id}` — device detail
-- [ ] `PUT /api/admin/devices/{id}` — update device
-- [ ] `POST /api/admin/devices/{id}/assign` — assign to user
-- [ ] `POST /api/admin/devices/{id}/lock` — lock/unlock
-- [ ] Permission: ADMIN only
-
-### Card 6 — Manage Devices (Admin FE Dev)
-- [ ] Device management page with table
-- [ ] Device detail view
-- [ ] Assign to user flow
-- [ ] Lock/unlock toggle
-
-### Acceptance Criteria
-- [ ] Device CRUD works
-- [ ] Assign/lock/unlock functional
-- [ ] Permission enforced
-
----
-
-## 📂 Source Code Files
-
-### Backend (`HealthGuard/backend/src/`)
-| File Path | Role |
-|-----------|------|
-| `controllers/device.controller.ts` | Route handlers for device management |
-| `services/device.service.ts` | Business logic |
-
-### Frontend (`HealthGuard/frontend/src/`)
-| File Path | Role |
-|-----------|------|
-| `pages/ManageDevices.tsx` | Device management page |
-
----
-
-## 🔗 Cross-References
-
-| Type | Reference |
-|------|-----------|
-| Use Case Files | `BA/UC/Admin/UC025_ManageDevices.md` |
-| DB Tables | `devices` |
-| Related Mobile Module | `REVIEW_MOBILE/summaries/DEVICE_summary.md` (patient-side device mgmt) |
-
----
-
-## 📊 Review Notes
-| Key | Value |
-|-----|-------|
-| Review Date | — |
-| Score | —/100 |
-| Reviewer Notes | — |
+## Cross-References
+| Type           | Ref                                                         |
+| -------------- | ----------------------------------------------------------- |
+| DB Tables      | devices                                                     |
+| UC Files       | BA/UC/Admin/UC025_ManageDevices.md                          |
+| Related Module | REVIEW_MOBILE/summaries/DEVICE_summary.md                   |

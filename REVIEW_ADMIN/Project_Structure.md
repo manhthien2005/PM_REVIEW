@@ -1,38 +1,47 @@
-# 📋 PROJECT STRUCTURE - ADMIN WEBSITE (HealthGuard)
+# PROJECT STRUCTURE - ADMIN WEBSITE (HealthGuard)
 
-> **Dự án**: HealthGuard Admin Dashboard  
+> **Project**: HealthGuard Admin Dashboard  
 > **Tech Stack**: Node.js / Express.js / Prisma ORM / TypeScript (Backend) + React / Vite / TypeScript (Frontend)  
-> **Mục đích**: Quản trị hệ thống HealthGuard cho Admin  
-> **Cập nhật lần cuối**: 03/03/2026
+> **Purpose**: Admin system management for HealthGuard  
+> **Last Updated**: 2026-03-05
 
 ---
 
-## 🏗️ Tổng Quan Kiến Trúc
+## Architecture Overview
 
 ```
 HealthGuard/
 ├── backend/                    # Admin Backend (Node.js + Express + Prisma)
-│   ├── prisma/                 # Prisma ORM schema
+│   ├── prisma/                 # Prisma ORM schema (1 file: schema.prisma)
 │   ├── src/
-│   │   ├── config/             # Database, environment config
-│   │   ├── controllers/        # Route handlers
-│   │   ├── lib/                # Shared libraries
-│   │   ├── middleware/         # Auth, CORS, error handling middleware
-│   │   ├── routes/             # Express route definitions
-│   │   ├── services/           # Business logic layer
-│   │   ├── utils/              # Helper functions
-│   │   └── index.ts            # App entry point
+│   │   ├── config/             # swagger.ts — Swagger spec config
+│   │   ├── controllers/        # authController.ts, userController.ts
+│   │   ├── lib/                # prisma.ts — Prisma client singleton
+│   │   ├── middleware/         # authMiddleware.ts, rateLimiter.ts
+│   │   ├── routes/             # authRoutes.ts, userRoutes.ts
+│   │   ├── services/           # 7 service files (see AUTH module)
+│   │   ├── utils/              # jwt.ts — JWT helper
+│   │   └── index.ts            # App entry point (port 5000)
+│   ├── .env                    # DB_URL, JWT_SECRET, PORT, SMTP config
 │   ├── package.json
+│   ├── prisma.config.ts
 │   └── tsconfig.json
 │
 ├── frontend/                   # Admin Frontend (React + Vite)
 │   ├── public/
 │   ├── src/
-│   │   ├── components/         # Reusable UI components
-│   │   ├── pages/              # Page components
-│   │   ├── services/           # API service calls
-│   │   ├── hooks/              # Custom React hooks
-│   │   ├── utils/              # Frontend utilities
+│   │   ├── components/
+│   │   │   ├── admin/          # AdminHeader.tsx, AdminLayout.tsx, AdminSidebar.tsx
+│   │   │   ├── ui/             # HighlightText.tsx, Modal.tsx, Toast.tsx
+│   │   │   └── users/          # UserTable.tsx, UserFormModal.tsx, DeleteConfirmModal.tsx, LockConfirmModal.tsx
+│   │   ├── pages/
+│   │   │   ├── LoginPage.tsx
+│   │   │   ├── DashboardPage.tsx
+│   │   │   └── admin/
+│   │   │       ├── AdminOverviewPage.tsx
+│   │   │       └── UserManagementPage.tsx
+│   │   ├── services/           # api.ts, authService.ts, userService.ts
+│   │   ├── types/              # auth.ts, user.ts
 │   │   ├── App.tsx
 │   │   └── main.tsx
 │   ├── index.html
@@ -44,118 +53,114 @@ HealthGuard/
 
 ---
 
-## 🔧 Chức Năng Theo Module
+## Modules
 
-### 1. [AUTH] Xác thực & Phân quyền (Sprint 1)
-> **SRS Ref**: UC001-UC004 | **Trello**: Sprint 1 - Cards 3, 4, 5, 6
+### 1. [AUTH] Authentication & Authorization (Sprint 1)
+> **SRS Ref**: UC001-UC004 | **JIRA**: EP04-Login, EP05-Register, EP12-Password
 
-| Chức năng            | API Endpoint                     | Trạng thái      | Ghi chú                                    |
-| -------------------- | -------------------------------- | --------------- | ------------------------------------------ |
-| Login (Admin)        | `POST /api/auth/login`           | ⬜ Chưa đánh giá | JWT issuer: `healthguard-admin`, expiry 8h |
-| Tạo user (bởi Admin) | `POST /api/users`                | ⬜ Chưa đánh giá | Require ADMIN JWT, `is_verified=true`      |
-| Forgot Password      | `POST /api/auth/forgot-password` | ⬜ Chưa đánh giá | Token 15 phút, rate limit 3/15min          |
-| Reset Password       | `POST /api/auth/reset-password`  | ⬜ Chưa đánh giá | Token one-time use                         |
-| Change Password      | `POST /api/auth/change-password` | ⬜ Chưa đánh giá | Require JWT, rate limit 5/15min            |
+| Function         | API Endpoint                  | Status           | Note                                        |
+| ---------------- | ----------------------------- | ---------------- | ------------------------------------------- |
+| Login (Admin)    | `POST /api/auth/sessions`     | ✅ Reviewed       | JWT iss: `healthguard-admin`, expiry 8h     |
+| Register (Admin) | `POST /api/auth/users`        | ✅ Reviewed       | Require ADMIN JWT, `is_verified=true`       |
+| Verify Email     | `POST /api/auth/email/verify` | ⬜ Not reviewed  | Email verification token                    |
+| Resend Verify    | `POST /api/auth/email/resend` | ⬜ Not reviewed  | Resend verification email                   |
+| Forgot Password  | `POST /api/auth/password/forgot` | ⬜ Not reviewed | Token 15min, rate limit 3/15min            |
+| Reset Password   | `POST /api/auth/password/reset`  | ⬜ Not reviewed | Token one-time use                          |
+| Change Password  | `PUT /api/auth/password`      | ⬜ Not reviewed  | Require JWT, rate limit 5/15min             |
 
-**Files liên quan**:
-- `backend/src/controllers/auth.controller.ts`
-- `backend/src/services/auth.service.ts`
-- `backend/src/middleware/auth.middleware.ts`
-- `frontend/src/pages/Login.tsx`
-- `frontend/src/pages/ForgotPassword.tsx`
-
----
-
-### 2. [ADMIN] Quản lý Users (Sprint 4)
-> **SRS Ref**: UC022 | **Trello**: Sprint 4 - Card 5
-
-| Chức năng   | API Endpoint                      | Trạng thái      | Ghi chú                  |
-| ----------- | --------------------------------- | --------------- | ------------------------ |
-| List users  | `GET /api/admin/users`            | ⬜ Chưa đánh giá | Search, filter, paginate |
-| Create user | `POST /api/admin/users`           | ⬜ Chưa đánh giá | ADMIN role only          |
-| User detail | `GET /api/admin/users/{id}`       | ⬜ Chưa đánh giá |                          |
-| Update user | `PUT /api/admin/users/{id}`       | ⬜ Chưa đánh giá |                          |
-| Delete user | `DELETE /api/admin/users/{id}`    | ⬜ Chưa đánh giá | Soft delete              |
-| Lock/Unlock | `POST /api/admin/users/{id}/lock` | ⬜ Chưa đánh giá | Audit log                |
-
-**Files liên quan**:
-- `backend/src/controllers/user.controller.ts`
-- `backend/src/services/user.service.ts`
-- `frontend/src/pages/ManageUsers.tsx`
+**Files:**
+- `backend/src/controllers/authController.ts` (31163 bytes)
+- `backend/src/services/authService.ts`, `registerService.ts`, `changePasswordService.ts`, `passwordResetService.ts`, `emailService.ts`, `verifyEmailService.ts`
+- `backend/src/middleware/authMiddleware.ts`, `rateLimiter.ts`
+- `frontend/src/pages/LoginPage.tsx` (12775 bytes)
+- `frontend/src/services/authService.ts`
 
 ---
 
-### 3. [ADMIN] Quản lý Devices (Sprint 4)
-> **SRS Ref**: UC025 | **Trello**: Sprint 4 - Card 6
+### 2. [ADMIN_USERS] User Management (Sprint 4)
+> **SRS Ref**: UC022 | **JIRA**: EP15-AdminManage
 
-| Chức năng     | API Endpoint                          | Trạng thái      | Ghi chú        |
-| ------------- | ------------------------------------- | --------------- | -------------- |
-| List devices  | `GET /api/admin/devices`              | ⬜ Chưa đánh giá |                |
-| Device detail | `GET /api/admin/devices/{id}`         | ⬜ Chưa đánh giá |                |
-| Update device | `PUT /api/admin/devices/{id}`         | ⬜ Chưa đánh giá |                |
-| Assign device | `POST /api/admin/devices/{id}/assign` | ⬜ Chưa đánh giá | Assign to user |
-| Lock device   | `POST /api/admin/devices/{id}/lock`   | ⬜ Chưa đánh giá |                |
+| Function    | API Endpoint                    | Status          | Note                       |
+| ----------- | ------------------------------- | --------------- | -------------------------- |
+| List users  | `GET /api/users`                | ⬜ Pending      | Search, filter, paginate   |
+| Create user | `POST /api/users`               | ⬜ Pending      | ADMIN role only            |
+| User detail | `GET /api/users/{id}`           | ⬜ Pending      |                            |
+| Update user | `PUT /api/users/{id}`           | ⬜ Pending      |                            |
+| Delete user | `DELETE /api/users/{id}`        | ⬜ Pending      | Soft delete, requires admin password |
+| Lock/Unlock | `PATCH /api/users/{id}/lock`    | ⬜ Pending      | Toggle, audit log          |
 
-**Files liên quan**:
-- `backend/src/controllers/device.controller.ts`
-- `backend/src/services/device.service.ts`
-- `frontend/src/pages/ManageDevices.tsx`
-
----
-
-### 4. [ADMIN] Cấu hình hệ thống (Sprint 4)
-> **SRS Ref**: UC024 | **Trello**: Sprint 4 - Card 7
-
-| Chức năng       | API Endpoint              | Trạng thái      | Ghi chú                     |
-| --------------- | ------------------------- | --------------- | --------------------------- |
-| Get settings    | `GET /api/admin/settings` | ⬜ Chưa đánh giá | Vital thresholds, AI config |
-| Update settings | `PUT /api/admin/settings` | ⬜ Chưa đánh giá | Cache on startup            |
-
-**Files liên quan**:
-- `backend/src/controllers/settings.controller.ts`
-- `backend/src/services/settings.service.ts`
-- `frontend/src/pages/SystemSettings.tsx`
+**Files:**
+- `backend/src/controllers/userController.ts` (14986 bytes)
+- `backend/src/services/userService.ts` (11339 bytes)
+- `backend/src/routes/userRoutes.ts`
+- `frontend/src/pages/admin/UserManagementPage.tsx` (15022 bytes)
+- `frontend/src/components/users/UserTable.tsx`, `UserFormModal.tsx`, `DeleteConfirmModal.tsx`, `LockConfirmModal.tsx`
+- `frontend/src/services/userService.ts`
 
 ---
 
-### 5. [ADMIN] Xem System Logs (Sprint 4)
-> **SRS Ref**: UC026 | **Trello**: Sprint 4 - Card 8
+### 3. [DEVICES] Device Management (Sprint 4)
+> **SRS Ref**: UC025 | **JIRA**: EP15-AdminManage
+> **Status**: ⬜ Not built — no controller/service/route exists yet
 
-| Chức năng  | API Endpoint                 | Trạng thái      | Ghi chú          |
-| ---------- | ---------------------------- | --------------- | ---------------- |
-| View logs  | `GET /api/admin/logs`        | ⬜ Chưa đánh giá | Filter, paginate |
-| Export CSV | `GET /api/admin/logs/export` | ⬜ Chưa đánh giá |                  |
+| Function      | API Endpoint                          | Status     | Note           |
+| ------------- | ------------------------------------- | ---------- | -------------- |
+| List devices  | `GET /api/admin/devices`              | ⬜ Planned |                |
+| Device detail | `GET /api/admin/devices/{id}`         | ⬜ Planned |                |
+| Update device | `PUT /api/admin/devices/{id}`         | ⬜ Planned |                |
+| Assign device | `POST /api/admin/devices/{id}/assign` | ⬜ Planned |                |
+| Lock device   | `POST /api/admin/devices/{id}/lock`   | ⬜ Planned |                |
 
-**Files liên quan**:
-- `backend/src/controllers/logs.controller.ts`
-- `backend/src/services/logs.service.ts`
-- `frontend/src/pages/SystemLogs.tsx`
+---
+
+### 4. [CONFIG] System Configuration (Sprint 4)
+> **SRS Ref**: UC024 | **JIRA**: EP16-AdminConfig
+> **Status**: ⬜ Not built — no controller/service/route exists yet
+
+| Function        | API Endpoint              | Status     | Note                        |
+| --------------- | ------------------------- | ---------- | --------------------------- |
+| Get settings    | `GET /api/admin/settings` | ⬜ Planned | Vital thresholds, AI config |
+| Update settings | `PUT /api/admin/settings` | ⬜ Planned | Cache on startup            |
+
+---
+
+### 5. [LOGS] System Logs (Sprint 4)
+> **SRS Ref**: UC026 | **JIRA**: EP16-AdminConfig
+> **Status**: ⬜ Not built — no controller/service/route exists yet
+
+| Function   | API Endpoint                 | Status     | Note             |
+| ---------- | ---------------------------- | ---------- | ---------------- |
+| View logs  | `GET /api/admin/logs`        | ⬜ Planned | Filter, paginate |
+| Export CSV | `GET /api/admin/logs/export` | ⬜ Planned |                  |
 
 ---
 
 ### 6. [INFRA] Infrastructure Setup (Sprint 1)
-> **SRS Ref**: N/A | **Trello**: Sprint 1 - Cards 1, 2A
+> **SRS Ref**: N/A | **JIRA**: EP01-Database, EP02-AdminBE
 
-| Chức năng                    | Trạng thái      | Ghi chú                            |
+| Function                     | Status          | Note                               |
 | ---------------------------- | --------------- | ---------------------------------- |
-| Database + TimescaleDB setup | ⬜ Chưa đánh giá | SQL SCRIPTS/ là source of truth    |
-| Express + TypeScript project | ⬜ Chưa đánh giá | Prisma ORM                         |
-| CORS middleware              | ⬜ Chưa đánh giá | Allow Admin Web origin             |
-| Logging (file + console)     | ⬜ Chưa đánh giá |                                    |
-| Environment variables        | ⬜ Chưa đánh giá | DB_URL, JWT_SECRET, PORT           |
-| Health check endpoint        | ⬜ Chưa đánh giá | `GET /health`                      |
-| Swagger docs                 | ⬜ Chưa đánh giá | swagger-jsdoc + swagger-ui-express |
+| Database + TimescaleDB setup | ⬜ Not reviewed | SQL SCRIPTS/ is source of truth    |
+| Express + TypeScript project | ✅ Built        | Prisma ORM, port 5000              |
+| CORS middleware              | ✅ Built        | Using cors() globally              |
+| Logging (file + console)     | ⬜ Not reviewed |                                    |
+| Environment variables        | ✅ Built        | .env present                       |
+| Health check endpoint        | ✅ Built        | `GET /api/health`                  |
+| Swagger docs                 | ✅ Built        | `/api-docs` — swagger-ui-express   |
 
-**Files liên quan**:
-- `backend/src/config/`
-- `backend/src/middleware/`
-- `backend/src/index.ts`
-- `backend/prisma/`
+**Files:**
+- `backend/src/index.ts` (993 bytes)
+- `backend/src/config/swagger.ts` (3287 bytes)
+- `backend/src/lib/prisma.ts` (621 bytes)
+- `backend/src/utils/jwt.ts` (502 bytes)
+- `backend/src/middleware/authMiddleware.ts`, `rateLimiter.ts`
+- `backend/prisma/` (schema.prisma)
 
 ---
 
-## 🔄 Lịch Sử Cập Nhật
+## Update History
 
-| Ngày       | Phiên bản | Nội dung                                       |
-| ---------- | --------- | ---------------------------------------------- |
-| 03/03/2026 | v1.0      | Khởi tạo Project Structure dựa trên Sprint 1-4 |
+| Date       | Version | Changes                                                                 |
+| ---------- | ------- | ----------------------------------------------------------------------- |
+| 2026-03-05 | v2.0    | CHECK scan: actual folder structure, routes corrected, Trello→JIRA      |
+| 2026-03-03 | v1.0    | Initial structure based on Sprint 1-4 planning                          |
