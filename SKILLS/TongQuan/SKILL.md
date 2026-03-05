@@ -28,7 +28,8 @@ Automatically activates when the user wants to:
 
 ### Tier 1: Navigation (ALWAYS read first)
 1. **Read `PM_REVIEW/MASTER_INDEX.md`** — The overall GPS map of the project.
-2. Determine the assessment scope (Admin / Mobile / or both).
+2. **Read `PM_REVIEW/Resources/SRS_INDEX.md`** — System-level context (architecture, features, thresholds).
+3. Determine the assessment scope (Admin / Mobile / or both).
 
 ### Tier 2: Prepare Integrated Skills
 3. **CRITICAL:** Before evaluating, read the internal bundled skills under `skills/` to inherit their high-level structural rules:
@@ -141,6 +142,7 @@ When the overview review concludes, you **MUST** update `MASTER_INDEX.md`:
 | Name             | Path                                                | When to read                                   |
 | ---------------- | --------------------------------------------------- | ---------------------------------------------- |
 | **MASTER INDEX** | `PM_REVIEW/MASTER_INDEX.md`                         | **ALWAYS**                                     |
+| **SRS Index**    | `PM_REVIEW/Resources/SRS_INDEX.md`                  | **ALWAYS** — System-level context              |
 | Admin Structure  | `PM_REVIEW/REVIEW_ADMIN/Project_Structure.md`       | When reviewing Admin                           |
 | Mobile Structure | `PM_REVIEW/REVIEW_MOBILE/Project_Structure.md`      | When reviewing Mobile                          |
 | Admin Summaries  | `PM_REVIEW/REVIEW_ADMIN/summaries/*.md`             | Based on module                                |

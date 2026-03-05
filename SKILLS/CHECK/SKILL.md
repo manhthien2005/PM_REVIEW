@@ -49,6 +49,7 @@ Scan actual project source code → update `Project_Structure.md` and all `summa
 ### Tier 1: Navigation (ALWAYS)
 1. Read `PM_REVIEW/MASTER_INDEX.md`
 2. Read `PM_REVIEW/Resources/TASK/JIRA/README.md` (JIRA Index)
+3. Read `PM_REVIEW/Resources/SRS_INDEX.md` (SRS quick-reference for system-level context)
 
 ### Tier 2: Current State
 3. Read current `Project_Structure.md` (ADMIN or MOBILE)
@@ -177,6 +178,7 @@ Display this changelog directly to the user (do NOT save to file).
 | Name             | Path                                           | When to read         |
 | ---------------- | ---------------------------------------------- | -------------------- |
 | MASTER INDEX     | `PM_REVIEW/MASTER_INDEX.md`                    | ALWAYS               |
+| **SRS Index**    | `PM_REVIEW/Resources/SRS_INDEX.md`             | ALWAYS               |
 | JIRA Index       | `PM_REVIEW/Resources/TASK/JIRA/README.md`      | ALWAYS               |
 | Summary Template | `references/summary-template.md`               | Phase 2              |
 | Update Checklist | `references/update-checklist.md`               | Both phases          |
