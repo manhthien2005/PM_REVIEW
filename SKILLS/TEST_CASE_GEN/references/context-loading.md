@@ -75,11 +75,11 @@
 
 ### Tier 4: API Code Scan (GENERATE mode, if available)
 
-| Step | Action                                                 | Extract                            |
-| ---- | ------------------------------------------------------ | ---------------------------------- |
-| 6    | Scan Admin API: `HealthGuard/src/routes/`              | Route definitions, HTTP methods    |
-| 7    | Scan Admin controllers: `HealthGuard/src/controllers/` | Validator logic, error responses   |
-| 8    | Scan Mobile API: `health_system/app/api/`              | FastAPI endpoints, Pydantic models |
+| Step | Action                                             | Extract                            |
+| ---- | -------------------------------------------------- | ---------------------------------- |
+| 6    | Scan Admin API: `backend/src/routes/`              | Route definitions, HTTP methods    |
+| 7    | Scan Admin controllers: `backend/src/controllers/` | Validator logic, error responses   |
+| 8    | Scan Mobile API: `health_system/app/api/`          | FastAPI endpoints, Pydantic models |
 
 **API-to-Test-Case mapping:**
 
@@ -110,13 +110,13 @@
 
 ### Admin Platform
 
-| Source Type   | Path Pattern                              |
-| ------------- | ----------------------------------------- |
-| Frontend      | `HealthGuard/src/pages/{module}/`         |
-| API Routes    | `HealthGuard/src/routes/{module}.ts`      |
-| Controllers   | `HealthGuard/src/controllers/{module}.ts` |
-| Middleware    | `HealthGuard/src/middleware/`             |
-| Prisma Schema | `HealthGuard/prisma/schema.prisma`        |
+| Source Type   | Path Pattern                                    |
+| ------------- | ----------------------------------------------- |
+| Frontend      | `frontend/src/pages/{module}/`                  |
+| API Routes    | `backend/src/routes/{module}Routes.ts`          |
+| Controllers   | `backend/src/controllers/{module}Controller.ts` |
+| Middleware    | `backend/src/middleware/`                       |
+| Prisma Schema | `backend/prisma/schema.prisma`                  |
 
 ### Mobile Platform
 

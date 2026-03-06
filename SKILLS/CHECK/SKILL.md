@@ -1,37 +1,35 @@
 ---
 name: project-check-update
-description: "Scan actual source code and update Project_Structure.md + summaries to stay in sync. Triggers: check project, update structure, check source, sync PM, update summaries."
-risk: safe
-source: custom
-date_added: "2026-03-04"
-date_updated: "2026-03-04"
+description: |
+  Quét mã nguồn thực tế và cập nhật Project_Structure.md + summaries/ để
+  PM_REVIEW luôn khớp với code hiện tại. Dành cho PM/AI agent quản lý
+  cấu trúc dự án HealthGuard.
+  Kích hoạt khi: "check project", "cập nhật cấu trúc", "kiểm tra source",
+  "project thay đổi chưa?", "sync lại PM", "update summaries",
+  "review structure", "kiểm tra project", "project còn đúng không?",
+  "check source", "update structure".
 ---
 
-# Skill: CHECK — Scan & Update PM_REVIEW
+# Goal
 
-## Purpose
-
-Scan actual project source code → update `Project_Structure.md` and all `summaries/*.md` to ensure PM_REVIEW always reflects the current state. These files are the **project overview map** that allows AI to understand the project without reading every file.
-
-## When to Use
-
-- After significant code changes (new/removed modules, new APIs, refactoring)
-- Before starting a new review session to ensure context accuracy
-- When migrating task references from Trello → JIRA
-- Periodically to keep PM_REVIEW in sync with source code
+Ensure PM_REVIEW always reflects the true state of source code by scanning
+actual project files and updating `Project_Structure.md` + `summaries/*.md`.
+One command replaces 30–60 minutes of manual cross-referencing.
 
 ---
 
-## Project Detection Protocol (MANDATORY)
+# Instructions
 
-### Step 1: Detect project folders
+## Step 0: Project Detection (MANDATORY)
+
+### Detect project folders
 
 | Project   | Path                                 | Target                     |
 | --------- | ------------------------------------ | -------------------------- |
 | ADMIN WEB | `d:\DoAn2\VSmartwatch\HealthGuard`   | `PM_REVIEW/REVIEW_ADMIN/`  |
 | MOBILE    | `d:\DoAn2\VSmartwatch\health_system` | `PM_REVIEW/REVIEW_MOBILE/` |
 
-### Step 2: Handle detection result
+### Handle detection result
 
 | Scenario              | Action                                                            |
 | --------------------- | ----------------------------------------------------------------- |
@@ -40,46 +38,47 @@ Scan actual project source code → update `Project_Structure.md` and all `summa
 | Neither exists        | Report error, stop                                                |
 
 > [!CAUTION]
-> When both projects exist, the AI **MUST** stop and ask: "Both ADMIN and MOBILE projects exist. Which one do you want to check & update?" — NEVER auto-select both.
+> When both projects exist, **STOP and ask:** "Both ADMIN and MOBILE projects exist. Which one do you want to check & update?" — NEVER auto-select.
 
 ---
 
-## Context Loading Protocol
+## Step 1: Context Loading (Tiered — Lazy)
 
-### Tier 1: Navigation (ALWAYS)
-1. Read `PM_REVIEW/MASTER_INDEX.md`
-2. Read `PM_REVIEW/Resources/TASK/JIRA/README.md` (JIRA Index)
-3. Read `PM_REVIEW/Resources/SRS_INDEX.md` (SRS quick-reference for system-level context)
+Load context in tiers. Read ONLY what is needed at each stage.
 
-### Tier 2: Current State
-3. Read current `Project_Structure.md` (ADMIN or MOBILE)
-4. Read all current `summaries/*.md`
-
-### Tier 3: Reference
-5. Read `references/summary-template.md` — required template for summary files
-6. Read `references/update-checklist.md` — checklist for both phases
+| Tier      | What                                      | When                               |
+| --------- | ----------------------------------------- | ---------------------------------- |
+| Tier 1    | `PM_REVIEW/MASTER_INDEX.md`               | ALWAYS — read first                |
+| Tier 2    | Current `Project_Structure.md`            | After project is selected          |
+| Tier 3    | `references/update-checklist.md`          | Before starting Phase 1            |
+| On-demand | `PM_REVIEW/Resources/TASK/JIRA/README.md` | ONLY when mapping Trello → JIRA    |
+| On-demand | `PM_REVIEW/Resources/SRS_INDEX.md`        | ONLY when verifying SRS references |
+| On-demand | `references/summary-template.md`          | ONLY during Phase 2                |
 
 ---
 
-## Phase 1: Update Project_Structure.md
+## Step 2: Phase 1 — Update Project_Structure.md
 
-### Process
-
-**Step 1 — Scan actual structure:**
+**2a — Scan actual structure:**
 - Use `list_dir` and `find_by_name` to scan the full project folder structure
 - Record: new folders, new files, deleted files, LOC changes
 - Scan `package.json` / `pubspec.yaml` / `requirements.txt` for dependencies
 
-**Step 2 — Compare with current Project_Structure.md:**
+**2b — Compare with current Project_Structure.md:**
 - Compare actual tree vs tree in file
 - Compare module/feature list
 - Read route files → confirm API endpoints actually exist
 
-**Step 3 — Update the file:**
+**2c — Update the file:**
 - Update tree structure to match reality
 - Update module statuses (✅ Done / ⬜ Not reviewed / ⚠️ Issues found)
 - Replace all "Trello" refs → "JIRA" with correct Epic Names (from JIRA Index)
 - Update date + version in changelog section
+
+**2d — VERIFY Phase 1:**
+- Count folders in updated file vs `list_dir` output — must match 100%
+- `grep` for "Trello" in file — must return 0 results
+- Display: `"📍 Phase 1 ✅ — {N} changes applied to Project_Structure.md"`
 
 ### Rules for Project_Structure updates
 - **Preserve existing format** — only update content
@@ -89,31 +88,21 @@ Scan actual project source code → update `Project_Structure.md` and all `summa
 
 ---
 
-## Phase 2: Update Summaries
+## Step 3: Phase 2 — Update Summaries
 
-### Process
+**3a — Read summary template:**
+- Read `references/summary-template.md` (required template)
 
-**Step 1 — Read current summary:**
-- Read each `summaries/*.md` file
-- Note existing content
+**3b — For EACH summary file:**
+1. Read current `summaries/*.md` file
+2. Scan corresponding source code (`view_file_outline`, `list_dir`)
+3. Confirm actual API endpoints from route files
+4. Confirm actual file paths + update LOC
+5. Map Trello → JIRA Epic Name (use JIRA Index)
+6. Rewrite using template from `references/summary-template.md`
+7. **OVERWRITE** the old summary file directly
 
-**Step 2 — Scan corresponding source code:**
-- Identify related files from the File Index in summary
-- Use `view_file_outline` on key files → confirm functions/classes exist
-- Read route files → confirm actual API endpoints
-- Check file sizes, LOC
-
-**Step 3 — Cross-reference JIRA:**
-- Use JIRA Index (`PM_REVIEW/Resources/TASK/JIRA/README.md`) to map module → Epic Name
-- Replace all "Trello Cards" → "JIRA: {Epic Name}"
-
-**Step 4 — Rewrite summary using new template:**
-
-> [!IMPORTANT]
-> **MUST** use the template in `references/summary-template.md`. Remove ALL unnecessary content. Keep only essential information.
-> **OVERWRITE** the old summary file directly — do NOT create a new file or version.
-
-### What to REMOVE (wastes tokens)
+**3c — What to REMOVE (wastes tokens):**
 
 | Section                               | Reason                                                    |
 | ------------------------------------- | --------------------------------------------------------- |
@@ -123,7 +112,7 @@ Scan actual project source code → update `Project_Structure.md` and all `summa
 | Empty Review Notes                    | Empty section = wasted tokens                             |
 | Generic Non-Functional Requirements   | Repeated in every module, provides no new info            |
 
-### What to KEEP (essential)
+**3d — What to KEEP (essential):**
 
 | Section                         | Value for AI                                     |
 | ------------------------------- | ------------------------------------------------ |
@@ -135,24 +124,20 @@ Scan actual project source code → update `Project_Structure.md` and all `summa
 | Cross-References                | DB tables, UC files, related modules             |
 | Review (if reviewed)            | Score + link to review file                      |
 
----
+**3e — VERIFY Phase 2:**
+- For each summary: confirm all file paths in File Index exist using `find_by_name`
+- Count updated files vs total summaries — report `"Updated X/Y summaries"`
+- Display: `"📍 Phase 2 ✅ — {X}/{Y} summaries updated"`
 
-## Overwrite Policy
-
-> [!IMPORTANT]
-> All updated files **MUST be overwritten in-place**. Do NOT create new versions, copies, or backups.
-
-| File                   | Action                             |
-| ---------------------- | ---------------------------------- |
-| `Project_Structure.md` | Overwrite directly                 |
-| `summaries/*.md`       | Overwrite directly                 |
-| `MASTER_INDEX.md`      | Update in-place if modules changed |
+### After all summaries are done:
+- Check `MASTER_INDEX.md` — any modules need updating?
+- Produce changelog summary for user
 
 ---
 
-## Output: Changelog
+## Step 4: Output Changelog
 
-After completion, the AI MUST produce a summary of changes:
+After completion, display a summary to user (**do NOT save to file**):
 
 ```
 ## CHECK Report — {PROJECT_NAME} ({DATE})
@@ -169,21 +154,166 @@ After completion, the AI MUST produce a summary of changes:
 - Trello → JIRA: [number of refs migrated]
 ```
 
-Display this changelog directly to the user (do NOT save to file).
+---
+
+## Progress Reporting
+
+After EACH major step, display progress to user:
+- `"📍 Step 1/4 — Detecting project..."`
+- `"📍 Step 2/4 — Scanning actual structure..."`
+- `"📍 Step 3/4 — Updating summary 3/7: AUTH..."`
+- `"📍 Step 4/4 — Generating changelog..."`
+
+## Recovery Protocol
+
+If skill fails mid-execution:
+1. Report: which files were already updated (committed changes)
+2. Report: which files were NOT yet processed
+3. User can re-run skill — idempotent, will skip already-correct files
+
+---
+
+# Examples
+
+## Example 1: Happy Path — ADMIN project, normal update
+
+**Context:** User says "check project". Both ADMIN and MOBILE folders exist.
+
+**AI Actions:**
+1. Detect both projects → Ask: "Both ADMIN and MOBILE exist. Which one?"
+2. User: "ADMIN"
+3. Load `MASTER_INDEX.md` → 6 modules listed
+4. Load `REVIEW_ADMIN/Project_Structure.md` → last updated 2026-02-28
+5. Scan `d:\DoAn2\VSmartwatch\HealthGuard\` with `list_dir`:
+   - Found NEW: `src/modules/notification/` (not in tree)
+   - Found DELETED: `src/modules/legacy-auth/` (in tree but gone)
+   - Found CHANGED: `src/modules/auth/auth.controller.ts` (200 → 280 LOC)
+6. Update `Project_Structure.md`:
+   - Add `notification/` to tree
+   - Remove `legacy-auth/` from tree
+   - Update AUTH module LOC
+   - Replace "Trello: Card #42" → "JIRA: EP04-Login"
+7. **VERIFY:** Tree folder count = 14, `grep "Trello"` = 0 matches ✅
+8. Display: `"📍 Phase 1 ✅ — 4 changes applied to Project_Structure.md"`
+9. Load `references/summary-template.md`
+10. Update `summaries/AUTH.md`: scan `auth/` → confirm 4 endpoints → rewrite
+11. Create NEW `summaries/NOTIFICATION.md` using template
+12. Remove `summaries/LEGACY_AUTH.md` reference from MASTER_INDEX
+13. **VERIFY:** All file paths in File Index exist ✅
+14. Display: `"📍 Phase 2 ✅ — 2/6 summaries updated, 1 created, 1 removed"`
+
+**Output:**
+```
+## CHECK Report — ADMIN (2026-03-06)
+
+### Project_Structure.md
+- Added: src/modules/notification/
+- Removed: src/modules/legacy-auth/
+- Updated: AUTH (LOC 200→280)
+- Trello → JIRA: 3 refs migrated
+
+### Summaries
+- Updated: AUTH.md, NOTIFICATION.md (new)
+- Format: AUTH.md converted to new template
+- Trello → JIRA: 2 refs migrated
+```
+
+---
+
+## Example 2: Edge Case — Single project, missing data
+
+**Context:** User says "kiểm tra project". Only MOBILE folder exists.
+
+**AI Actions:**
+1. Detect only MOBILE → proceed automatically (no need to ask)
+2. Load `MASTER_INDEX.md` → 8 modules listed
+3. Load `REVIEW_MOBILE/Project_Structure.md`
+4. Scan `d:\DoAn2\VSmartwatch\health_system\`:
+   - `lib/features/sleep/` exists but has only placeholder files (0 LOC)
+   - `lib/features/analysis/` folder does NOT exist yet
+5. Update `Project_Structure.md`:
+   - SLEEP module → status ⬜ Not built (placeholder only)
+   - ANALYSIS module → status ⬜ Not built (folder missing)
+6. Load JIRA Index → no Epic found for SLEEP module
+7. Mark SLEEP as "JIRA: TBD" and flag in changelog
+8. **VERIFY:** Tree matches, "Trello" count = 0 ✅
+9. Update `summaries/SLEEP.md`:
+   - Rewrite with template, note "⬜ Not built — placeholder files only"
+   - File Index: empty (no real source files)
+10. Skip `summaries/ANALYSIS.md` — no source code, write minimal summary noting "⬜ Not built"
+11. **VERIFY:** File paths verified ✅
+
+**Output:**
+```
+## CHECK Report — MOBILE (2026-03-06)
+
+### Project_Structure.md
+- Updated: SLEEP (→ ⬜ Not built), ANALYSIS (→ ⬜ Not built)
+- Trello → JIRA: 5 refs migrated
+
+### Summaries
+- Updated: SLEEP.md (minimal — not built)
+- Created: ANALYSIS.md (minimal — not built)
+- ⚠️ JIRA mapping missing: SLEEP → marked as "JIRA: TBD"
+```
+
+---
+
+# Constraints
+
+## 🔴 Safety (vi phạm = FAIL)
+- 🚫 **NEVER update both projects simultaneously** — chọn lệch = corrupt data
+- 🚫 **NEVER overwrite without showing diff preview** when >3 files affected — confirm trước
+- ✅ **ALWAYS display progress** after each major step — user must see what's happening
+- ✅ **ALWAYS report recovery state** if skill fails mid-execution
+
+## 🟡 Operational (nên tuân thủ)
+- Summaries MUST follow template in `references/summary-template.md`
+- Preserve `Project_Structure.md` format — only update content
+- After updating summaries → update `MASTER_INDEX.md` if modules changed
+- OVERWRITE old files directly — no versioning, no backups
+
+## 🟢 Convention (khuyến khích)
+- DO NOT read full SRS — only read UC files when needed
+- DO NOT read full JIRA CSV — use JIRA Index
+- Keep Context Loading lazy — read on-demand, not all at once
+
+---
+
+## Dry-Run Mode
+
+If user says "check --dry-run" or "check nhưng đừng sửa gì":
+1. Run full scan (Phase 1 + Phase 2) as normal
+2. Display all PROPOSED changes as diffs
+3. **DO NOT write any files**
+4. Ask user: "Apply these changes? (yes/no)"
+
+---
+
+## Edge Cases
+
+| Scenario                                          | Action                                                    |
+| ------------------------------------------------- | --------------------------------------------------------- |
+| Summary file exists but module has no source code | Rewrite summary noting "⬜ Not built", keep JIRA/UC refs   |
+| Source code exists but no summary file            | Create new summary using `references/summary-template.md` |
+| Module folder was deleted since last check        | Remove from `Project_Structure.md`, update MASTER_INDEX   |
+| `Project_Structure.md` does not exist             | Report error — user must create it first or run TongQuan  |
+| JIRA Index has no matching Epic for a module      | Mark as "JIRA: TBD" and flag in changelog                 |
+| User requests dry-run                             | Show diffs only, do not write — ask confirm before apply  |
+| Skill fails mid-Phase 2                           | Report completed + remaining files, user can re-run       |
 
 ---
 
 ## Reference Documents
 
-| Name             | Path                                           | When to read         |
-| ---------------- | ---------------------------------------------- | -------------------- |
-| MASTER INDEX     | `PM_REVIEW/MASTER_INDEX.md`                    | ALWAYS               |
-| **SRS Index**    | `PM_REVIEW/Resources/SRS_INDEX.md`             | ALWAYS               |
-| JIRA Index       | `PM_REVIEW/Resources/TASK/JIRA/README.md`      | ALWAYS               |
-| Summary Template | `references/summary-template.md`               | Phase 2              |
-| Update Checklist | `references/update-checklist.md`               | Both phases          |
-| Admin Structure  | `PM_REVIEW/REVIEW_ADMIN/Project_Structure.md`  | When checking ADMIN  |
-| Mobile Structure | `PM_REVIEW/REVIEW_MOBILE/Project_Structure.md` | When checking MOBILE |
+| Name              | Path                                        | When to read            |
+| ----------------- | ------------------------------------------- | ----------------------- |
+| MASTER INDEX      | `PM_REVIEW/MASTER_INDEX.md`                 | ALWAYS (Tier 1)         |
+| Project Structure | `PM_REVIEW/REVIEW_{X}/Project_Structure.md` | After project selected  |
+| Update Checklist  | `references/update-checklist.md`            | Before Phase 1          |
+| JIRA Index        | `PM_REVIEW/Resources/TASK/JIRA/README.md`   | On-demand (Trello→JIRA) |
+| SRS Index         | `PM_REVIEW/Resources/SRS_INDEX.md`          | On-demand (SRS verify)  |
+| Summary Template  | `references/summary-template.md`            | Phase 2 only            |
 
 ---
 
@@ -198,25 +328,4 @@ The CHECK scan is considered **DONE** when ALL of the following are true:
 - [ ] LOC counts are updated for implemented files
 - [ ] MASTER_INDEX.md is updated if modules were added/removed
 - [ ] Changelog summary displayed to user
-
-## Edge Cases
-
-| Scenario                                          | Action                                                    |
-| ------------------------------------------------- | --------------------------------------------------------- |
-| Summary file exists but module has no source code | Rewrite summary noting "⬜ Not built", keep JIRA/UC refs   |
-| Source code exists but no summary file            | Create new summary using `references/summary-template.md` |
-| Module folder was deleted since last check        | Remove from `Project_Structure.md`, update MASTER_INDEX   |
-| `Project_Structure.md` does not exist             | Report error — user must create it first or run TongQuan  |
-| JIRA Index has no matching Epic for a module      | Mark as "JIRA: TBD" and flag in changelog                 |
-
----
-
-## Rules
-
-- **NEVER update both projects simultaneously** — must choose one
-- **DO NOT read full SRS** — only read UC files when needed
-- **DO NOT read full JIRA CSV** — use JIRA Index
-- **Summaries MUST follow the new template** — compact, remove token waste
-- **Preserve Project_Structure.md format** — only update content
-- **OVERWRITE old files directly** — no versioning, no backups
-- After updating summaries → update `MASTER_INDEX.md` if needed (new/removed modules)
+- [ ] Progress was reported at every major step
