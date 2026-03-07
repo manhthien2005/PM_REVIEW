@@ -3,7 +3,7 @@
 > **Project**: HealthGuard Admin Dashboard  
 > **Tech Stack**: Node.js / Express.js / Prisma ORM / TypeScript (Backend) + React / Vite / TypeScript (Frontend)  
 > **Purpose**: Admin system management for HealthGuard  
-> **Last Updated**: 2026-03-07
+> **Last Updated**: 2026-03-07 (CHECK v2.2)
 
 ---
 
@@ -16,13 +16,15 @@ HealthGuard/
 │   ├── src/
 │   │   ├── config/             # swagger.ts — Swagger spec config
 │   │   ├── controllers/        # authController.ts, userController.ts
+│   │   ├── generated/client/   # Prisma generated client (auto-generated)
 │   │   ├── lib/                # prisma.ts — Prisma client singleton
 │   │   ├── middleware/         # authMiddleware.ts, rateLimiter.ts
 │   │   ├── routes/             # authRoutes.ts, userRoutes.ts
+│   │   ├── scripts/            # seedTestUsers.ts — Test data seeding
 │   │   ├── services/           # 7 service files (see AUTH module)
-│   │   ├── utils/              # jwt.ts — JWT helper
+│   │   ├── utils/              # jwt.ts, validators.ts
 │   │   └── index.ts            # App entry point (port 5000)
-│   ├── .env                    # DB_URL, JWT_SECRET, PORT, SMTP config
+│   ├── .env                    # DB_URL, JWT_SECRET, PORT, SMTP, FRONTEND_URL
 │   ├── package.json
 │   ├── prisma.config.ts
 │   └── tsconfig.json
@@ -30,6 +32,7 @@ HealthGuard/
 ├── frontend/                   # Admin Frontend (React + Vite)
 │   ├── public/
 │   ├── src/
+│   │   ├── assets/             # react.svg (default Vite asset)
 │   │   ├── components/
 │   │   │   ├── admin/          # AdminHeader.tsx, AdminLayout.tsx, AdminSidebar.tsx
 │   │   │   ├── ui/             # HighlightText.tsx, Modal.tsx, Toast.tsx
@@ -42,9 +45,13 @@ HealthGuard/
 │   │   │       └── UserManagementPage.tsx
 │   │   ├── services/           # api.ts, authService.ts, userService.ts
 │   │   ├── types/              # auth.ts, user.ts
+│   │   ├── utils/              # toast.ts — Toast notification utility
+│   │   ├── App.css
 │   │   ├── App.tsx
+│   │   ├── index.css
 │   │   └── main.tsx
 │   ├── index.html
+│   ├── eslint.config.js
 │   ├── vite.config.ts
 │   └── package.json
 │
@@ -61,6 +68,7 @@ HealthGuard/
 | Function         | API Endpoint                     | Status         | Note                                    |
 | ---------------- | -------------------------------- | -------------- | --------------------------------------- |
 | Login (Admin)    | `POST /api/auth/sessions`        | ✅ Reviewed     | JWT iss: `healthguard-admin`, expiry 8h |
+| Get Current User | `GET /api/auth/me`               | ⬜ Not reviewed | Require JWT, returns current user info  |
 | Register (Admin) | `POST /api/auth/users`           | ✅ Reviewed     | Require ADMIN JWT, `is_verified=true`   |
 | Verify Email     | `POST /api/auth/email/verify`    | ⬜ Not reviewed | Email verification token                |
 | Resend Verify    | `POST /api/auth/email/resend`    | ⬜ Not reviewed | Resend verification email               |
@@ -70,10 +78,11 @@ HealthGuard/
 
 **Files:**
 - `backend/src/controllers/authController.ts` (34127 bytes)
-- `backend/src/services/authService.ts`, `registerService.ts`, `changePasswordService.ts`, `passwordResetService.ts`, `emailService.ts`, `verifyEmailService.ts`
-- `backend/src/middleware/authMiddleware.ts`, `rateLimiter.ts`
+- `backend/src/services/authService.ts` (4718), `registerService.ts` (5065), `changePasswordService.ts` (3817), `passwordResetService.ts` (6820), `emailService.ts` (9012), `verifyEmailService.ts` (4878)
+- `backend/src/middleware/authMiddleware.ts` (2452), `rateLimiter.ts` (1382)
+- `backend/src/utils/validators.ts` (1890 bytes)
 - `frontend/src/pages/LoginPage.tsx` (13071 bytes)
-- `frontend/src/services/authService.ts`
+- `frontend/src/services/authService.ts` (2474 bytes)
 
 ---
 
@@ -92,10 +101,10 @@ HealthGuard/
 **Files:**
 - `backend/src/controllers/userController.ts` (14986 bytes)
 - `backend/src/services/userService.ts` (11339 bytes)
-- `backend/src/routes/userRoutes.ts`
+- `backend/src/routes/userRoutes.ts` (647 bytes)
 - `frontend/src/pages/admin/UserManagementPage.tsx` (15090 bytes)
-- `frontend/src/components/users/UserTable.tsx`, `UserFormModal.tsx`, `DeleteConfirmModal.tsx`, `LockConfirmModal.tsx`
-- `frontend/src/services/userService.ts`
+- `frontend/src/components/users/UserTable.tsx` (10809), `UserFormModal.tsx` (21000), `DeleteConfirmModal.tsx` (4477), `LockConfirmModal.tsx` (3186)
+- `frontend/src/services/userService.ts` (2589 bytes)
 
 ---
 
@@ -149,19 +158,22 @@ HealthGuard/
 | Swagger docs                 | ✅ Built        | `/api-docs` — swagger-ui-express |
 
 **Files:**
-- `backend/src/index.ts` (993 bytes)
-- `backend/src/config/swagger.ts` (3287 bytes)
-- `backend/src/lib/prisma.ts` (621 bytes)
-- `backend/src/utils/jwt.ts` (502 bytes)
-- `backend/src/middleware/authMiddleware.ts`, `rateLimiter.ts`
-- `backend/prisma/` (schema.prisma)
+- `backend/src/index.ts` (1363 bytes)
+- `backend/src/config/swagger.ts` (3383 bytes)
+- `backend/src/lib/prisma.ts` (935 bytes)
+- `backend/src/utils/jwt.ts` (1088 bytes)
+- `backend/src/middleware/authMiddleware.ts` (2452), `rateLimiter.ts` (1382)
+- `backend/prisma/schema.prisma` (4621 bytes)
+- `backend/src/scripts/seedTestUsers.ts` (3276 bytes)
+- `backend/src/generated/client/` (Prisma auto-generated)
 
 ---
 
 ## Update History
 
-| Date       | Version | Changes                                                            |
-| ---------- | ------- | ------------------------------------------------------------------ |
-| 2026-03-07 | v2.1    | CHECK scan: updated byte sizes, verified endpoints                 |
-| 2026-03-05 | v2.0    | CHECK scan: actual folder structure, routes corrected, Trello→JIRA |
-| 2026-03-03 | v1.0    | Initial structure based on Sprint 1-4 planning                     |
+| Date       | Version | Changes                                                                                          |
+| ---------- | ------- | ------------------------------------------------------------------------------------------------ |
+| 2026-03-07 | v2.2    | CHECK scan: +generated/, +scripts/, +validators.ts, +frontend utils/assets, +GET /me, byte sizes |
+| 2026-03-07 | v2.1    | CHECK scan: updated byte sizes, verified endpoints                                               |
+| 2026-03-05 | v2.0    | CHECK scan: actual folder structure, routes corrected, Trello→JIRA                               |
+| 2026-03-03 | v1.0    | Initial structure based on Sprint 1-4 planning                                                   |
