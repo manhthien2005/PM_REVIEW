@@ -172,6 +172,35 @@ WITH NO DATA;
 
 COMMENT ON VIEW vitals_daily IS 'Continuous aggregate: vitals theo ngày (dùng cho trends dài hạn)';
 
+-- ============================================================================
+-- Table: sleep_sessions
+-- Purpose: Lưu trữ dữ liệu phân tích giấc ngủ (aggregated từ vitals/motion)
+-- Frequency: 1 session/night/user
+-- ============================================================================
+CREATE TABLE IF NOT EXISTS sleep_sessions (
+    id SERIAL PRIMARY KEY,
+    user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    device_id INT REFERENCES devices(id) ON DELETE SET NULL,
+    
+    -- Session Time
+    start_time TIMESTAMPTZ NOT NULL,
+    end_time TIMESTAMPTZ NOT NULL,
+    
+    -- Metrics
+    sleep_score SMALLINT CHECK (sleep_score >= 0 AND sleep_score <= 100),
+    phases JSONB,  -- Ex: {"awake": 30, "light": 180, "deep": 90, "rem": 60} (minutes)
+    wake_count SMALLINT DEFAULT 0,
+    
+    -- Metadata
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_sleep_sessions_user_time ON sleep_sessions(user_id, start_time DESC);
+
+COMMENT ON TABLE sleep_sessions IS 'Bảng lưu trữ phân tích giấc ngủ tổng hợp hàng ngày';
+COMMENT ON COLUMN sleep_sessions.phases IS 'Thời lượng các giai đoạn ngủ (Awake, Light, Deep, REM) lưu dưới dạng JSONB';
+
 -- Print confirmation
 DO $$
 BEGIN
@@ -180,5 +209,6 @@ BEGIN
     RAISE NOTICE '✓ Created continuous aggregate: vitals_5min';
     RAISE NOTICE '✓ Created continuous aggregate: vitals_hourly';
     RAISE NOTICE '✓ Created continuous aggregate: vitals_daily';
+    RAISE NOTICE '✓ Created table: sleep_sessions';
     RAISE NOTICE '→ Aggregates will auto-refresh based on policies (setup in 09_create_policies.sql)';
 END $$;

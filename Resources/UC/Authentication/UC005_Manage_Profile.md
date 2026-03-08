@@ -55,6 +55,14 @@
 | 3.c.4 | Hệ thống        | Validate (chiều cao 50-250cm, cân nặng 2-500kg) và lưu                                                                       |
 | 3.c.5 | Hệ thống        | Thông báo "Thông tin y tế đã được cập nhật"                                                                                  |
 
+### 3.d - Yêu cầu xóa tài khoản (App Store / GDPR Compliance)
+| Bước  | Người thực hiện | Hành động                                                                                                                    |
+| ----- | --------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| 3.d.1 | Người dùng      | Cuộn xuống cuối trang Hồ sơ, chọn "Xóa tài khoản vĩnh viễn"                                                                  |
+| 3.d.2 | Hệ thống        | Hiển thị popup Cảnh báo đỏ: "Hành động này không thể hoàn tác. Dữ liệu y tế sẽ bị xóa/ẩn danh sau 30 ngày." Yêu cầu nhập MK. |
+| 3.d.3 | Người dùng      | Nhập mật khẩu xác nhận và Tích chọn "Tôi hiểu hậu quả". Nhấn "Xác nhận xóa".                                                 |
+| 3.d.4 | Hệ thống        | Đánh dấu tài khoản `deleted_at = NOW()`, đưa thông tin vào `users_archive`. Đăng xuất người dùng.                            |
+
 ### 5.a - Validation thất bại
 | Bước  | Người thực hiện | Hành động                                                                          |
 | ----- | --------------- | ---------------------------------------------------------------------------------- |
@@ -73,6 +81,7 @@
 - **BR-005-06**: Nhóm máu chỉ chấp nhận giá trị: A+, A-, B+, B-, AB+, AB-, O+, O-
 - **BR-005-07**: Chiều cao (50-250 cm) và cân nặng (2-500 kg) phải là số dương hợp lệ
 - **BR-005-08**: Thuốc đang dùng và dị ứng lưu dạng danh sách, cho phép thêm/xóa từng mục
+- **BR-005-09**: Khi "Xóa tài khoản" được kích hoạt, hệ thống sẽ soft delete (`deleted_at`), đưa data tĩnh vào `users_archive`. Worker hệ thống sẽ tự động quét và thu dọn dữ liệu time-series (vitals, motion) liên quan sau chính xác 30 ngày (Data Retention Period).
 
 ---
 

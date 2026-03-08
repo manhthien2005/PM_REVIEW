@@ -1,7 +1,7 @@
 # BÁO CÁO KIỂM TRA USE CASE — HealthGuard
 
-> **Ngày**: 05/03/2026
-> **Phiên bản**: 1
+> **Ngày**: 08/03/2026
+> **Phiên bản**: 2 (Post-Audit with Fix Plan)
 > **Tổng UC kiểm tra**: 26
 > **Công cụ**: UC_AUDIT Skill v1.0
 
@@ -9,15 +9,15 @@
 
 ## 1. TỔNG QUAN KIỂM TRA
 
-| Metric                  | Kết quả |
-| ----------------------- | ------- |
-| Tổng UC                 | 26      |
-| UC đạt chất lượng       | 18      |
-| UC cần sửa              | 8       |
-| HG-FUNC được phủ        | 11/11   |
-| UC có JIRA Task         | 24/26   |
-| Cột SQL được phủ bởi UC | ~80%    |
-| Tổng findings           | 31      |
+| Metric                  | Kết quả                        |
+| ----------------------- | ------------------------------ |
+| Tổng UC                 | 26                             |
+| UC đạt chất lượng       | 18                             |
+| UC cần sửa              | 10                             |
+| HG-FUNC được phủ        | 11/11 (Thiếu định nghĩa Sleep) |
+| UC có JIRA Task         | 24/26                          |
+| Cột SQL được phủ bởi UC | ~80% (Thiếu bảng Sleep)        |
+| Tổng findings           | 35                             |
 
 ---
 
@@ -427,7 +427,10 @@
 
 | Priority | Issue                       | Action Required                                                                                        | Affected UCs                                    |
 | -------- | --------------------------- | ------------------------------------------------------------------------------------------------------ | ----------------------------------------------- |
-| **P0**   | —                           | Không có lỗi P0 (BROKEN_INCLUDE, BROKEN_EXTEND, COUNT_MISMATCH ✅)                                      | —                                               |
+| **P0**   | Thiếu luồng CRUD (UC025)    | Bổ sung luồng "Thêm/Import Thiết bị" vào UC025 (Admin). Cập nhật JIRA và SQL.                          | UC025                                           |
+| **P0**   | Lỗi Compliance (App Store)  | Bổ sung tính năng "Xóa tài khoản vĩnh viễn" vào hệ thống (tạo UC mới hoặc thêm vào UC009).             | Auth Module                                     |
+| **P1**   | Thiếu SQL Schema (Sleep)    | Bổ sung bảng `sleep_sessions` vào database để phục vụ UC020, UC021.                                    | UC020, UC021                                    |
+| **P1**   | SRS Orphan UCs              | Bổ sung `HG-FUNC-12: Sleep tracking` vào tài liệu `SRS_INDEX.md`.                                      | UC020, UC021                                    |
 | **P1**   | UC_NO_TASK (2)              | Tạo JIRA Story cho UC005 (Profile) và UC009 (Logout) — thêm vào EP04 hoặc EP mới                       | UC005, UC009                                    |
 | **P1**   | STATS_DESYNC                | Cập nhật `UC/README.md` v3.0 → v4.0: tổng = 26 UC, thêm UC005+UC009                                    | README.md                                       |
 | **P1**   | ORPHAN_COLUMN (medical)     | Bổ sung `blood_type`, `height_cm`, `weight_kg`, `medications`, `allergies` vào UC005                   | UC005                                           |
@@ -456,4 +459,31 @@
 | **Findings P1**             | 3        | —        |
 | **Findings P2**             | 5        | —        |
 | **Findings P3**             | 1        | —        |
-| **Total Findings**          | 9 nhóm   | 31 items |
+| **Total Findings**          | 11 nhóm  | 35 items |
+
+---
+
+## 8. KẾ HOẠCH KHẮC PHỤC (FIX PLAN) TÍNH NĂNG THIẾU
+
+Dựa trên yêu cầu rà soát các luồng CRUD (như UC025 thiếu Thêm Thiết Bị), dưới đây là kế hoạch bổ sung nghiệp vụ chi tiết nhằm đảm bảo vòng đời hệ thống hoàn chỉnh:
+
+### 8.1. Bổ sung luồng "Thêm Thiết Bị" (UC025 - Quản lý thiết bị)
+**Vấn đề:** Admin có thể Gán, Khóa thiết bị nhưng chưa có Use Case/Flow cho việc *nhập thiết bị mới* vào kho.
+**Hành động chi tiết:**
+- **Tài liệu UC (`UC025_Manage_Devices.md`)**: Bổ sung Alt Flow `4.d - Thêm thiết bị thủ công` (nhập form) và `4.e - Import thiết bị hàng loạt` (upload file CSV excel).
+- **Thiết kế CSDL (SQL)**: Bảng `devices` cần làm rõ trạng thái thiết bị rảnh (VD: bổ sung field `is_provisioned` hoặc mặc định `user_id = NULL`).
+- **JIRA Task**: Tạo thêm Story: *"Là Quản trị viên, tôi muốn nhập thông tin thiết bị IoT mới vào hệ thống để có thể cấp phát/bán cho bệnh nhân sau này."*
+
+### 8.2. Bổ sung "Xóa Tài Khoản" (Tuân thủ App Store/GDPR Compliance)
+**Vấn đề:** Bất kỳ app nào cho phép đăng ký tài khoản đều bắt buộc phải có chức năng cho phép người dùng xóa hoàn toàn dữ liệu. Hệ thống hiện đang thiếu thiết kế này.
+**Hành động chi tiết:**
+- **Tài liệu UC**: Bổ sung Flow "Yêu cầu xóa tài khoản" vào `UC009_Manage_Profile.md` (hoặc tạo file UC riêng).
+- **Thiết kế CSDL (SQL)**: Cấu trúc hiện tại đã có `deleted_at` (Soft Delete). Cần thiết kế một luồng **Cron Job/Worker** chạy ngầm định kỳ: Ẩn danh hóa/Xóa cứng toàn bộ bản ghi `vitals`, `motion_data`, `risk_scores` gắn với bệnh nhân sau 30 ngày kể từ lúc kích hoạt xóa.
+- **JIRA Task**: Thêm Story: *"Là Bệnh nhân, tôi muốn có tính năng xóa hoàn toàn tài khoản và lịch sử dữ liệu sức khỏe của mình để bảo vệ quyền riêng tư cá nhân."*
+
+### 8.3. Khớp nối hệ sinh thái Sleep Monitoring (Giấc Ngủ)
+**Vấn đề:** Đã có tài liệu UC020, UC021 nhưng tính năng này lại chưa được định nghĩa trong luồng thiết kế kỹ thuật (SRS, SQL Schema).
+**Hành động chi tiết:**
+- **Tài liệu SRS (`SRS_INDEX.md`)**: Thêm Feature mới với `HG-FUNC-12: Theo dõi và phân tích giấc ngủ (Sleep Tracking)`.
+- **Cấu trúc SQL**: Cập nhật DDL scripts thêm bảng `sleep_sessions` bao gồm các trường: `session_id`, `user_id`, `start_time`, `end_time`, `sleep_score`, `phases` (loại JSONB lưu chu trình ngủ: Awake, Light, Deep, REM).
+- **JIRA Task**: Epic EP14-Sleep đã tồn tại, chỉ cần đảm bảo có sub-tasks cho việc xây dựng DB Migration.

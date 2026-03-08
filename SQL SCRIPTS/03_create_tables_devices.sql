@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS devices (
     uuid UUID UNIQUE NOT NULL DEFAULT gen_random_uuid(),
     
     -- Ownership
-    user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    user_id INT REFERENCES users(id) ON DELETE SET NULL, -- Cho phép NULL nếu thiết bị nằm trong kho (chưa gán)
     
     -- Device Info
     device_name VARCHAR(100),

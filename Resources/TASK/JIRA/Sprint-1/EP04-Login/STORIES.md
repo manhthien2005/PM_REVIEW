@@ -76,3 +76,31 @@
 - [ ] Sai mật khẩu → lỗi rõ ràng
 - [ ] Rate limiting: lần thứ 6 bị chặn
 - [ ] Phân quyền role đúng
+
+---
+
+## S06: [Mobile BE+FE] Quản lý Hồ sơ & Cập nhật Y tế (UC005)
+- **Assignee:** Fullstack Dev | **SP:** 3 | **Priority:** Medium | **Component:** Mobile
+- **Labels:** Mobile, Auth, Sprint-1
+
+**Description:** API GET/PUT profile. Các trường dữ liệu y tế: Chiều cao, cân nặng, nhóm máu, dị ứng. **Tính năng XÓA TÀI KHOẢN (Compliance)**: Soft delete user, insert `users_archive`. Có background worker tự dọn dẹp time-series (vitals/motion) sau 30 ngày.
+
+**Acceptance Criteria:**
+- [ ] GET /api/users/profile, PUT /api/users/profile
+- [ ] Validate dữ liệu chiều cao, cân nặng, SĐT
+- [ ] DELETE /api/users/profile (Account Deletion) — Soft delete + Archive
+- [ ] Cronjob/Worker dọn dẹp data y tế sau 30 ngày chạy thành công.
+
+---
+
+## S07: [Mobile+Admin] Đăng xuất hệ thống (UC009)
+- **Assignee:** Fullstack Dev | **SP:** 1 | **Priority:** Medium | **Component:** Auth
+- **Labels:** Auth, Sprint-1
+
+**Description:** Đăng xuất an toàn. Vô hiệu hóa JWT (nếu có blacklist) hoặc xóa Refresh Token dưới DB. Clear local storage/secure storage trên client. Ghi Audit Log.
+
+**Acceptance Criteria:**
+- [ ] GET/POST /api/auth/logout gọi thành công
+- [ ] Refresh token bị thu hồi ở backend DB
+- [ ] Local state/Secure storage frontend bị xóa sạch
+- [ ] Audit log ghi nhận hành động đăng xuất

@@ -61,6 +61,7 @@ Application Layer
 |                         | HG-FUNC-07 | Auto-SOS with GPS if no user response in 30s              |
 | Risk Assessment & XAI   | HG-FUNC-08 | Risk Score = f(HRV, SpO₂, HR, BP history)                 |
 |                         | HG-FUNC-09 | XAI explanation for HIGH risk alerts                      |
+| Sleep Tracking & Anls.  | HG-FUNC-12 | Analyze sleep quality, score, and sleep phases            |
 | Data Pipeline & Storage | HG-FUNC-10 | Stream processing from multiple simultaneous simulators   |
 |                         | HG-FUNC-11 | Store history in PostgreSQL for review & model retraining |
 
@@ -120,12 +121,13 @@ Risk assessment runs every 6 hours or on-demand.
 
 ## Business Processes (Summary)
 
-| Process                   | Key Steps                                                      |
-| ------------------------- | -------------------------------------------------------------- |
-| Continuous Monitoring     | Device→MQTT→Server→threshold check→alert→store in TimescaleDB  |
-| Fall Detection & Response | AI detect→30s countdown→user cancel OR auto-SOS with GPS       |
-| Health Risk Assessment    | Every 6h or on-demand→Risk Score 0-100→XAI explanation→notify  |
-| Manual SOS                | Hold 3s→confirm→GPS + Push/SMS/Email to all emergency contacts |
+| Process                   | Key Steps                                                             |
+| ------------------------- | --------------------------------------------------------------------- |
+| Continuous Monitoring     | Device→MQTT→Server→threshold check→alert→store in TimescaleDB         |
+| Fall Detection & Response | AI detect→30s countdown→user cancel OR auto-SOS with GPS              |
+| Health Risk Assessment    | Every 6h or on-demand→Risk Score 0-100→XAI explanation→notify         |
+| Sleep Analysis            | Nightly processing of HR/motion→Sleep phases (Awake/Light/Deep)→Score |
+| Manual SOS                | Hold 3s→confirm→GPS + Push/SMS/Email to all emergency contacts        |
 
 ---
 
