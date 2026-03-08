@@ -5,7 +5,7 @@
 ## Purpose & Technique
 - Admin authentication: login → JWT (iss `healthguard-admin`, 8h), register (admin-only), forgot/reset/change password
 - Email verification flow (verify token + resend); rate-limiting on login (5/15min per IP) and password operations
-- Services split by feature: `authService`, `registerService`, `changePasswordService`, `passwordResetService`, `emailService`, `verifyEmailService`
+- Core logic centralized in `auth.service.js` under MVC pattern
 
 ## API Index
 | Endpoint                  | Method | Note                                 |
@@ -20,22 +20,18 @@
 | /api/auth/password        | PUT    | Change password (JWT required)       |
 
 ## File Index
-| Path                                          | Role                             |
-| --------------------------------------------- | -------------------------------- |
-| backend/src/controllers/authController.ts     | All auth route handlers (34127B) |
-| backend/src/services/authService.ts           | Login + JWT logic (4718B)        |
-| backend/src/services/registerService.ts       | User registration (5065B)        |
-| backend/src/services/changePasswordService.ts | Change password logic (3817B)    |
-| backend/src/services/passwordResetService.ts  | Forgot/reset flow (6820B)        |
-| backend/src/services/emailService.ts          | Email sending (9012B)            |
-| backend/src/services/verifyEmailService.ts    | Email verification (4878B)       |
-| backend/src/middleware/authMiddleware.ts      | JWT verify + role check (2452B)  |
-| backend/src/middleware/rateLimiter.ts         | Rate limiter config (1382B)      |
-| backend/src/utils/validators.ts               | Input validators (1890B)         |
-| backend/src/routes/authRoutes.ts              | Route definitions (1177B)        |
-| frontend/src/pages/LoginPage.tsx              | Login UI (13071B)                |
-| frontend/src/services/authService.ts          | Frontend auth API calls (2474B)  |
-| frontend/src/types/auth.ts                    | Auth TypeScript types (601B)     |
+| Path                                                  | Role                             |
+| ----------------------------------------------------- | -------------------------------- |
+| backend/src/controllers/auth.controller.js            | All auth route handlers (4009B)  |
+| backend/src/services/auth.service.js                  | Auth + JWT + Mail logic (15731B) |
+| backend/src/middlewares/auth.js                       | JWT verify + role check (3502B)  |
+| backend/src/middlewares/validate.js                   | Input validators (1942B)         |
+| backend/src/routes/auth.routes.js                     | Route definitions (2149B)        |
+| frontend/src/pages/LoginPage.jsx                      | Login UI (12326B)                |
+| frontend/src/pages/ForgotPasswordPage.jsx             | Forgot password UI (9603B)       |
+| frontend/src/pages/ResetPasswordPage.jsx              | Reset password UI (14907B)       |
+| frontend/src/components/admin/ChangePasswordModal.jsx | Change password UI (12602B)      |
+| frontend/src/services/authService.js                  | Frontend auth API calls (3922B)  |
 
 ## Known Issues
 - 🟡 Login route uses `/api/auth/sessions` (not `/api/auth/login`) — deviates from SRS spec

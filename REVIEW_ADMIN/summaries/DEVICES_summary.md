@@ -17,11 +17,11 @@
 | /api/admin/devices/{id}/lock      | POST   | Lock/unlock device    |
 
 ## File Index
-| Path                                        | Role               |
-| ------------------------------------------ | ------------------ |
-| backend/src/controllers/device.controller.ts | ⬜ Not built yet  |
-| backend/src/services/device.service.ts       | ⬜ Not built yet  |
-| frontend/src/pages/ManageDevices.tsx         | ⬜ Not built yet  |
+| Path                                         | Role               |
+| -------------------------------------------- | ------------------ |
+| backend/src/controllers/device.controller.js | ⬜ Not built yet  |
+| backend/src/services/device.service.js       | ⬜ Not built yet  |
+| frontend/src/pages/ManageDevices.jsx         | ⬜ Not built yet  |
 
 ## Known Issues
 - 🔴 No source code exists — controller, service, route, and frontend page all unbuilt

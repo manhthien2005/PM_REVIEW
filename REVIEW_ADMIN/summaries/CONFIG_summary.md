@@ -16,9 +16,9 @@
 ## File Index
 | Path                                           | Role               |
 | ---------------------------------------------- | ------------------ |
-| backend/src/controllers/settings.controller.ts | ⬜ Not built yet  |
-| backend/src/services/settings.service.ts       | ⬜ Not built yet  |
-| frontend/src/pages/SystemSettings.tsx          | ⬜ Not built yet  |
+| backend/src/controllers/settings.controller.js | ⬜ Not built yet  |
+| backend/src/services/settings.service.js       | ⬜ Not built yet  |
+| frontend/src/pages/SystemSettings.jsx          | ⬜ Not built yet  |
 
 ## Known Issues
 - 🔴 No source code exists — controller, service, route, and frontend page all unbuilt

@@ -16,9 +16,9 @@
 ## File Index
 | Path                                         | Role               |
 | -------------------------------------------- | ------------------ |
-| backend/src/controllers/logs.controller.ts   | ⬜ Not built yet  |
-| backend/src/services/logs.service.ts         | ⬜ Not built yet  |
-| frontend/src/pages/SystemLogs.tsx            | ⬜ Not built yet  |
+| backend/src/controllers/logs.controller.js   | ⬜ Not built yet  |
+| backend/src/services/logs.service.js         | ⬜ Not built yet  |
+| frontend/src/pages/SystemLogs.jsx            | ⬜ Not built yet  |
 
 ## Known Issues
 - 🔴 No source code exists — controller, service, route, and frontend page all unbuilt

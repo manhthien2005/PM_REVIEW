@@ -1,58 +1,54 @@
 # PROJECT STRUCTURE - ADMIN WEBSITE (HealthGuard)
 
 > **Project**: HealthGuard Admin Dashboard  
-> **Tech Stack**: Node.js / Express.js / Prisma ORM / TypeScript (Backend) + React / Vite / TypeScript (Frontend)  
+> **Tech Stack**: Node.js / Express.js / Prisma ORM / JavaScript (Backend) + React / Vite / JavaScript (Frontend)  
 > **Purpose**: Admin system management for HealthGuard  
-> **Last Updated**: 2026-03-07 (CHECK v2.2)
+> **Last Updated**: 2026-03-08 (CHECK Phase 1)
 
 ---
 
 ## Architecture Overview
 
-```
+```text
 HealthGuard/
 ├── backend/                    # Admin Backend (Node.js + Express + Prisma)
 │   ├── prisma/                 # Prisma ORM schema (1 file: schema.prisma)
 │   ├── src/
-│   │   ├── config/             # swagger.ts — Swagger spec config
-│   │   ├── controllers/        # authController.ts, userController.ts
-│   │   ├── generated/client/   # Prisma generated client (auto-generated)
-│   │   ├── lib/                # prisma.ts — Prisma client singleton
-│   │   ├── middleware/         # authMiddleware.ts, rateLimiter.ts
-│   │   ├── routes/             # authRoutes.ts, userRoutes.ts
-│   │   ├── scripts/            # seedTestUsers.ts — Test data seeding
-│   │   ├── services/           # 7 service files (see AUTH module)
-│   │   ├── utils/              # jwt.ts, validators.ts
-│   │   └── index.ts            # App entry point (port 5000)
-│   ├── .env                    # DB_URL, JWT_SECRET, PORT, SMTP, FRONTEND_URL
+│   │   ├── __tests__/          # Unit tests (controllers, middlewares, services, utils)
+│   │   ├── config/             # env.js, swagger.js
+│   │   ├── controllers/        # auth.controller.js, user.controller.js
+│   │   ├── middlewares/        # auth.js, errorHandler.js, validate.js
+│   │   ├── routes/             # auth.routes.js, index.js, user.routes.js
+│   │   ├── services/           # auth.service.js, user.service.js
+│   │   ├── utils/              # ApiError.js, ApiResponse.js, catchAsync.js, email.js, prisma.js
+│   │   ├── app.js              # Express app setup
+│   │   └── server.js           # App entry point (port 5000)
+│   ├── .env                    # Environment variables
 │   ├── package.json
 │   ├── prisma.config.ts
-│   └── tsconfig.json
+│   └── seed-test-data.js       # Test data seeding
 │
 ├── frontend/                   # Admin Frontend (React + Vite)
-│   ├── public/
+│   ├── public/                 # vite.svg
 │   ├── src/
-│   │   ├── assets/             # react.svg (default Vite asset)
+│   │   ├── assets/             # react.svg
 │   │   ├── components/
-│   │   │   ├── admin/          # AdminHeader.tsx, AdminLayout.tsx, AdminSidebar.tsx
-│   │   │   ├── ui/             # HighlightText.tsx, Modal.tsx, Toast.tsx
-│   │   │   └── users/          # UserTable.tsx, UserFormModal.tsx, DeleteConfirmModal.tsx, LockConfirmModal.tsx
+│   │   │   ├── admin/          # AdminHeader.jsx, AdminLayout.jsx, AdminSidebar.jsx, ChangePasswordModal.jsx
+│   │   │   ├── ui/             # AlertModal.jsx, ConfirmModal.jsx, Modal.jsx
+│   │   │   └── users/          # DeleteConfirmModal.jsx, LockConfirmModal.jsx, UserFormModal.jsx
 │   │   ├── pages/
-│   │   │   ├── LoginPage.tsx
-│   │   │   ├── DashboardPage.tsx
-│   │   │   └── admin/
-│   │   │       ├── AdminOverviewPage.tsx
-│   │   │       └── UserManagementPage.tsx
-│   │   ├── services/           # api.ts, authService.ts, userService.ts
-│   │   ├── types/              # auth.ts, user.ts
-│   │   ├── utils/              # toast.ts — Toast notification utility
+│   │   │   ├── ForgotPasswordPage.jsx
+│   │   │   ├── LoginPage.jsx
+│   │   │   ├── ResetPasswordPage.jsx
+│   │   │   └── admin/          # AdminOverviewPage.jsx, UserManagementPage.jsx
+│   │   ├── services/           # api.js, authService.js
 │   │   ├── App.css
-│   │   ├── App.tsx
+│   │   ├── App.jsx
 │   │   ├── index.css
-│   │   └── main.tsx
+│   │   └── main.jsx
 │   ├── index.html
 │   ├── eslint.config.js
-│   ├── vite.config.ts
+│   ├── vite.config.js
 │   └── package.json
 │
 └── package.json                # Root package.json (workspaces)
@@ -77,12 +73,15 @@ HealthGuard/
 | Change Password  | `PUT /api/auth/password`         | ⬜ Not reviewed | Require JWT, rate limit 5/15min         |
 
 **Files:**
-- `backend/src/controllers/authController.ts` (34127 bytes)
-- `backend/src/services/authService.ts` (4718), `registerService.ts` (5065), `changePasswordService.ts` (3817), `passwordResetService.ts` (6820), `emailService.ts` (9012), `verifyEmailService.ts` (4878)
-- `backend/src/middleware/authMiddleware.ts` (2452), `rateLimiter.ts` (1382)
-- `backend/src/utils/validators.ts` (1890 bytes)
-- `frontend/src/pages/LoginPage.tsx` (13071 bytes)
-- `frontend/src/services/authService.ts` (2474 bytes)
+- `backend/src/controllers/auth.controller.js` (4009 bytes)
+- `backend/src/services/auth.service.js` (15731 bytes)
+- `backend/src/middlewares/auth.js` (3502 bytes), `validate.js` (1942 bytes)
+- `backend/src/routes/auth.routes.js` (2149 bytes)
+- `frontend/src/pages/LoginPage.jsx` (12326 bytes)
+- `frontend/src/pages/ForgotPasswordPage.jsx` (9603 bytes)
+- `frontend/src/pages/ResetPasswordPage.jsx` (14907 bytes)
+- `frontend/src/components/admin/ChangePasswordModal.jsx` (12602 bytes)
+- `frontend/src/services/authService.js` (3922 bytes)
 
 ---
 
@@ -99,12 +98,12 @@ HealthGuard/
 | Lock/Unlock | `PATCH /api/users/{id}/lock` | ⬜ Pending | Toggle, audit log                    |
 
 **Files:**
-- `backend/src/controllers/userController.ts` (14986 bytes)
-- `backend/src/services/userService.ts` (11339 bytes)
-- `backend/src/routes/userRoutes.ts` (647 bytes)
-- `frontend/src/pages/admin/UserManagementPage.tsx` (15090 bytes)
-- `frontend/src/components/users/UserTable.tsx` (10809), `UserFormModal.tsx` (21000), `DeleteConfirmModal.tsx` (4477), `LockConfirmModal.tsx` (3186)
-- `frontend/src/services/userService.ts` (2589 bytes)
+- `backend/src/controllers/user.controller.js` (1746 bytes)
+- `backend/src/services/user.service.js` (2426 bytes)
+- `backend/src/routes/user.routes.js` (1348 bytes)
+- `frontend/src/pages/admin/UserManagementPage.jsx` (23889 bytes)
+- `frontend/src/components/users/UserFormModal.jsx` (12955 bytes), `DeleteConfirmModal.jsx` (3785 bytes), `LockConfirmModal.jsx` (2576 bytes)
+- `frontend/src/services/api.js` (613 bytes)
 
 ---
 
@@ -150,7 +149,7 @@ HealthGuard/
 | Function                     | Status         | Note                             |
 | ---------------------------- | -------------- | -------------------------------- |
 | Database + TimescaleDB setup | ⬜ Not reviewed | SQL SCRIPTS/ is source of truth  |
-| Express + TypeScript project | ✅ Built        | Prisma ORM, port 5000            |
+| Express + JavaScript project | ✅ Built        | Prisma ORM, port 5000            |
 | CORS middleware              | ✅ Built        | Using cors() globally            |
 | Logging (file + console)     | ⬜ Not reviewed |                                  |
 | Environment variables        | ✅ Built        | .env present                     |
@@ -158,14 +157,13 @@ HealthGuard/
 | Swagger docs                 | ✅ Built        | `/api-docs` — swagger-ui-express |
 
 **Files:**
-- `backend/src/index.ts` (1363 bytes)
-- `backend/src/config/swagger.ts` (3383 bytes)
-- `backend/src/lib/prisma.ts` (935 bytes)
-- `backend/src/utils/jwt.ts` (1088 bytes)
-- `backend/src/middleware/authMiddleware.ts` (2452), `rateLimiter.ts` (1382)
-- `backend/prisma/schema.prisma` (4621 bytes)
-- `backend/src/scripts/seedTestUsers.ts` (3276 bytes)
-- `backend/src/generated/client/` (Prisma auto-generated)
+- `backend/src/app.js` (879 bytes)
+- `backend/src/server.js` (296 bytes)
+- `backend/src/config/swagger.js` (6975 bytes)
+- `backend/src/utils/prisma.js` (447 bytes)
+- `backend/src/middlewares/errorHandler.js` (1660 bytes), `validate.js` (1942 bytes)
+- `backend/prisma/schema.prisma`
+- `backend/seed-test-data.js` (14273 bytes)
 
 ---
 
@@ -173,6 +171,7 @@ HealthGuard/
 
 | Date       | Version | Changes                                                                                          |
 | ---------- | ------- | ------------------------------------------------------------------------------------------------ |
+| 2026-03-08 | v2.3    | CHECK scan: corrected paths, extensions to JS/JSX, added test files, updated LOC and file sizes  |
 | 2026-03-07 | v2.2    | CHECK scan: +generated/, +scripts/, +validators.ts, +frontend utils/assets, +GET /me, byte sizes |
 | 2026-03-07 | v2.1    | CHECK scan: updated byte sizes, verified endpoints                                               |
 | 2026-03-05 | v2.0    | CHECK scan: actual folder structure, routes corrected, Trello→JIRA                               |
