@@ -71,6 +71,28 @@
 | 5.e.1 | Admin           | Nhập từ khóa hoặc chọn bộ lọc (vai trò, trạng thái) |
 | 5.e.2 | Hệ thống        | Hiển thị kết quả phù hợp                            |
 
+### 5.f - Quản lý quan hệ Bệnh nhân — Người chăm sóc
+| Bước  | Người thực hiện | Hành động                                                                                       |
+| ----- | --------------- | ----------------------------------------------------------------------------------------------- |
+| 5.f.1 | Admin           | Click vào một bệnh nhân trong danh sách, chọn tab "Quan hệ chăm sóc".                           |
+| 5.f.2 | Hệ thống        | Hiển thị danh sách Caregivers đang gán cho bệnh nhân này (tên, email, is_primary, permissions). |
+| 5.f.3 | Admin           | Click "Thêm Caregiver" → Chọn user có role `caregiver` → Xác nhận.                              |
+| 5.f.4 | Hệ thống        | Tạo record trong `user_relationships`, ghi `audit_logs`.                                        |
+
+### 5.g - Gán/Đổi Primary Caregiver
+| Bước  | Người thực hiện | Hành động                                                                                    |
+| ----- | --------------- | -------------------------------------------------------------------------------------------- |
+| 5.g.1 | Admin           | Trong tab "Quan hệ chăm sóc", click "Set Primary" tại caregiver mong muốn.                   |
+| 5.g.2 | Hệ thống        | Cập nhật `is_primary = true` cho caregiver mới, set `false` cho caregiver cũ, ghi audit log. |
+
+### 5.h - Xóa quan hệ chăm sóc
+| Bước  | Người thực hiện | Hành động                                                                |
+| ----- | --------------- | ------------------------------------------------------------------------ |
+| 5.h.1 | Admin           | Click "Xóa" tại hàng caregiver.                                          |
+| 5.h.2 | Hệ thống        | Popup xác nhận "Caregiver sẽ không thể xem dữ liệu bệnh nhân. Tiếp tục?" |
+| 5.h.3 | Admin           | Xác nhận.                                                                |
+| 5.h.4 | Hệ thống        | Xóa record trong `user_relationships`, ghi audit log.                    |
+
 ---
 
 ## Business Rules
@@ -80,6 +102,9 @@
 - **BR-022-03**: Sử dụng soft delete để bảo toàn dữ liệu
 - **BR-022-04**: Ghi audit log mọi hành động (thêm/sửa/xóa/khóa)
 - **BR-022-05**: Email chưa tồn tại khi thêm mới
+- **BR-022-06**: Mỗi bệnh nhân chỉ có tối đa 1 primary caregiver. Khi gán primary mới, primary cũ tự động bị unset.
+- **BR-022-07**: Caregiver chỉ xem được dữ liệu bệnh nhân nếu có record trong `user_relationships` — ràng buộc bảo mật cốt lõi.
+- **BR-022-08**: Chỉ cho phép mapping giữa user role `patient` và user role `caregiver`.
 
 ---
 
@@ -89,6 +114,7 @@
   - Chỉ ADMIN truy cập
   - Xóa cần xác thực mật khẩu
   - Audit log đầy đủ
+  - Thay đổi mapping Patient-Caregiver ảnh hưởng trực tiếp đến authorization
 - **Performance**: Load danh sách < 1 giây
 - **Data Integrity**: Soft delete thay vì hard delete
 - **Usability**: Pagination, search, filter

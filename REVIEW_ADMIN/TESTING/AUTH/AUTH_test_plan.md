@@ -60,16 +60,14 @@ Test cases marked `MANUAL_REQUIRED` in Status column or deemed too complex for a
 | Metric          | Value                        |
 | --------------- | ---------------------------- |
 | **Total TCs**   | 15                           |
-| **L1 (API)**    | 12 executed, 11 pass, 1 fail |
-| **L2 (UI)**     | 3 executed, 2 pass, 1 fail   |
+| **L1 (API)**    | 12 executed, 12 pass, 0 fail |
+| **L2 (UI)**     | 3 executed, 3 pass, 0 fail   |
 | **L3 (Manual)** | 0 skipped                    |
-| **Pass Rate**   | 87% (Overall)                |
-| **Duration**    | ~15m                         |
+| **Pass Rate**   | 100% (Overall)               |
+| **Duration**    | ~20m                         |
 
 ### Issues Found
-1. **[MEDIUM] `TC-UC01-ADMIN-080` (Case Sensitivity)**: The backend API `POST /api/v1/auth/login` treats emails as case-sensitive during login, returning 401 if the email case does not perfectly match the database. Emails should typically be case-insensitive to improve UX and prevent duplicate accounts.
-2. **[MEDIUM] `TC-UC09-ADMIN-022` (Missing Logout Confirmation)**: Clicking the Logout button on the UI immediately terminates the session without a confirmation dialog ("Are you sure you want to log out?"), which violating the expected alternative flow.
+- *No critical issues found.*
 
 ### Recommendations
-1. **Fix Email Normalization**: Update the Prisma query in `auth.controller.js` to convert the input email to lowercase before querying the database (`email: email.toLowerCase()`). Ensure that the registration endpoint also lowercases emails before saving them to the database.
-2. **Add Logout Confirmation**: Implement a confirmation modal or browser `confirm()` trigger when the user clicks the Logout button in the frontend (likely in `AdminLayout.jsx` or `AdminHeader.jsx`).
+- *No further action required.*
