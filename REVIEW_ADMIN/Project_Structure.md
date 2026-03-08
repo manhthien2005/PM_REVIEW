@@ -1,9 +1,9 @@
 # PROJECT STRUCTURE - ADMIN WEBSITE (HealthGuard)
 
 > **Project**: HealthGuard Admin Dashboard  
-> **Tech Stack**: Node.js / Express.js / Prisma ORM / TypeScript (Backend) + React / Vite / TypeScript (Frontend)  
+> **Tech Stack**: Node.js / Express.js / Prisma ORM / JavaScript (Backend) + React / Vite / JavaScript (Frontend)  
 > **Purpose**: Admin system management for HealthGuard  
-> **Last Updated**: 2026-03-07 (CHECK v2.2)
+> **Last Updated**: 2026-03-08 (CHECK v2.4)
 
 ---
 
@@ -12,50 +12,46 @@
 ```
 HealthGuard/
 ├── backend/                    # Admin Backend (Node.js + Express + Prisma)
-│   ├── prisma/                 # Prisma ORM schema (1 file: schema.prisma)
+│   ├── prisma/                 # Prisma ORM schema
 │   ├── src/
-│   │   ├── config/             # swagger.ts — Swagger spec config
-│   │   ├── controllers/        # authController.ts, userController.ts
-│   │   ├── generated/client/   # Prisma generated client (auto-generated)
-│   │   ├── lib/                # prisma.ts — Prisma client singleton
-│   │   ├── middleware/         # authMiddleware.ts, rateLimiter.ts
-│   │   ├── routes/             # authRoutes.ts, userRoutes.ts
-│   │   ├── scripts/            # seedTestUsers.ts — Test data seeding
-│   │   ├── services/           # 7 service files (see AUTH module)
-│   │   ├── utils/              # jwt.ts, validators.ts
-│   │   └── index.ts            # App entry point (port 5000)
-│   ├── .env                    # DB_URL, JWT_SECRET, PORT, SMTP, FRONTEND_URL
+│   │   ├── __tests__/          # Test files
+│   │   ├── config/             # Configuration files
+│   │   ├── controllers/        # auth.controller.js, user.controller.js
+│   │   ├── middlewares/        # Auth and rate limit middlewares
+│   │   ├── routes/             # auth.routes.js, user.routes.js, index.js
+│   │   ├── services/           # auth.service.js, user.service.js
+│   │   ├── utils/              # Utility functions
+│   │   ├── app.js              # Express app setup
+│   │   └── server.js           # App entry point
+│   ├── .env
+│   ├── .env.example
+│   ├── API_GUIDE.md
+│   ├── package-lock.json
 │   ├── package.json
 │   ├── prisma.config.ts
-│   └── tsconfig.json
+│   └── test-user.txt
 │
 ├── frontend/                   # Admin Frontend (React + Vite)
 │   ├── public/
 │   ├── src/
-│   │   ├── assets/             # react.svg (default Vite asset)
-│   │   ├── components/
-│   │   │   ├── admin/          # AdminHeader.tsx, AdminLayout.tsx, AdminSidebar.tsx
-│   │   │   ├── ui/             # HighlightText.tsx, Modal.tsx, Toast.tsx
-│   │   │   └── users/          # UserTable.tsx, UserFormModal.tsx, DeleteConfirmModal.tsx, LockConfirmModal.tsx
+│   │   ├── assets/             # Static assets
+│   │   ├── components/         # React components
 │   │   ├── pages/
-│   │   │   ├── LoginPage.tsx
-│   │   │   ├── DashboardPage.tsx
-│   │   │   └── admin/
-│   │   │       ├── AdminOverviewPage.tsx
-│   │   │       └── UserManagementPage.tsx
-│   │   ├── services/           # api.ts, authService.ts, userService.ts
-│   │   ├── types/              # auth.ts, user.ts
-│   │   ├── utils/              # toast.ts — Toast notification utility
+│   │   │   ├── admin/          # AdminOverviewPage.jsx, UserManagementPage.jsx
+│   │   │   ├── ForgotPasswordPage.jsx
+│   │   │   ├── LoginPage.jsx
+│   │   │   └── ResetPasswordPage.jsx
+│   │   ├── services/           # api.js, authService.js
 │   │   ├── App.css
-│   │   ├── App.tsx
+│   │   ├── App.jsx
 │   │   ├── index.css
-│   │   └── main.tsx
-│   ├── index.html
+│   │   └── main.jsx
 │   ├── eslint.config.js
-│   ├── vite.config.ts
-│   └── package.json
+│   ├── index.html
+│   ├── package.json
+│   └── vite.config.js
 │
-└── package.json                # Root package.json (workspaces)
+└── package.json                # Root package.json
 ```
 
 ---
@@ -65,46 +61,44 @@ HealthGuard/
 ### 1. [AUTH] Authentication & Authorization (Sprint 1)
 > **SRS Ref**: UC001-UC004 | **JIRA**: EP04-Login, EP05-Register, EP12-Password
 
-| Function         | API Endpoint                     | Status         | Note                                    |
-| ---------------- | -------------------------------- | -------------- | --------------------------------------- |
-| Login (Admin)    | `POST /api/auth/sessions`        | ✅ Reviewed     | JWT iss: `healthguard-admin`, expiry 8h |
-| Get Current User | `GET /api/auth/me`               | ⬜ Not reviewed | Require JWT, returns current user info  |
-| Register (Admin) | `POST /api/auth/users`           | ✅ Reviewed     | Require ADMIN JWT, `is_verified=true`   |
-| Verify Email     | `POST /api/auth/email/verify`    | ⬜ Not reviewed | Email verification token                |
-| Resend Verify    | `POST /api/auth/email/resend`    | ⬜ Not reviewed | Resend verification email               |
-| Forgot Password  | `POST /api/auth/password/forgot` | ⬜ Not reviewed | Token 15min, rate limit 3/15min         |
-| Reset Password   | `POST /api/auth/password/reset`  | ⬜ Not reviewed | Token one-time use                      |
-| Change Password  | `PUT /api/auth/password`         | ⬜ Not reviewed | Require JWT, rate limit 5/15min         |
+| Function         | API Endpoint                 | Status         | Note                                   |
+| ---------------- | ---------------------------- | -------------- | -------------------------------------- |
+| Login (Admin)    | `POST /auth/login`           | ✅ Reviewed     | JWT login                              |
+| Get Current User | `GET /auth/me`               | ⬜ Not reviewed | Require JWT, returns current user info |
+| Register (Admin) | `POST /auth/register`        | ✅ Reviewed     | Require ADMIN JWT                      |
+| Forgot Password  | `POST /auth/forgot-password` | ⬜ Not reviewed | Send reset token                       |
+| Reset Password   | `POST /auth/reset-password`  | ⬜ Not reviewed | Token one-time use                     |
+| Change Password  | `PUT /auth/password`         | ⬜ Not reviewed | Require JWT                            |
+| Logout           | `POST /auth/logout`          | ⬜ Not reviewed | Logout                                 |
 
 **Files:**
-- `backend/src/controllers/authController.ts` (34127 bytes)
-- `backend/src/services/authService.ts` (4718), `registerService.ts` (5065), `changePasswordService.ts` (3817), `passwordResetService.ts` (6820), `emailService.ts` (9012), `verifyEmailService.ts` (4878)
-- `backend/src/middleware/authMiddleware.ts` (2452), `rateLimiter.ts` (1382)
-- `backend/src/utils/validators.ts` (1890 bytes)
-- `frontend/src/pages/LoginPage.tsx` (13071 bytes)
-- `frontend/src/services/authService.ts` (2474 bytes)
+- `backend/src/controllers/auth.controller.js` (4009 bytes)
+- `backend/src/services/auth.service.js` (16902 bytes)
+- `backend/src/routes/auth.routes.js` (2149 bytes)
+- `frontend/src/pages/LoginPage.jsx` (12326 bytes)
+- `frontend/src/pages/ForgotPasswordPage.jsx` (9603 bytes)
+- `frontend/src/pages/ResetPasswordPage.jsx` (14907 bytes)
+- `frontend/src/services/authService.js` (3922 bytes)
 
 ---
 
 ### 2. [ADMIN_USERS] User Management (Sprint 4)
 > **SRS Ref**: UC022 | **JIRA**: EP15-AdminManage
 
-| Function    | API Endpoint                 | Status    | Note                                 |
-| ----------- | ---------------------------- | --------- | ------------------------------------ |
-| List users  | `GET /api/users`             | ⬜ Pending | Search, filter, paginate             |
-| Create user | `POST /api/users`            | ⬜ Pending | ADMIN role only                      |
-| User detail | `GET /api/users/{id}`        | ⬜ Pending |                                      |
-| Update user | `PUT /api/users/{id}`        | ⬜ Pending |                                      |
-| Delete user | `DELETE /api/users/{id}`     | ⬜ Pending | Soft delete, requires admin password |
-| Lock/Unlock | `PATCH /api/users/{id}/lock` | ⬜ Pending | Toggle, audit log                    |
+| Function     | API Endpoint        | Status    | Note                     |
+| ------------ | ------------------- | --------- | ------------------------ |
+| List users   | `GET /users/`       | ⬜ Pending | Search, filter, paginate |
+| Create user  | `POST /users/`      | ⬜ Pending | ADMIN role only          |
+| User detail  | `GET /users/:id`    | ⬜ Pending |                          |
+| Replace user | `PUT /users/:id`    | ⬜ Pending | Replace entire user data |
+| Update user  | `PATCH /users/:id`  | ⬜ Pending | Partial update           |
+| Delete user  | `DELETE /users/:id` | ⬜ Pending | Soft delete              |
 
 **Files:**
-- `backend/src/controllers/userController.ts` (14986 bytes)
-- `backend/src/services/userService.ts` (11339 bytes)
-- `backend/src/routes/userRoutes.ts` (647 bytes)
-- `frontend/src/pages/admin/UserManagementPage.tsx` (15090 bytes)
-- `frontend/src/components/users/UserTable.tsx` (10809), `UserFormModal.tsx` (21000), `DeleteConfirmModal.tsx` (4477), `LockConfirmModal.tsx` (3186)
-- `frontend/src/services/userService.ts` (2589 bytes)
+- `backend/src/controllers/user.controller.js` (1746 bytes)
+- `backend/src/services/user.service.js` (2426 bytes)
+- `backend/src/routes/user.routes.js` (1348 bytes)
+- `frontend/src/pages/admin/UserManagementPage.jsx` (23889 bytes)
 
 ---
 
@@ -147,33 +141,27 @@ HealthGuard/
 ### 6. [INFRA] Infrastructure Setup (Sprint 1)
 > **SRS Ref**: N/A | **JIRA**: EP01-Database, EP02-AdminBE
 
-| Function                     | Status         | Note                             |
-| ---------------------------- | -------------- | -------------------------------- |
-| Database + TimescaleDB setup | ⬜ Not reviewed | SQL SCRIPTS/ is source of truth  |
-| Express + TypeScript project | ✅ Built        | Prisma ORM, port 5000            |
-| CORS middleware              | ✅ Built        | Using cors() globally            |
-| Logging (file + console)     | ⬜ Not reviewed |                                  |
-| Environment variables        | ✅ Built        | .env present                     |
-| Health check endpoint        | ✅ Built        | `GET /api/health`                |
-| Swagger docs                 | ✅ Built        | `/api-docs` — swagger-ui-express |
+| Function                     | Status         | Note                            |
+| ---------------------------- | -------------- | ------------------------------- |
+| Database + TimescaleDB setup | ⬜ Not reviewed | SQL SCRIPTS/ is source of truth |
+| Express + JavaScript project | ✅ Built        | Prisma ORM, Nodemon             |
+| Routes & Middlewares         | ✅ Built        | Configured in app.js            |
+| Environment variables        | ✅ Built        | .env present                    |
+| Health check endpoint        | ✅ Built        | `GET /health`                   |
 
 **Files:**
-- `backend/src/index.ts` (1363 bytes)
-- `backend/src/config/swagger.ts` (3383 bytes)
-- `backend/src/lib/prisma.ts` (935 bytes)
-- `backend/src/utils/jwt.ts` (1088 bytes)
-- `backend/src/middleware/authMiddleware.ts` (2452), `rateLimiter.ts` (1382)
-- `backend/prisma/schema.prisma` (4621 bytes)
-- `backend/src/scripts/seedTestUsers.ts` (3276 bytes)
-- `backend/src/generated/client/` (Prisma auto-generated)
+- `backend/src/server.js` (296 bytes)
+- `backend/src/app.js` (879 bytes)
+- `backend/src/routes/index.js` (649 bytes)
 
 ---
 
 ## Update History
 
-| Date       | Version | Changes                                                                                          |
-| ---------- | ------- | ------------------------------------------------------------------------------------------------ |
-| 2026-03-07 | v2.2    | CHECK scan: +generated/, +scripts/, +validators.ts, +frontend utils/assets, +GET /me, byte sizes |
-| 2026-03-07 | v2.1    | CHECK scan: updated byte sizes, verified endpoints                                               |
-| 2026-03-05 | v2.0    | CHECK scan: actual folder structure, routes corrected, Trello→JIRA                               |
-| 2026-03-03 | v1.0    | Initial structure based on Sprint 1-4 planning                                                   |
+| Date       | Version | Changes                                                                                           |
+| ---------- | ------- | ------------------------------------------------------------------------------------------------- |
+| 2026-03-08 | v2.4    | CHECK scan: Migrated to JS, refactored backend structure, frontend JSX extensions, updated routes |
+| 2026-03-07 | v2.2    | CHECK scan: +generated/, +scripts/, +validators.ts, +frontend utils/assets, +GET /me, byte sizes  |
+| 2026-03-07 | v2.1    | CHECK scan: updated byte sizes, verified endpoints                                                |
+| 2026-03-05 | v2.0    | CHECK scan: actual folder structure, routes corrected, Trello→JIRA                                |
+| 2026-03-03 | v1.0    | Initial structure based on Sprint 1-4 planning                                                    |

@@ -1,0 +1,75 @@
+╔══════════════════════════════════════════════════════════════════════════════════════════╗
+║                     AUTH TEST ACCOUNTS — HealthGuard v2                                 ║
+╠══════════════════════════════════════════════════════════════════════════════════════════╣
+║                                                                                        ║
+║  Chạy seed: node seed-test-data.js                                                     ║
+║                                                                                        ║
+╠══════════════════════════════════════════════════════════════════════════════════════════╣
+║  #  │ Email                         │ Password        │ Role      │ Test Case           ║
+╠══════════════════════════════════════════════════════════════════════════════════════════╣
+║  1  │ admin@healthguard.vn          │ Admin@123!      │ admin     │ Login OK (admin)     ║
+║  2  │ patient@healthguard.vn        │ Patient@123!    │ patient   │ Login OK (patient)   ║
+║  3  │ caregiver@healthguard.vn      │ Caregiver@123!  │ caregiver │ Login OK (caregiver) ║
+║  4  │ locked@healthguard.vn         │ Locked@123!     │ patient   │ Khóa vĩnh viễn      ║
+║  5  │ unverified@healthguard.vn     │ Unverified@123! │ patient   │ Chưa verify email    ║
+║  6  │ templocked@healthguard.vn     │ TempLock@123!   │ patient   │ Tạm khóa 15 phút    ║
+║  7  │ almostlocked@healthguard.vn   │ Almost@123!     │ patient   │ Sai 4/5 lần         ║
+║  8  │ deleted@healthguard.vn        │ Deleted@123!    │ patient   │ Soft deleted         ║
+║  9  │ changepass@healthguard.vn     │ ChangeMe@123!   │ patient   │ Test đổi mật khẩu   ║
+║ 10  │ resetpass@healthguard.vn      │ ResetMe@123!    │ caregiver │ Test reset password  ║
+║ 11  │ oldtoken@healthguard.vn       │ OldToken@123!   │ patient   │ Token version=5     ║
+╠══════════════════════════════════════════════════════════════════════════════════════════╣
+║  -  │ notexist@test.com             │ (bất kỳ)        │ -         │ Email không tồn tại  ║
+║  -  │ not-an-email                  │ (bất kỳ)        │ -         │ Email sai format     ║
+╚══════════════════════════════════════════════════════════════════════════════════════════╝
+
+═══════════════════════════════════════════════════════════════════════════════════════════
+                          CHI TIẾT TEST CASES THEO CHỨC NĂNG
+═══════════════════════════════════════════════════════════════════════════════════════════
+
+▶ LOGIN (POST /api/v1/auth/login)
+  ✅ #1  admin@healthguard.vn     + Admin@123!       → 200 Login thành công (admin)
+  ✅ #2  patient@healthguard.vn   + Patient@123!     → 200 Login thành công (patient)
+  ✅ #3  caregiver@healthguard.vn + Caregiver@123!   → 200 Login thành công (caregiver)
+  ❌ #1  admin@healthguard.vn     + WrongPassword    → 401 Sai mật khẩu
+  ❌ #4  locked@healthguard.vn    + Locked@123!      → 423 Tài khoản bị khóa
+  ❌ #5  unverified@healthguard.vn+ Unverified@123!  → 401 Chưa xác thực email
+  ❌ #6  templocked@healthguard.vn+ TempLock@123!    → 423 Tạm khóa (sai 5 lần)
+  ❌ #7  almostlocked@healthguard.vn + WrongPass     → 401 Sai lần thứ 5 → auto lock
+  ❌ -   notexist@test.com        + (bất kỳ)         → 401 Email không tồn tại
+  ❌ -   not-an-email              + (bất kỳ)        → 400 Email sai format
+  ❌ -   (để trống)                + (để trống)       → 400 Thiếu fields
+
+▶ FORGOT PASSWORD (POST /api/v1/auth/forgot-password)
+  ✅ #10 resetpass@healthguard.vn                    → 200 Gửi email reset
+  ✅ -   notexist@test.com                           → 200 (anti-enumeration, vẫn trả success)
+  ❌ -   not-an-email                                → 400 Email sai format
+
+▶ RESET PASSWORD (POST /api/v1/auth/reset-password)
+  ✅     Token hợp lệ + newPassword ≥ 8 ký tự       → 200 Đặt lại thành công
+  ❌     Token hết hạn (>15 phút)                    → 400 Link đã hết hạn
+  ❌     Token không hợp lệ                          → 400 Link không hợp lệ
+  ❌     Mật khẩu mới = mật khẩu cũ                  → 400 Không được trùng
+  ❌     newPassword ≠ confirmPassword                → 400 Không khớp
+  ❌     newPassword < 8 ký tự                        → 400 Quá ngắn
+
+▶ CHANGE PASSWORD (PUT /api/v1/auth/password) — cần đăng nhập
+  ✅ #9  Login changepass@healthguard.vn → đổi pass  → 200 Đổi thành công + email thông báo
+  ❌     Sai mật khẩu hiện tại                       → 401 Mật khẩu không đúng
+  ❌     Mật khẩu mới = mật khẩu cũ                  → 400 Không được trùng
+  ❌     newPassword ≠ confirmPassword                → 400 Không khớp
+
+▶ REGISTER (POST /api/v1/auth/register) — cần admin token
+  ✅ #1  Login admin → tạo patient/caregiver mới     → 201 Tạo thành công
+  ❌     Tạo role=admin                               → 403 Không cho phép
+  ❌     Email đã tồn tại                             → 409 Trùng email
+  ❌     Mật khẩu < 8 ký tự                           → 400 Quá ngắn
+  ❌     Tuổi < 13                                    → 400 Chưa đủ tuổi
+
+▶ LOGOUT (POST /api/v1/auth/logout)
+  ✅     Bất kỳ user đã đăng nhập                    → 200 Xoá cookie
+
+▶ GET ME (GET /api/v1/auth/me) — cần đăng nhập
+  ✅     Đăng nhập → GET /me                         → 200 Trả thông tin user
+  ❌ #11 Dùng token cũ (tokenVersion=1, DB=5)        → 401 Phiên hết hạn
+  ❌     Không có token                               → 401 Chưa đăng nhập

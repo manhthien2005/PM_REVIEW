@@ -21,14 +21,14 @@
 
 ## MODULE INDEX — ADMIN (HealthGuard/)
 
-| #   | Module                                                                    | Sprint | UC Refs            | Summary File                                                            | Review Status | Score  | Quality     | Review File                         | Last Review |
-| --- | ------------------------------------------------------------------------- | ------ | ------------------ | ----------------------------------------------------------------------- | ------------- | ------ | ----------- | ----------------------------------- | ----------- |
-| 1   | **AUTH** — Login, Register, Forgot/Reset/Change Password, Profile, Logout | S1     | UC001-UC005, UC009 | [AUTH_summary.md](REVIEW_ADMIN/summaries/AUTH_summary.md)               | ✅ Done        | 71/100 | ⚠️ Needs Fix | [View](REVIEW_ADMIN/AUTH_review.md) | 2026-03-07  |
-| 2   | **ADMIN_USERS** — CRUD Users, Lock/Unlock                                 | S4     | UC022              | [ADMIN_USERS_summary.md](REVIEW_ADMIN/summaries/ADMIN_USERS_summary.md) | ⬜ Pending     | —      | —           | —                                   | —           |
-| 3   | **DEVICES** — List, Detail, Update, Assign, Lock Devices                  | S4     | UC025              | [DEVICES_summary.md](REVIEW_ADMIN/summaries/DEVICES_summary.md)         | ⬜ Not built   | —      | —           | —                                   | —           |
-| 4   | **CONFIG** — System Settings (Thresholds, AI config)                      | S4     | UC024              | [CONFIG_summary.md](REVIEW_ADMIN/summaries/CONFIG_summary.md)           | ⬜ Not built   | —      | —           | —                                   | —           |
-| 5   | **LOGS** — View/Export System Logs                                        | S4     | UC026              | [LOGS_summary.md](REVIEW_ADMIN/summaries/LOGS_summary.md)               | ⬜ Not built   | —      | —           | —                                   | —           |
-| 6   | **INFRA** — DB Setup, Express Project, CORS, Health Check, Swagger        | S1     | N/A                | [INFRA_summary.md](REVIEW_ADMIN/summaries/INFRA_summary.md)             | ⬜ Pending     | —      | —           | —                                   | —           |
+| #   | Module                                                                    | Sprint | UC Refs            | Summary File                                                            | Review Status | Score  | Quality | Review File                         | Last Review |
+| --- | ------------------------------------------------------------------------- | ------ | ------------------ | ----------------------------------------------------------------------- | ------------- | ------ | ------- | ----------------------------------- | ----------- |
+| 1   | **AUTH** — Login, Register, Forgot/Reset/Change Password, Profile, Logout | S1     | UC001-UC005, UC009 | [AUTH_summary.md](REVIEW_ADMIN/summaries/AUTH_summary.md)               | ✅ Done        | 93/100 | ✅ Pass  | [View](REVIEW_ADMIN/AUTH_review.md) | 2026-03-08  |
+| 2   | **ADMIN_USERS** — CRUD Users, Lock/Unlock                                 | S4     | UC022              | [ADMIN_USERS_summary.md](REVIEW_ADMIN/summaries/ADMIN_USERS_summary.md) | ⬜ Pending     | —      | —       | —                                   | —           |
+| 3   | **DEVICES** — List, Detail, Update, Assign, Lock Devices                  | S4     | UC025              | [DEVICES_summary.md](REVIEW_ADMIN/summaries/DEVICES_summary.md)         | ⬜ Not built   | —      | —       | —                                   | —           |
+| 4   | **CONFIG** — System Settings (Thresholds, AI config)                      | S4     | UC024              | [CONFIG_summary.md](REVIEW_ADMIN/summaries/CONFIG_summary.md)           | ⬜ Not built   | —      | —       | —                                   | —           |
+| 5   | **LOGS** — View/Export System Logs                                        | S4     | UC026              | [LOGS_summary.md](REVIEW_ADMIN/summaries/LOGS_summary.md)               | ⬜ Not built   | —      | —       | —                                   | —           |
+| 6   | **INFRA** — DB Setup, Express Project, CORS, Health Check, Swagger        | S1     | N/A                | [INFRA_summary.md](REVIEW_ADMIN/summaries/INFRA_summary.md)             | ⬜ Pending     | —      | —       | —                                   | —           |
 
 ---
 
