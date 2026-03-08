@@ -8,20 +8,17 @@
 
 -- 1. Thêm cột token_version để hỗ trợ session invalidation (SRS §5.3)
 ALTER TABLE users 
-ADD COLUMN IF NOT EXISTS token_version INT NOT NULL DEFAULT 1;
+ADD COLUMN IF NOT EXISTS token_version INT NOT NULL DEFAULT 1,
+ADD COLUMN IF NOT EXISTS failed_login_attempts INT NOT NULL DEFAULT 0,
+ADD COLUMN IF NOT EXISTS locked_until TIMESTAMPTZ(6);
 
--- 2. Thêm các cột cho tính năng quên mật khẩu (one-time use token) (EP12-S01-AC5)
-ALTER TABLE users 
-ADD COLUMN IF NOT EXISTS reset_token_hash VARCHAR(255),
-ADD COLUMN IF NOT EXISTS reset_token_expiry TIMESTAMPTZ(6);
-
--- 3. Thêm comments mô tả mục đích các cột
+-- 2. Thêm comments mô tả mục đích các cột
 COMMENT ON COLUMN users.token_version IS 'Phiên bản token hiện tại (Tăng lên để logout tất cả thiết bị khi đổi mật khẩu)';
-COMMENT ON COLUMN users.reset_token_hash IS 'Hash của token reset mật khẩu (Dùng 1 lần)';
-COMMENT ON COLUMN users.reset_token_expiry IS 'Thời gian hết hạn của reset token';
+COMMENT ON COLUMN users.failed_login_attempts IS 'Số lần đăng nhập sai mật khẩu (Reset sau khi thành công)';
+COMMENT ON COLUMN users.locked_until IS 'Thời gian khóa tài khoản tạm thời (do bruteforce)';
 
--- 4. Thông báo hoàn tất
+-- 3. Thông báo hoàn tất
 DO $$
 BEGIN
-    RAISE NOTICE '✓ Updated table: users with new auth fields (token_version, reset_token_hash, reset_token_expiry)';
+    RAISE NOTICE '✓ Updated table: users with new auth fields (token_version, failed_login_attempts, locked_until)';
 END $$;

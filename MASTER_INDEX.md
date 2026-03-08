@@ -21,14 +21,14 @@
 
 ## MODULE INDEX — ADMIN (HealthGuard/)
 
-| #   | Module                                                                    | Sprint | UC Refs            | Summary File                                                            | Review Status | Score  | Quality | Review File                         | Last Review |
-| --- | ------------------------------------------------------------------------- | ------ | ------------------ | ----------------------------------------------------------------------- | ------------- | ------ | ------- | ----------------------------------- | ----------- |
-| 1   | **AUTH** — Login, Register, Forgot/Reset/Change Password, Profile, Logout | S1     | UC001-UC005, UC009 | [AUTH_summary.md](REVIEW_ADMIN/summaries/AUTH_summary.md)               | ✅ Done        | 93/100 | ✅ Pass  | [View](REVIEW_ADMIN/AUTH_review.md) | 2026-03-08  |
-| 2   | **ADMIN_USERS** — CRUD Users, Lock/Unlock                                 | S4     | UC022              | [ADMIN_USERS_summary.md](REVIEW_ADMIN/summaries/ADMIN_USERS_summary.md) | ⬜ Pending     | —      | —       | —                                   | —           |
-| 3   | **DEVICES** — List, Detail, Update, Assign, Lock Devices                  | S4     | UC025              | [DEVICES_summary.md](REVIEW_ADMIN/summaries/DEVICES_summary.md)         | ⬜ Not built   | —      | —       | —                                   | —           |
-| 4   | **CONFIG** — System Settings (Thresholds, AI config)                      | S4     | UC024              | [CONFIG_summary.md](REVIEW_ADMIN/summaries/CONFIG_summary.md)           | ⬜ Not built   | —      | —       | —                                   | —           |
-| 5   | **LOGS** — View/Export System Logs                                        | S4     | UC026              | [LOGS_summary.md](REVIEW_ADMIN/summaries/LOGS_summary.md)               | ⬜ Not built   | —      | —       | —                                   | —           |
-| 6   | **INFRA** — DB Setup, Express Project, CORS, Health Check, Swagger        | S1     | N/A                | [INFRA_summary.md](REVIEW_ADMIN/summaries/INFRA_summary.md)             | ⬜ Pending     | —      | —       | —                                   | —           |
+| #   | Module                                                                    | Sprint | UC Refs            | Summary File                                                            | Review Status | Score  | Quality | Review File                                             | Last Review |
+| --- | ------------------------------------------------------------------------- | ------ | ------------------ | ----------------------------------------------------------------------- | ------------- | ------ | ------- | ------------------------------------------------------- | ----------- |
+| 1   | **AUTH** — Login, Register, Forgot/Reset/Change Password, Profile, Logout | S1     | UC001-UC005, UC009 | [AUTH_summary.md](REVIEW_ADMIN/summaries/AUTH_summary.md)               | ✅ Done        | 93/100 | ✅ Pass  | [View](REVIEW_ADMIN/AUTH_review.md)                     | 2026-03-08  |
+| 2   | **ADMIN_USERS** — CRUD Users, Lock/Unlock                                 | S4     | UC022              | [ADMIN_USERS_summary.md](REVIEW_ADMIN/summaries/ADMIN_USERS_summary.md) | ✅ Done        | 89/100 | ✅ Pass  | [View](REVIEW_ADMIN/MANAGE_USERS_ADMIN_USERS_review.md) | 2026-03-08  |
+| 3   | **DEVICES** — List, Detail, Update, Assign, Lock Devices                  | S4     | UC025              | [DEVICES_summary.md](REVIEW_ADMIN/summaries/DEVICES_summary.md)         | ⬜ Not built   | —      | —       | —                                                       | —           |
+| 4   | **CONFIG** — System Settings (Thresholds, AI config)                      | S4     | UC024              | [CONFIG_summary.md](REVIEW_ADMIN/summaries/CONFIG_summary.md)           | ⬜ Not built   | —      | —       | —                                                       | —           |
+| 5   | **LOGS** — View/Export System Logs                                        | S4     | UC026              | [LOGS_summary.md](REVIEW_ADMIN/summaries/LOGS_summary.md)               | ⬜ Not built   | —      | —       | —                                                       | —           |
+| 6   | **INFRA** — DB Setup, Express Project, CORS, Health Check, Swagger        | S1     | N/A                | [INFRA_summary.md](REVIEW_ADMIN/summaries/INFRA_summary.md)             | ⬜ Pending     | —      | —       | —                                                       | —           |
 
 ---
 
@@ -102,10 +102,12 @@
 
 ## Update History
 
-| Date       | Version | Changes                                                                                              |
-| ---------- | ------- | ---------------------------------------------------------------------------------------------------- |
-| 2026-03-07 | v2.3    | CHECK ADMIN: +generated/, +scripts/, +validators.ts, +GET /me, exact byte sizes, 3 summaries updated |
-| 2026-03-05 | v2.2    | CHECK ADMIN: corrected routes, folder structure, Trello→JIRA, summaries → new template               |
-| 2026-03-04 | v2.1    | Added Quality Status + Review File columns; score classification (≥76 Pass)                          |
-| 2026-03-04 | v2.0    | CHECK scan: Trello→JIRA, MOBILE 7/8 modules confirmed NOT built, AUTH 82/100                         |
-| 2026-03-03 | v1.0    | Initial creation with 14 module summaries                                                            |
+| Date       | Version | Changes                                                                                                                                                                                                                     |
+| ---------- | ------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-03-08 | v2.5    | CHECK ADMIN: split UserManagementPage into smaller components, updated file sizes in Project_Structure and summaries                                                                                                        |
+| 2026-03-08 | v2.4    | CHECK ADMIN: corrected API prefix /api/v1/, PATCH not PUT for users, +logout endpoint, +userService.js, expanded __tests__ (10 files), removed seed-test-data.js, +API_GUIDE.md, updated 12 file sizes, 3 summaries updated |
+| 2026-03-07 | v2.3    | CHECK ADMIN: +generated/, +scripts/, +validators.ts, +GET /me, exact byte sizes, 3 summaries updated                                                                                                                        |
+| 2026-03-05 | v2.2    | CHECK ADMIN: corrected routes, folder structure, Trello→JIRA, summaries → new template                                                                                                                                      |
+| 2026-03-04 | v2.1    | Added Quality Status + Review File columns; score classification (≥76 Pass)                                                                                                                                                 |
+| 2026-03-04 | v2.0    | CHECK scan: Trello→JIRA, MOBILE 7/8 modules confirmed NOT built, AUTH 82/100                                                                                                                                                |
+| 2026-03-03 | v1.0    | Initial creation with 14 module summaries                                                                                                                                                                                   |
