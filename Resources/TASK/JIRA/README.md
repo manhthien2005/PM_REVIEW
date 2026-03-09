@@ -32,7 +32,7 @@ Source CSV: `JIRA_IMPORT_ALL.csv` (untouched, for JIRA import)
 | EP13-RiskScore    | Analysis     | UC016,017     | 4       | 11   | Medium   | 4      |
 | EP14-Sleep        | Sleep        | UC020,021     | 4       | 8    | Medium   | 4      |
 | EP15-AdminManage  | Admin        | UC022,025     | 5       | 12   | Medium   | 4      |
-| EP16-AdminConfig  | Admin        | UC024,026     | 3       | 5    | Low      | 4      |
+| EP16-AdminConfig  | Admin        | UC024,026     | 3       | 8    | Low      | 4      |
 
 ## UC → Epic Lookup
 
