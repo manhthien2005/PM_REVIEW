@@ -3,7 +3,7 @@
 > **Project**: HealthGuard Mobile App  
 > **Tech Stack**: Flutter / Dart (Frontend) + FastAPI / SQLAlchemy / Python (Backend)  
 > **Purpose**: Mobile app for Patient and Caregiver health monitoring  
-> **Last Updated**: 04/03/2026  
+> **Last Updated**: 10/03/2026  
 > **Review Progress**: 1/8 modules completed (AUTH: 82/100)
 
 ---
@@ -24,12 +24,38 @@ health_system/
 │   │   └── utils/               # Validators, helpers (2 files)
 │   ├── features/                # Feature modules (Clean Architecture)
 │   │   ├── auth/                # ✅ Login, Register, Verify, Password (16 files)
-│   │   ├── device/              # ⬜ Empty — not implemented
-│   │   ├── emergency/           # ⬜ Empty — not implemented
-│   │   ├── health_monitoring/   # ⬜ Empty — not implemented
-│   │   ├── home/                # ⬜ Dashboard screen only (1 file)
-│   │   ├── profile/             # ⬜ Empty — not implemented
-│   │   └── sleep_analysis/      # ⬜ Empty — not implemented
+│   │   ├── home/                # 🔵 Navigation shell (2 files)
+│   │   │   └── screens/         # main_screen.dart (bottom nav), dashboard_screen.dart
+│   │   ├── device/              # ⬜ Placeholder — Clean Arch folders + 1 screen (25 LOC)
+│   │   │   ├── models/          # Empty (only .gitkeep)
+│   │   │   ├── providers/       # Empty (only .gitkeep)
+│   │   │   ├── repositories/    # Empty (only .gitkeep)
+│   │   │   ├── screens/         # device_screen.dart (placeholder)
+│   │   │   └── widgets/         # Empty (only .gitkeep)
+│   │   ├── emergency/           # ⬜ Placeholder — Clean Arch folders + 1 screen (25 LOC)
+│   │   │   ├── models/          # Empty (only .gitkeep)
+│   │   │   ├── providers/       # Empty (only .gitkeep)
+│   │   │   ├── repositories/    # Empty (only .gitkeep)
+│   │   │   ├── screens/         # warning_screen.dart (placeholder)
+│   │   │   └── widgets/         # Empty (only .gitkeep)
+│   │   ├── health_monitoring/   # ⬜ Placeholder — Clean Arch folders + 1 screen (25 LOC)
+│   │   │   ├── models/          # Empty (only .gitkeep)
+│   │   │   ├── providers/       # Empty (only .gitkeep)
+│   │   │   ├── repositories/    # Empty (only .gitkeep)
+│   │   │   ├── screens/         # health_monitoring_screen.dart (placeholder)
+│   │   │   └── widgets/         # Empty (only .gitkeep)
+│   │   ├── profile/             # ⬜ Placeholder — Clean Arch folders + 1 screen (40 LOC, has logout)
+│   │   │   ├── models/          # Empty (only .gitkeep)
+│   │   │   ├── providers/       # Empty (only .gitkeep)
+│   │   │   ├── repositories/    # Empty (only .gitkeep)
+│   │   │   ├── screens/         # profile_screen.dart (placeholder with logout button)
+│   │   │   └── widgets/         # Empty (only .gitkeep)
+│   │   └── sleep_analysis/      # ⬜ Placeholder — Clean Arch folders + 1 screen (25 LOC)
+│   │       ├── models/          # Empty (only .gitkeep)
+│   │       ├── providers/       # Empty (only .gitkeep)
+│   │       ├── repositories/    # Empty (only .gitkeep)
+│   │       ├── screens/         # sleep_screen.dart (placeholder)
+│   │       └── widgets/         # Empty (only .gitkeep)
 │   └── shared/                  # Shared widgets, models (5 files)
 │       ├── models/              # Shared data models (1 file)
 │       └── widgets/             # Reusable widgets (4 files)
@@ -109,23 +135,57 @@ health_system/
 
 ---
 
-### 2. [DEVICE] IoT Device Management (Sprint 2)
+### 2. [HOME] Main Navigation Shell (Sprint 1-2)
 
-> **SRS Ref**: UC040, UC041, UC042 | **JIRA**: EP07-Device  
-> **Review Status**: ⬜ Not implemented
+> **SRS Ref**: N/A (UI Infrastructure) | **JIRA**: N/A  
+> **Review Status**: 🔵 Scaffolding done — placeholder screens
 
-| Feature         | API Endpoint                           | Status       |
-| --------------- | -------------------------------------- | ------------ |
-| Register device | `POST /api/mobile/devices/register`    | ⬜ Not built |
-| List devices    | `GET /api/mobile/devices`              | ⬜ Not built |
-| Unbind device   | `POST /api/mobile/devices/{id}/unbind` | ⬜ Not built |
-| Device status   | `GET /api/mobile/devices/{id}/status`  | ⬜ Not built |
+| Feature                  | Screen File                          | Status         | Note                                         |
+| ------------------------ | ------------------------------------ | -------------- | -------------------------------------------- |
+| Bottom Navigation Bar    | `home/screens/main_screen.dart`      | ✅ Done        | 5 tabs with gradient blue design, custom nav |
+| Dashboard (patient view) | `home/screens/dashboard_screen.dart` | ⬜ Placeholder | Simple screen with centered text             |
 
-> ⚠️ Both `lib/features/device/` and backend route files are **empty directories**
+**Navigation Structure**:
+
+- **Tab 1**: Sức khỏe (Health Monitoring) → `health_monitoring_screen.dart`
+- **Tab 2**: Giấc ngủ (Sleep Analysis) → `sleep_screen.dart`
+- **Tab 3**: Cảnh báo (Emergency/Warning) → `warning_screen.dart`
+- **Tab 4**: Thiết bị (Device) → `device_screen.dart`
+- **Tab 5**: Cá nhân (Profile) → `profile_screen.dart`
+
+**Implementation Details**:
+
+- Custom navigation bar (replaced default `BottomNavigationBar` due to overflow issues)
+- Gradient blue theme (`Colors.blue.shade800` → `Colors.blue.shade600`)
+- Selected tab: glow effect with larger icon (28px vs 24px)
+- Height: 70px with 12px border radius
+- Smooth animations (300ms duration)
+
+**Known Issues**:
+
+- Dashboard screen is placeholder only — no actual content
+- All feature screens are placeholders (simple centered text)
+- No data flow between screens yet
 
 ---
 
-### 3. [INFRA] Backend Setup + Data Ingestion (Sprint 1-2)
+### 3. [DEVICE] IoT Device Management (Sprint 2)
+
+> **SRS Ref**: UC040, UC041, UC042 | **JIRA**: EP07-Device  
+> **Review Status**: ⬜ Placeholder screen only — no logic
+
+| Feature         | API Endpoint                           | Status       | Screen Status                                |
+| --------------- | -------------------------------------- | ------------ | -------------------------------------------- |
+| Register device | `POST /api/mobile/devices/register`    | ⬜ Not built | ⬜ `device_screen.dart` placeholder (25 LOC) |
+| List devices    | `GET /api/mobile/devices`              | ⬜ Not built | —                                            |
+| Unbind device   | `POST /api/mobile/devices/{id}/unbind` | ⬜ Not built | —                                            |
+| Device status   | `GET /api/mobile/devices/{id}/status`  | ⬜ Not built | —                                            |
+
+> ⚠️ Clean Architecture folders created but empty (models/, providers/, repositories/, widgets/ have only .gitkeep)
+
+---
+
+### 4. [INFRA] Backend Setup + Data Ingestion (Sprint 1-2)
 
 > **SRS Ref**: N/A | **JIRA**: EP01-Database, EP03-MobileBE, EP06-Ingestion  
 > **Review Status**: ⬜ Pending (partially working — FastAPI + Auth infra done)
@@ -144,45 +204,45 @@ health_system/
 
 ---
 
-### 4. [MONITORING] Health Metrics (Sprint 2)
+### 5. [MONITORING] Health Metrics (Sprint 2)
 
 > **SRS Ref**: UC006, UC007, UC008 | **JIRA**: EP08-Monitoring  
-> **Review Status**: ⬜ Not implemented
+> **Review Status**: ⬜ Placeholder screen only — no logic
 
-| Feature             | API Endpoint                                                | Status       |
-| ------------------- | ----------------------------------------------------------- | ------------ |
-| View latest vitals  | `GET /api/mobile/patients/{id}/vital-signs/latest`          | ⬜ Not built |
-| View metric detail  | `GET /api/mobile/patients/{id}/vital-signs/{metric}/detail` | ⬜ Not built |
-| View health history | `GET /api/mobile/patients/{id}/vital-signs/history`         | ⬜ Not built |
+| Feature             | API Endpoint                                                | Status       | Screen Status                                           |
+| ------------------- | ----------------------------------------------------------- | ------------ | ------------------------------------------------------- |
+| View latest vitals  | `GET /api/mobile/patients/{id}/vital-signs/latest`          | ⬜ Not built | ⬜ `health_monitoring_screen.dart` placeholder (25 LOC) |
+| View metric detail  | `GET /api/mobile/patients/{id}/vital-signs/{metric}/detail` | ⬜ Not built | —                                                       |
+| View health history | `GET /api/mobile/patients/{id}/vital-signs/history`         | ⬜ Not built | —                                                       |
 
-> ⚠️ Both `lib/features/health_monitoring/` and backend are **empty**
+> ⚠️ Clean Architecture folders created but empty (models/, providers/, repositories/, widgets/ have only .gitkeep)
 
 ---
 
-### 5. [EMERGENCY] Fall Detection & SOS (Sprint 3)
+### 6. [EMERGENCY] Fall Detection & SOS (Sprint 3)
 
 > **SRS Ref**: UC010, UC011, UC014, UC015 | **JIRA**: EP09-FallDetect, EP10-SOS  
-> **Review Status**: ⬜ Not implemented
+> **Review Status**: ⬜ Placeholder screen only — no logic
 
-| Feature             | API Endpoint                                    | Status       |
-| ------------------- | ----------------------------------------------- | ------------ |
-| Confirm fall (safe) | `POST /api/mobile/fall-events/{id}/confirm`     | ⬜ Not built |
-| Trigger SOS (auto)  | `POST /api/mobile/fall-events/{id}/trigger-sos` | ⬜ Not built |
-| Manual SOS          | `POST /api/mobile/sos/manual-trigger`           | ⬜ Not built |
-| Cancel SOS          | `POST /api/mobile/sos/{id}/cancel`              | ⬜ Not built |
-| Active SOS list     | `GET /api/mobile/sos/active`                    | ⬜ Not built |
-| SOS detail          | `GET /api/mobile/sos/{id}`                      | ⬜ Not built |
-| Respond to SOS      | `POST /api/mobile/sos/{id}/respond`             | ⬜ Not built |
-| Resolve SOS         | `POST /api/mobile/sos/{id}/resolve`             | ⬜ Not built |
+| Feature             | API Endpoint                                    | Status       | Screen Status                                 |
+| ------------------- | ----------------------------------------------- | ------------ | --------------------------------------------- |
+| Confirm fall (safe) | `POST /api/mobile/fall-events/{id}/confirm`     | ⬜ Not built | ⬜ `warning_screen.dart` placeholder (25 LOC) |
+| Trigger SOS (auto)  | `POST /api/mobile/fall-events/{id}/trigger-sos` | ⬜ Not built | —                                             |
+| Manual SOS          | `POST /api/mobile/sos/manual-trigger`           | ⬜ Not built | —                                             |
+| Cancel SOS          | `POST /api/mobile/sos/{id}/cancel`              | ⬜ Not built | —                                             |
+| Active SOS list     | `GET /api/mobile/sos/active`                    | ⬜ Not built | —                                             |
+| SOS detail          | `GET /api/mobile/sos/{id}`                      | ⬜ Not built | —                                             |
+| Respond to SOS      | `POST /api/mobile/sos/{id}/respond`             | ⬜ Not built | —                                             |
+| Resolve SOS         | `POST /api/mobile/sos/{id}/resolve`             | ⬜ Not built | —                                             |
 
-> ⚠️ Both `lib/features/emergency/` and backend are **empty**
+> ⚠️ Clean Architecture folders created but empty (models/, providers/, repositories/, widgets/ have only .gitkeep)
 
 ---
 
-### 6. [NOTIFICATION] Alerts & Emergency Contacts (Sprint 3)
+### 7. [NOTIFICATION] Alerts & Emergency Contacts (Sprint 3)
 
 > **SRS Ref**: UC030, UC031 | **JIRA**: EP11-Notification  
-> **Review Status**: ⬜ Not implemented
+> **Review Status**: ⬜ Not implemented — no screen created
 
 | Feature                 | API Endpoint                                         | Status       |
 | ----------------------- | ---------------------------------------------------- | ------------ |
@@ -192,9 +252,11 @@ health_system/
 | Acknowledge alert       | `POST /api/mobile/alerts/{id}/acknowledge`           | ⬜ Not built |
 | Notification settings   | `GET/PUT /api/mobile/notification-settings`          | ⬜ Not built |
 
+> ⚠️ No feature folder created for notification module yet
+
 ---
 
-### 7. [ANALYSIS] Risk Scoring & AI (Sprint 4)
+### 8. [ANALYSIS] Risk Scoring & AI (Sprint 4)
 
 > **SRS Ref**: UC016, UC017 | **JIRA**: EP13-RiskScore  
 > **Review Status**: ⬜ Not implemented
@@ -208,24 +270,64 @@ health_system/
 
 ---
 
-### 8. [SLEEP] Sleep Analysis (Sprint 4)
+### 8. [ANALYSIS] Risk Scoring & AI (Sprint 4)
+
+> **SRS Ref**: UC016, UC017 | **JIRA**: EP13-RiskScore  
+> **Review Status**: ⬜ Not implemented — no screen created
+
+| Feature           | API Endpoint                                       | Status       |
+| ----------------- | -------------------------------------------------- | ------------ |
+| Latest risk score | `GET /api/mobile/patients/{id}/risk-score/latest`  | ⬜ Not built |
+| Risk history      | `GET /api/mobile/patients/{id}/risk-score/history` | ⬜ Not built |
+| Risk detail       | `GET /api/mobile/risk-scores/{id}`                 | ⬜ Not built |
+| AI Risk Scoring   | `POST /ai/risk-scoring` (internal)                 | ⬜ Not built |
+
+> ⚠️ No feature folder created for analysis module yet
+
+---
+
+### 9. [SLEEP] Sleep Analysis (Sprint 4)
 
 > **SRS Ref**: UC020, UC021 | **JIRA**: EP14-Sleep  
-> **Review Status**: ⬜ Not implemented
+> **Review Status**: ⬜ Placeholder screen only — no logic
 
-| Feature             | API Endpoint                                  | Status       |
-| ------------------- | --------------------------------------------- | ------------ |
-| Latest sleep report | `GET /api/mobile/patients/{id}/sleep/latest`  | ⬜ Not built |
-| Sleep history       | `GET /api/mobile/patients/{id}/sleep/history` | ⬜ Not built |
+| Feature             | API Endpoint                                  | Status       | Screen Status                               |
+| ------------------- | --------------------------------------------- | ------------ | ------------------------------------------- |
+| Latest sleep report | `GET /api/mobile/patients/{id}/sleep/latest`  | ⬜ Not built | ⬜ `sleep_screen.dart` placeholder (25 LOC) |
+| Sleep history       | `GET /api/mobile/patients/{id}/sleep/history` | ⬜ Not built | —                                           |
 
-> ⚠️ `lib/features/sleep_analysis/` and backend are **empty**
+> ⚠️ Clean Architecture folders created but empty (models/, providers/, repositories/, widgets/ have only .gitkeep)
+
+### 10. [PROFILE] User Profile & Settings (Sprint 1-2)
+
+> **SRS Ref**: UC009 | **JIRA**: EP04-Login (Profile view), EP05-Register  
+> **Review Status**: ⬜ Placeholder screen with logout only
+
+| Feature      | Screen File                           | Status         | Note                                      |
+| ------------ | ------------------------------------- | -------------- | ----------------------------------------- |
+| View profile | `profile/screens/profile_screen.dart` | ⬜ Placeholder | Simple screen with logout button (40 LOC) |
+| Edit profile | —                                     | ⬜ Not built   | No edit UI yet                            |
+| Logout       | `profile/screens/profile_screen.dart` | ✅ Done        | Uses AuthProvider to clear session        |
+
+**Implementation Details**:
+
+- Profile screen connected to `AuthProvider` for logout functionality
+- Logout button triggers `authProvider.logout()` → clears JWT → navigates to login
+- Screen accessible via bottom navigation Tab 5
+
+**Known Issues**:
+
+- No profile data display — placeholder only
+- No edit profile functionality
+- Clean Architecture folders empty (models/, providers/, repositories/, widgets/ have only .gitkeep)
 
 ## Update History
 
-| Date       | Version | Changes                                                                                                |
-| ---------- | ------- | ------------------------------------------------------------------------------------------------------ |
-| 04/03/2026 | v2.1    | CHECK scan: Updated LOC for auth.py (260), auth_service.py (779), jwt.py (121), email_service.py (190) |
-| 04/03/2026 | v2.0    | CHECK scan: Trello→JIRA, accurate LOC, 7/8 modules confirmed NOT implemented, tree updated             |
-| 04/03/2026 | v1.2    | AUTH 82/100, Forgot/Reset/Change PWD UI, jwt_decode dependency, 15 tests                               |
-| 04/03/2026 | v1.1    | AUTH after review v3 (78/100), deep link integration, rate limiting, audit logging                     |
-| 03/03/2026 | v1.0    | Initial creation based on Sprint 1-4                                                                   |
+| Date       | Version | Changes                                                                                                                                    |
+| ---------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| 10/03/2026 | v2.2    | CHECK scan: Added HOME navigation (main_screen.dart), all features now have Clean Arch folders + placeholder screens, added PROFILE module |
+| 04/03/2026 | v2.1    | CHECK scan: Updated LOC for auth.py (260), auth_service.py (779), jwt.py (121), email_service.py (190)                                     |
+| 04/03/2026 | v2.0    | CHECK scan: Trello→JIRA, accurate LOC, 7/8 modules confirmed NOT implemented, tree updated                                                 |
+| 04/03/2026 | v1.2    | AUTH 82/100, Forgot/Reset/Change PWD UI, jwt_decode dependency, 15 tests                                                                   |
+| 04/03/2026 | v1.1    | AUTH after review v3 (78/100), deep link integration, rate limiting, audit logging                                                         |
+| 03/03/2026 | v1.0    | Initial creation based on Sprint 1-4                                                                                                       |
