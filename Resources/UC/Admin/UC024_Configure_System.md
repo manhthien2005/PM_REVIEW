@@ -2,15 +2,15 @@
 
 ## 1. Bảng đặc tả Use Case
 
-| Thuộc tính         | Nội dung                                                                                                                                                                                                                                                                    |
-| ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Mã UC**          | UC024                                                                                                                                                                                                                                                                       |
-| **Tên UC**         | Cấu hình hệ thống toàn cục (Global System Settings)                                                                                                                                                                                                                         |
-| **Tác nhân chính** | Quản trị viên cấp cao (Super Admin)                                                                                                                                                                                                                                         |
-| **Mô tả**          | Cung cấp cho Admin quyền lực cao nhất để tinh chỉnh các hoạt động cốt lõi của hệ thống, bao gồm cấu hình độ nhạy AI (ngừa false alarm), quản lý đóng/mở luồng gọi điện/SMS (để kiểm soát chi phí API), đặt ngưỡng sinh tồn mặc định và đưa hệ thống vào trạng thái bảo trì. |
-| **Trigger**        | Admin truy cập mục "Cấu hình hệ thống" trên màn hình điều khiển (Admin Dashboard).                                                                                                                                                                                          |
-| **Tiền điều kiện** | Admin đã đăng nhập và được gắn quyền `super_admin` hoặc có permission tương đương.                                                                                                                                                                                          |
-| **Hậu điều kiện**  | Cấu hình mới được ghi vào DB. Backend workers tự động reload cấu hình mới (ngay lập tức hoặc tính từ chu kỳ kế tiếp). Hệ thống ghi log kiểm toán (`audit_logs`) mọi thay đổi.                                                                                               |
+| Thuộc tính         | Nội dung                                                                                                                                                                                                                                                 |
+| ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Mã UC**          | UC024                                                                                                                                                                                                                                                    |
+| **Tên UC**         | Cấu hình hệ thống toàn cục (Global System Settings)                                                                                                                                                                                                      |
+| **Tác nhân chính** | Quản trị viên cấp cao (Super Admin)                                                                                                                                                                                                                      |
+| **Mô tả**          | Cung cấp cho Admin quyền lực cao nhất để tinh chỉnh các hoạt động cốt lõi của hệ thống, bao gồm cấu hình độ nhạy AI (ngừa false alarm), cấu hình luồng thông báo Push Notification, đặt ngưỡng sinh tồn mặc định và đưa hệ thống vào trạng thái bảo trì. |
+| **Trigger**        | Admin truy cập mục "Cấu hình hệ thống" trên màn hình điều khiển (Admin Dashboard).                                                                                                                                                                       |
+| **Tiền điều kiện** | Admin đã đăng nhập và được gắn quyền `super_admin` hoặc có permission tương đương.                                                                                                                                                                       |
+| **Hậu điều kiện**  | Cấu hình mới được ghi vào DB. Backend workers tự động reload cấu hình mới (ngay lập tức hoặc tính từ chu kỳ kế tiếp). Hệ thống ghi log kiểm toán (`audit_logs`) mọi thay đổi.                                                                            |
 
 ---
 
@@ -23,9 +23,9 @@ Thiết kế màn hình này đem lại tính thực tiễn cao cho sản phẩm
    - `auto_sos_countdown_sec` (Thời gian đếm ngược - mặc định: 30s): Cho phép user có thời gian bấm CANCEL trước khi hệ thống tự động gọi cấp cứu.
    - `enable_auto_sos` (Tự kích hoạt SOS): Kill-switch đóng/mở hoàn toàn khả năng tự tạo SOS (Dùng khi Call Center đang quá tải).
 
-2. **Quản lý Cước phí & Kênh Liên lạc (Cost Control)**
-   - `sms_enabled` / `call_enabled` (Công tắc SMS/Voice Call): Việc Push Notification qua app là miễn phí, nhưng SMS qua Twilio tốn tiền. Admin có quyền ngắt các kênh này khi hết ngân sách.
-   - `max_sms_per_user_daily` (Giới hạn SMS theo ngày): Đề phòng lỗi loop spam SMS gây tốn tiền, đặt giới hạn trần (ví dụ: 5 sms/bệnh nhân/ngày).
+2. **Quản lý Kênh Liên lạc (Communication Channels)**
+   - Hệ thống sử dụng hoàn toàn **Push Notification** qua ứng dụng di động để gửi cảnh báo nhằm tối ưu chi phí và đảm bảo tính tức thời.
+   - Các cấu hình SMS/Voice Call đã được loại bỏ phân hệ này.
 
 3. **Cấu hình Sinh tồn Mặc định (Clinical Defaults)**
    - SpO2 Min (92%), Nhịp tim Min/Max (50-120). Nếu bác sĩ/caregiver quên thiết lập ngưỡng cá nhân cho bệnh nhân, hệ thống sẽ sử dụng các **Global Default** này làm căn cứ chốt chặn.
@@ -41,8 +41,8 @@ Thiết kế màn hình này đem lại tính thực tiễn cao cho sản phẩm
 | Bước | Người thực hiện | Hành động                                                                                                                                                                                                  |
 | ---- | --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 1    | Admin           | Truy cập menu "Cấu hình hệ thống".                                                                                                                                                                         |
-| 2    | Hệ thống        | Query bảng `system_settings` và render UI form chia thành 4 tab: **AI**, **Notification (Cước phí)**, **Sinh tồn**, và **Bảo trì**.                                                                        |
-| 3    | Admin           | Thay đổi một tham số. Ví dụ: Tắt `sms_enabled` do hết ngân sách hoặc thay đổi `auto_sos_countdown_sec` từ 30 -> 20.                                                                                        |
+| 2    | Hệ thống        | Query bảng `system_settings` và render UI form chia thành 4 tab: **AI**, **Notification**, **Sinh tồn**, và **Bảo trì**.                                                                                   |
+| 3    | Admin           | Thay đổi một tham số. Ví dụ: Thay đổi `auto_sos_countdown_sec` từ 30 -> 20.                                                                                                                                |
 | 4    | Admin           | Bấm "Lưu Thay Đổi".                                                                                                                                                                                        |
 | 5    | Hệ thống        | Hiển thị hộp thoại xác nhận (Modal): "Bạn đang thay đổi cấu hình lõi của hệ thống. Nhập lại mật khẩu để tiếp tục."                                                                                         |
 | 6    | Admin           | Nhập mật khẩu (Password confirmation) và xác nhận.                                                                                                                                                         |

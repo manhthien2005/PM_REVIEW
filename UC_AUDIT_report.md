@@ -487,3 +487,9 @@ Dựa trên yêu cầu rà soát các luồng CRUD (như UC025 thiếu Thêm Thi
 - **Tài liệu SRS (`SRS_INDEX.md`)**: Thêm Feature mới với `HG-FUNC-12: Theo dõi và phân tích giấc ngủ (Sleep Tracking)`.
 - **Cấu trúc SQL**: Cập nhật DDL scripts thêm bảng `sleep_sessions` bao gồm các trường: `session_id`, `user_id`, `start_time`, `end_time`, `sleep_score`, `phases` (loại JSONB lưu chu trình ngủ: Awake, Light, Deep, REM).
 - **JIRA Task**: Epic EP14-Sleep đã tồn tại, chỉ cần đảm bảo có sub-tasks cho việc xây dựng DB Migration.
+
+---
+
+## 9. CHANGELOG (Lịch sử cập nhật)
+
+- **[2026-03-10 20:53:34]**: Cập nhật `UC024_Configure_System.md` - Loại bỏ mô tả thiết lập SMS/Gọi điện do quyết định hệ thống chỉ thống nhất sử dụng duy nhất Push Notification.
