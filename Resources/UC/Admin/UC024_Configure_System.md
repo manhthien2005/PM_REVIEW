@@ -28,7 +28,7 @@ Thiết kế màn hình này đem lại tính thực tiễn cao cho sản phẩm
    - Các cấu hình SMS/Voice Call đã được loại bỏ phân hệ này.
 
 3. **Cấu hình Sinh tồn Mặc định (Clinical Defaults)**
-   - SpO2 Min (92%), Nhịp tim Min/Max (50-120). Nếu bác sĩ/caregiver quên thiết lập ngưỡng cá nhân cho bệnh nhân, hệ thống sẽ sử dụng các **Global Default** này làm căn cứ chốt chặn.
+   - SpO2 Min (92%), Nhịp tim Min/Max (50-120). Nếu người dùng chưa thiết lập ngưỡng cá nhân, hệ thống sẽ sử dụng các **Global Default** này làm căn cứ chốt chặn.
 
 4. **Bảo mật & Bảo trì (Security & Maintenance)**
    - `maintenance_mode` (Chế độ bảo trì): Kích hoạt sẽ hiển thị "Đang bảo trì" cho tất cả người dùng (app, web), ngoại trừ tài khoản có quyền Admin để test hệ thống.

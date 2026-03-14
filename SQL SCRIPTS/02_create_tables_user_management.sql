@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS users (
     avatar_url TEXT,
     
     -- Role & Status
-    role VARCHAR(20) NOT NULL DEFAULT 'patient' CHECK (role IN ('patient', 'caregiver', 'admin')),
+    role VARCHAR(20) NOT NULL DEFAULT 'user' CHECK (role IN ('user', 'admin')),
     is_active BOOLEAN DEFAULT true,
     is_verified BOOLEAN DEFAULT false,
     
@@ -62,7 +62,7 @@ COMMENT ON COLUMN users.deleted_at IS 'Soft delete timestamp (GDPR compliance)';
 CREATE TABLE IF NOT EXISTS user_relationships (
     id SERIAL PRIMARY KEY,
     patient_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    caregiver_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    caregiver_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE, -- CHÚ Ý: caregiver_id ở logic kiến trúc mới hoàn toàn mang ý nghĩa là "ID của người đang xem/theo dõi dữ liệu", áp dụng chung cho mọi `user`.
     
     -- Relationship
     relationship_type VARCHAR(50) CHECK (relationship_type IN ('family', 'friend', 'doctor', 'nurse', 'other')),

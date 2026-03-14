@@ -6,7 +6,7 @@
 |------------|----------|
 | **Mã UC** | UC008 |
 | **Tên UC** | Xem lịch sử chỉ số sức khỏe |
-| **Tác nhân chính** | Bệnh nhân, Người chăm sóc |
+| **Tác nhân chính** | User |
 | **Mô tả** | Người dùng xem lại lịch sử các chỉ số sức khỏe trong khoảng thời gian dài (ngày, tuần, tháng) để theo dõi xu hướng. **Phân biệt với UC007**: UC007 tập trung drill-down chi tiết một chỉ số cụ thể, UC008 cho phép xem xu hướng tổng hợp nhiều chỉ số, so sánh qua các ngày và phát hiện pattern dài hạn. |
 | **Trigger** | Người dùng chọn chức năng "Lịch sử sức khỏe" từ màn hình chính hoặc từ UC006. |
 | **Tiền điều kiện** | - Người dùng đã đăng nhập.<br>- Có ít nhất một khoảng thời gian đã được ghi nhận dữ liệu. |
@@ -61,6 +61,10 @@
 - **BR-008-04**: Không hiển thị dữ liệu vượt ngoài thời gian retention đã cấu hình (VD: > 1 năm có thể không còn dữ liệu chi tiết). 
 
 ---
+
+
+## Business Rules - Phân quyền (Authorization)
+- **BR-Auth-01**: User A chỉ được phép truy vấn/xem dữ liệu y tế của User B nếu ID của cả hai tồn tại trong bảng `user_relationships` và có cờ `can_view_vitals = true` (hoặc User A xem dữ liệu của chính mình).
 
 ## Yêu cầu phi chức năng
 

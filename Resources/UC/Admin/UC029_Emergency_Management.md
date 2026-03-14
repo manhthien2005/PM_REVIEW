@@ -41,7 +41,7 @@
 | ----- | --------------- | -------------------------------------------------------------------------------------------------------------- |
 | 5.b.1 | Admin           | Chọn sự cố đang `active` và click "Đã phản hồi" hoặc "Đã giải quyết".                                          |
 | 5.b.2 | Hệ thống        | Popup xác nhận kèm ô ghi chú (bắt buộc).                                                                       |
-| 5.b.3 | Admin           | Nhập ghi chú (VD: "Đã liên hệ caregiver Nguyễn Văn A, xác nhận an toàn") và xác nhận.                          |
+| 5.b.3 | Admin           | Nhập ghi chú (VD: "Đã liên hệ tài khoản liên kết Nguyễn Văn A để xác nhận an toàn") và xác nhận.                          |
 | 5.b.4 | Hệ thống        | Cập nhật `sos_events.status` (active → responded → resolved), lưu `responded_at`/`resolved_at`, ghi audit log. |
 
 ### 5.c — Liên hệ khẩn cấp từ Dashboard

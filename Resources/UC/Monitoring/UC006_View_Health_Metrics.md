@@ -6,7 +6,7 @@
 |------------|----------|
 | **Mã UC** | UC006 |
 | **Tên UC** | Xem chỉ số sức khỏe theo thời gian thực |
-| **Tác nhân chính** | Bệnh nhân, Người chăm sóc |
+| **Tác nhân chính** | User |
 | **Mô tả** | Người dùng xem các chỉ số sức khỏe hiện tại và nhận cảnh báo khi có bất thường |
 | **Trigger** | Người dùng mở ứng dụng hoặc truy cập Dashboard |
 | **Tiền điều kiện** | - Người dùng đã đăng nhập<br>- Thiết bị IoT đang kết nối và gửi dữ liệu |
@@ -64,6 +64,10 @@
 - Nhịp tim bất thường kéo dài > 5 phút: Gửi thông báo
 
 ---
+
+
+## Business Rules - Phân quyền (Authorization)
+- **BR-Auth-01**: User A chỉ được phép truy vấn/xem dữ liệu y tế của User B nếu ID của cả hai tồn tại trong bảng `user_relationships` và có cờ `can_view_vitals = true` (hoặc User A xem dữ liệu của chính mình).
 
 ## Yêu cầu phi chức năng
 

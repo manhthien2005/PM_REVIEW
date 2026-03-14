@@ -104,6 +104,10 @@ Top 5 yếu tố ảnh hưởng:
 
 ---
 
+
+## Business Rules - Phân quyền (Authorization)
+- **BR-Auth-01**: User A chỉ được phép truy vấn/xem dữ liệu y tế của User B nếu ID của cả hai tồn tại trong bảng `user_relationships` và có cờ `can_view_vitals = true` (hoặc User A xem dữ liệu của chính mình).
+
 ## Yêu cầu phi chức năng
 
 - **Accuracy**: AUC-ROC > 0.85, Sensitivity > 90%
