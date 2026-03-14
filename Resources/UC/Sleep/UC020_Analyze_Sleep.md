@@ -6,7 +6,7 @@
 |------------|----------|
 | **Mã UC** | UC020 |
 | **Tên UC** | Phân tích giấc ngủ |
-| **Tác nhân chính** | Bệnh nhân |
+| **Tác nhân chính** | User |
 | **Mô tả** | Hệ thống phân tích dữ liệu trong thời gian ngủ (được cấu hình) để ước tính chất lượng giấc ngủ và các chỉ số liên quan. |
 | **Trigger** | - Người dùng bật chế độ "Theo dõi giấc ngủ" trên app.<br>- Hoặc hệ thống tự động nhận diện khung giờ ngủ đã cấu hình (VD: 22:00–06:00). |
 | **Tiền điều kiện** | - Người dùng đeo thiết bị trong lúc ngủ.<br>- Thiết bị thu thập đủ dữ liệu (nhịp tim, chuyển động). |
@@ -51,6 +51,10 @@
 - **BR-020-03**: Các chỉ số phân tích chính: tổng thời gian ngủ, thời gian nằm nhưng không ngủ, số lần tỉnh giấc, nhịp tim trung bình và thấp nhất trong lúc ngủ. 
 
 ---
+
+
+## Business Rules - Phân quyền (Authorization)
+- **BR-Auth-01**: User A chỉ được phép truy vấn/xem dữ liệu y tế của User B nếu ID của cả hai tồn tại trong bảng `user_relationships` và có cờ `can_view_vitals = true` (hoặc User A xem dữ liệu của chính mình).
 
 ## Yêu cầu phi chức năng
 

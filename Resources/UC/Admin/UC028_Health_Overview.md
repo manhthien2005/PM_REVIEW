@@ -35,7 +35,7 @@
 | ----- | --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 6.a.1 | Admin           | Click vào một bệnh nhân trong bảng cảnh báo hoặc bảng risk cao.                                                                                                                                                                                                                                                  |
 | 6.a.2 | Hệ thống        | Hiển thị trang chi tiết sức khỏe bệnh nhân:<br>- **Vitals hiện tại**: HR, SpO₂, BP, Temp<br>- **Risk Score**: Giá trị, Level, Thời điểm đánh giá<br>- **Biểu đồ 24h** (từ `vitals_5min`)<br>- **Biểu đồ 7 ngày** (từ `vitals_daily`)<br>- **Risk trend 30 ngày** của bệnh nhân<br>- **Lịch sử cảnh báo** gần đây |
-| 6.a.3 | Admin           | Xem chi tiết và quyết định hành động (liên hệ caregiver, khóa tài khoản, v.v.).                                                                                                                                                                                                                                  |
+| 6.a.3 | Admin           | Xem chi tiết và quyết định hành động (liên hệ người giám hộ hợp pháp/người phụ trách, khóa tài khoản, v.v.).                                                                                                                                                                                                                                  |
 
 ### 6.b — Lọc theo chỉ số bất thường
 

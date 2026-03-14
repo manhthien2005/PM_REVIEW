@@ -6,7 +6,7 @@
 |------------|----------|
 | **Mã UC** | UC007 |
 | **Tên UC** | Xem chi tiết chỉ số sức khỏe |
-| **Tác nhân chính** | Bệnh nhân, Người chăm sóc |
+| **Tác nhân chính** | User |
 | **Mô tả** | Người dùng xem chi tiết một chỉ số sức khỏe (nhịp tim, SpO₂, huyết áp, nhiệt độ) với thống kê và biểu đồ theo khoảng thời gian linh hoạt. |
 | **Trigger** | Người dùng chọn 1 chỉ số cụ thể trên màn hình UC006 hoặc truy cập màn hình “Chi tiết chỉ số”. |
 | **Tiền điều kiện** | - Người dùng đã đăng nhập.<br>- Đã có thiết bị gán với tài khoản và có dữ liệu trong khoảng thời gian chọn. |
@@ -62,6 +62,10 @@
 - **BR-007-04**: Tôn trọng quyền truy cập của caregiver (chỉ xem bệnh nhân mà họ được gán quyền giám sát). 
 
 ---
+
+
+## Business Rules - Phân quyền (Authorization)
+- **BR-Auth-01**: User A chỉ được phép truy vấn/xem dữ liệu y tế của User B nếu ID của cả hai tồn tại trong bảng `user_relationships` và có cờ `can_view_vitals = true` (hoặc User A xem dữ liệu của chính mình).
 
 ## Yêu cầu phi chức năng
 
