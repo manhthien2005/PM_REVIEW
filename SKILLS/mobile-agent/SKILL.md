@@ -61,7 +61,7 @@ User description is ambiguous, confidence < 70%?
 
 1. **Gather Context**: Read SRS, Use Cases, Project Structure, and Screen Index (`README.md` in `Screen` folder).
 2. **Silent Multi-Agent Brainstorming** (DO NOT print to output — save tokens):
-   - Act as **UI/UX Designer** (ref: `ui-ux-pro-max` + `mobile-design`): Define layout, typography, colors, spacing for target audience (elderly patients, caregivers).
+   - Act as **UI/UX Designer** (ref: `ui-ux-pro-max` + `mobile-design`): Define layout, typography, colors, spacing for target audience (elderly users, linked family members/monitoring users).
    - Act as **Widget Architect** (ref: `ui-ux-designer`): Identify shared widgets to create or reuse.
    - Act as **Skeptic**: Find edge cases — network loss, empty data, tiny text, hard-to-tap buttons.
    - Act as **Flutter Expert** (ref: `flutter-expert`): Validate feasibility — which widgets, external packages needed, Clean Architecture compliance.
@@ -160,6 +160,7 @@ When user requests or when SRS/UC changes are detected:
 
 1. AI **reads current screen file** → compares against latest UC/SRS info.
 2. **Updates content directly** (fix flows, add/remove states, update API endpoints).
+   - ⚠️ **Architecture Rule:** Ensure all screens strictly adopt the unified `User` role and `Linked Profiles` (Profile Switcher) mechanism. Do not use deprecated `patient`/`caregiver` functional roles.
 3. **Updates navigation links**: When a new screen is added → scan related screens and **add bidirectional cross-links** for sync.
 4. Log changes in the `## Sync Notes` section.
 
@@ -207,14 +208,14 @@ When running `TASK full`, also check if reference skill files in `references/` a
 
 ## 1. Description
 - **SRS Ref**: UC010, UC011
-- **User Role**: Patient
-- **Purpose**: Display alert when fall is detected, allow patient to confirm safe or trigger SOS within a 30-second countdown.
+- **User Role**: User (Profile: Monitored Person)
+- **Purpose**: Display alert when fall is detected, allow user to confirm safe or trigger SOS within a 30-second countdown.
 
 ## 2. User Flow
 1. System detects fall → Push notification + Open alert screen
 2. Display 30-second countdown with circular animation
-3. Patient taps "I'm OK" → Cancel countdown, log event, return to Home
-4. Patient taps "Call SOS" OR 30 seconds elapse → Auto-send SOS, navigate to SOS Active screen
+3. User taps "I'm OK" → Cancel countdown, log event, return to Home
+4. User taps "Call SOS" OR 30 seconds elapse → Auto-send SOS, navigate to SOS Active screen
 5. If network lost → Cache SOS request, retry when connected
 
 ## 3. UI States
@@ -261,9 +262,9 @@ When running `TASK full`, also check if reference skill files in `references/` a
 
 ```
 📋 TASK Report:
-- Total screens discovered from SRS: 22
-- Screen specs already exist: 2/22
-- Missing: 20 screens (listed by module)
+- Total screens discovered from SRS: 40
+- Screen specs already exist: 2/40
+- Missing: 38 screens (listed by module)
 - Newly created: 0 (awaiting confirmation)
 - README.md updated: ✅
 
