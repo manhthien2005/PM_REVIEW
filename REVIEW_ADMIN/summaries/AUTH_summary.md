@@ -19,18 +19,20 @@
 | /api/v1/auth/logout          | POST   | Logout (JWT required)                |
 
 ## File Index
-| Path                                                  | Role                             |
-| ----------------------------------------------------- | -------------------------------- |
-| backend/src/controllers/auth.controller.js            | All auth route handlers (4107B)  |
-| backend/src/services/auth.service.js                  | Auth + JWT + Mail logic (16902B) |
-| backend/src/middlewares/auth.js                       | JWT verify + role check (3502B)  |
-| backend/src/middlewares/validate.js                   | Input validators (2553B)         |
-| backend/src/routes/auth.routes.js                     | Route definitions (2149B)        |
-| frontend/src/pages/LoginPage.jsx                      | Login UI (12954B)                |
-| frontend/src/pages/ForgotPasswordPage.jsx             | Forgot password UI (9603B)       |
-| frontend/src/pages/ResetPasswordPage.jsx              | Reset password UI (14907B)       |
-| frontend/src/components/admin/ChangePasswordModal.jsx | Change password UI (12602B)      |
-| frontend/src/services/authService.js                  | Frontend auth API calls (3922B)  |
+| Path                                                  | Role                              |
+| ----------------------------------------------------- | --------------------------------- |
+| backend/src/controllers/auth.controller.js            | All auth route handlers (4670B)   |
+| backend/src/services/auth.service.js                  | Auth + JWT + Mail logic (17969B)  |
+| backend/src/middlewares/auth.js                       | JWT verify + role check (3502B)   |
+| backend/src/middlewares/validate.js                   | Input validators (2553B)          |
+| backend/src/routes/auth.routes.js                     | Route definitions (2149B)         |
+| backend/src/__tests__/controllers/auth.controller.test.js | Controller tests (10085B)     |
+| backend/src/__tests__/services/auth.service.test.js   | Service tests (19007B)            |
+| frontend/src/pages/LoginPage.jsx                      | Login UI (12954B)                 |
+| frontend/src/pages/ForgotPasswordPage.jsx             | Forgot password UI (9603B)        |
+| frontend/src/pages/ResetPasswordPage.jsx              | Reset password UI (14907B)        |
+| frontend/src/components/admin/ChangePasswordModal.jsx | Change password UI (12602B)       |
+| frontend/src/services/authService.js                  | Frontend auth API calls (3922B)   |
 
 ## Known Issues
 - 🟡 No email verify/resend endpoints in actual routes (only in service layer)
