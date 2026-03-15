@@ -3,7 +3,7 @@
 > **Project**: HealthGuard Admin Dashboard  
 > **Tech Stack**: Node.js / Express.js / Prisma ORM / JavaScript (Backend) + React / Vite / JavaScript (Frontend)  
 > **Purpose**: Admin system management for HealthGuard  
-> **Last Updated**: 2026-03-11 (CHECK Phase 1)
+> **Last Updated**: 2026-03-15 (CHECK Phase 1)
 
 ---
 
@@ -22,10 +22,10 @@ HealthGuard/
 │   │   │   ├── services/      # auth.service.test.js, user.service.test.js, device.service.test.js, emergency.service.test.js, logs.service.test.js, settings.service.test.js
 │   │   │   └── utils/         # ApiError.test.js, ApiResponse.test.js, catchAsync.test.js
 │   │   ├── config/             # env.js, swagger.js
-│   │   ├── controllers/        # auth.controller.js, user.controller.js, device.controller.js, emergency.controller.js, logs.controller.js, settings.controller.js
+│   │   ├── controllers/        # auth.controller.js, user.controller.js, device.controller.js, emergency.controller.js, logs.controller.js, settings.controller.js, dashboard.controller.js, health.controller.js, relationship.controller.js
 │   │   ├── middlewares/        # auth.js, errorHandler.js, validate.js
-│   │   ├── routes/             # auth.routes.js, index.js, user.routes.js, device.routes.js, emergency.routes.js, logs.routes.js, settings.routes.js
-│   │   ├── services/           # auth.service.js, user.service.js, device.service.js, emergency.service.js, logs.service.js, settings.service.js
+│   │   ├── routes/             # auth.routes.js, index.js, user.routes.js, device.routes.js, emergency.routes.js, logs.routes.js, settings.routes.js, dashboard.routes.js, health.routes.js, relationship.routes.js
+│   │   ├── services/           # auth.service.js, user.service.js, device.service.js, emergency.service.js, logs.service.js, settings.service.js, dashboard.service.js, health.service.js, relationship.service.js, risk-calculator.service.js
 │   │   ├── utils/              # ApiError.js, ApiResponse.js, catchAsync.js, email.js, prisma.js
 │   │   │   └── __mocks__/     # prisma.js (Jest mock)
 │   │   ├── app.js              # Express app setup
@@ -44,8 +44,10 @@ HealthGuard/
 │   │   ├── components/
 │   │   │   ├── admin/          # AdminHeader.jsx, AdminLayout.jsx, AdminSidebar.jsx, ChangePasswordModal.jsx
 │   │   │   ├── common/         # (empty)
+│   │   │   ├── dashboard/      # DashboardAlertsChart.jsx, DashboardConstants.js, DashboardIncidentsTable.jsx, DashboardKPIBar.jsx, DashboardPatientsTable.jsx, DashboardRiskChart.jsx
 │   │   │   ├── devices/        # AssignDeviceModal.jsx, DeviceFormModal.jsx, DevicesConstants.js, DevicesPagination.jsx, DevicesTable.jsx, DevicesToolbar.jsx, LockDeviceModal.jsx, UnassignDeviceModal.jsx
 │   │   │   ├── emergency/      # EmergencyConstants.js, EmergencyDetailModal.jsx, EmergencyPagination.jsx, EmergencyStatusPrompt.jsx, EmergencySummaryBar.jsx, EmergencyTable.jsx, EmergencyToolbar.jsx
+│   │   │   ├── health/         # AlertsPagination.jsx, HealthConstants.js, HealthSummaryBar.jsx, PatientHealthDetailModal.jsx, RiskDistributionChart.jsx, RiskPagination.jsx, ThresholdAlertsTable.jsx
 │   │   │   ├── logs/           # LogDetailModal.jsx, LogsConstants.js, LogsPagination.jsx, LogsTable.jsx, LogsToolbar.jsx
 │   │   │   ├── settings/       # PasswordConfirmModal.jsx, SettingsConstants.js, SettingsForm.jsx
 │   │   │   ├── ui/             # AlertModal.jsx, ConfirmModal.jsx, Modal.jsx
@@ -54,8 +56,8 @@ HealthGuard/
 │   │   │   ├── ForgotPasswordPage.jsx
 │   │   │   ├── LoginPage.jsx
 │   │   │   ├── ResetPasswordPage.jsx
-│   │   │   └── admin/          # AdminOverviewPage.jsx, UserManagementPage.jsx, DeviceManagementPage.jsx, DeviceManagementPageTest.jsx, EmergencyPage.jsx, SystemLogsPage.jsx, SystemSettingsPage.jsx
-│   │   ├── services/           # api.js, authService.js, userService.js, deviceService.js, emergencyService.js, logsService.js
+│   │   │   └── admin/          # AdminOverviewPage.jsx, DeviceManagementPage.jsx, EmergencyPage.jsx, HealthOverviewPage.jsx, SystemLogsPage.jsx, SystemSettingsPage.jsx, UserManagementPage.jsx
+│   │   ├── services/           # api.js, authService.js, userService.js, deviceService.js, emergencyService.js, logsService.js, dashboardService.js, healthService.js, relationshipService.js
 │   │   ├── App.css
 │   │   ├── App.jsx
 │   │   ├── index.css
@@ -88,7 +90,7 @@ HealthGuard/
 **Files:**
 - `backend/src/controllers/auth.controller.js` (4670 bytes)
 - `backend/src/services/auth.service.js` (17969 bytes)
-- `backend/src/middlewares/auth.js` (3502 bytes), `validate.js` (2553 bytes)
+- `backend/src/middlewares/auth.js` (3502 bytes), `validate.js` (2538 bytes)
 - `backend/src/routes/auth.routes.js` (2149 bytes)
 - `backend/src/__tests__/controllers/auth.controller.test.js` (10085 bytes)
 - `backend/src/__tests__/services/auth.service.test.js` (19007 bytes)
@@ -119,7 +121,7 @@ HealthGuard/
 - `backend/src/__tests__/controllers/user.controller.test.js` (5847 bytes)
 - `backend/src/__tests__/services/user.service.test.js` (14442 bytes)
 - `frontend/src/pages/admin/UserManagementPage.jsx` (12418 bytes)
-- `frontend/src/components/users/UserFormModal.jsx` (12955 bytes), `DeleteConfirmModal.jsx` (3785 bytes), `LockConfirmModal.jsx` (2576 bytes), `UsersConstants.js` (1598 bytes), `UsersPagination.jsx` (3911 bytes), `UsersTable.jsx` (9267 bytes), `UsersToolbar.jsx` (6730 bytes)
+- `frontend/src/components/users/UserFormModal.jsx` (12955 bytes), `DeleteConfirmModal.jsx` (3785 bytes), `LockConfirmModal.jsx` (2576 bytes), `UsersConstants.js` (1438 bytes), `UsersPagination.jsx` (3911 bytes), `UsersTable.jsx` (9735 bytes), `UsersToolbar.jsx` (6730 bytes)
 - `frontend/src/services/api.js` (613 bytes)
 - `frontend/src/services/userService.js` (2290 bytes)
 
@@ -218,7 +220,7 @@ HealthGuard/
 - `backend/src/utils/catchAsync.js` (447 bytes)
 - `backend/src/utils/email.js` (4274 bytes)
 - `backend/src/utils/__mocks__/prisma.js` (218 bytes)
-- `backend/src/middlewares/errorHandler.js` (1660 bytes), `validate.js` (2553 bytes)
+- `backend/src/middlewares/errorHandler.js` (1660 bytes), `validate.js` (2538 bytes)
 - `backend/prisma/schema.prisma` (22588 bytes)
 - `backend/API_GUIDE.md` (11161 bytes)
 
@@ -245,8 +247,74 @@ HealthGuard/
 - `backend/src/routes/emergency.routes.js` (3501 bytes)
 - `backend/src/__tests__/services/emergency.service.test.js` (8528 bytes)
 - `frontend/src/pages/admin/EmergencyPage.jsx` (11671 bytes)
-- `frontend/src/components/emergency/EmergencyConstants.js` (781 bytes), `EmergencyDetailModal.jsx` (12329 bytes), `EmergencyPagination.jsx` (1964 bytes), `EmergencyStatusPrompt.jsx` (3460 bytes), `EmergencySummaryBar.jsx` (2496 bytes), `EmergencyTable.jsx` (5673 bytes), `EmergencyToolbar.jsx` (5383 bytes)
+- `frontend/src/components/emergency/EmergencyConstants.js` (781 bytes), `EmergencyDetailModal.jsx` (12324 bytes), `EmergencyPagination.jsx` (1964 bytes), `EmergencyStatusPrompt.jsx` (3460 bytes), `EmergencySummaryBar.jsx` (2496 bytes), `EmergencyTable.jsx` (5673 bytes), `EmergencyToolbar.jsx` (5383 bytes)
 - `frontend/src/services/emergencyService.js` (2977 bytes)
+
+---
+
+### 8. [DASHBOARD] Admin Dashboard (Sprint 4)
+> **SRS Ref**: N/A | **JIRA**: TBD
+> **Status**: ✅ Built
+
+| Function | API Endpoint | Status | Note |
+| --- | --- | --- | --- |
+| Get KPIs | `GET /api/v1/dashboard/kpi` | ⬜ Pending | |
+| Get Patients List | `GET /api/v1/dashboard/patients` | ⬜ Pending | |
+| Get Recent Incidents | `GET /api/v1/dashboard/incidents` | ⬜ Pending | |
+| Get Patient Details | `GET /api/v1/dashboard/patients/:id` | ⬜ Pending | |
+| Get Patient Vitals | `GET /api/v1/dashboard/patients/:id/vitals` | ⬜ Pending | |
+
+**Files:**
+- `backend/src/controllers/dashboard.controller.js` (2047 bytes)
+- `backend/src/services/dashboard.service.js` (11191 bytes)
+- `backend/src/routes/dashboard.routes.js` (4575 bytes)
+- `backend/src/__tests__/controllers/dashboard.controller.test.js` (5690 bytes)
+- `backend/src/__tests__/services/dashboard.service.test.js` (10174 bytes)
+- `frontend/src/components/dashboard/DashboardAlertsChart.jsx` (4005 bytes), `DashboardConstants.js` (1413 bytes), `DashboardIncidentsTable.jsx` (3540 bytes), `DashboardKPIBar.jsx` (2743 bytes), `DashboardPatientsTable.jsx` (3759 bytes), `DashboardRiskChart.jsx` (3660 bytes)
+- `frontend/src/services/dashboardService.js` (1109 bytes)
+
+---
+
+### 9. [HEALTH] Health Management (Sprint 4)
+> **SRS Ref**: N/A | **JIRA**: TBD
+> **Status**: ✅ Built
+
+| Function | API Endpoint | Status | Note |
+| --- | --- | --- | --- |
+| Get Summary | `GET /api/v1/health/summary` | ⬜ Pending | |
+| Get Risk Distribution | `GET /api/v1/health/risks/distribution` | ⬜ Pending | |
+| Get Threshold Alerts | `GET /api/v1/health/alerts` | ⬜ Pending | |
+
+**Files:**
+- `backend/src/controllers/health.controller.js` (4940 bytes)
+- `backend/src/services/health.service.js` (12114 bytes)
+- `backend/src/services/risk-calculator.service.js` (3621 bytes)
+- `backend/src/routes/health.routes.js` (1919 bytes)
+- `backend/src/__tests__/controllers/health.controller.test.js` (5462 bytes)
+- `backend/src/__tests__/services/health.service.test.js` (9379 bytes)
+- `frontend/src/pages/admin/HealthOverviewPage.jsx` (9686 bytes)
+- `frontend/src/components/health/AlertsPagination.jsx` (3806 bytes), `HealthConstants.js` (1336 bytes), `HealthSummaryBar.jsx` (1837 bytes), `PatientHealthDetailModal.jsx` (8625 bytes), `RiskDistributionChart.jsx` (9240 bytes), `RiskPagination.jsx` (3808 bytes), `ThresholdAlertsTable.jsx` (6687 bytes)
+- `frontend/src/services/healthService.js` (3176 bytes)
+
+---
+
+### 10. [RELATIONSHIP] User Relationships (Sprint 4)
+> **SRS Ref**: N/A | **JIRA**: EP15-AdminManage
+> **Status**: ✅ Built
+
+| Function | API Endpoint | Status | Note |
+| --- | --- | --- | --- |
+| Create | `POST /api/v1/users/relationships` | ⬜ Pending | |
+| List Relationships | `GET /api/v1/users/relationships` | ⬜ Pending | |
+| Search | `GET /api/v1/users/relationships/search` | ⬜ Pending | |
+| Unlink | `DELETE /api/v1/users/relationships/:patientId/:caregiverId` | ⬜ Pending | |
+
+**Files:**
+- `backend/src/controllers/relationship.controller.js` (1972 bytes)
+- `backend/src/services/relationship.service.js` (8811 bytes)
+- `backend/src/routes/relationship.routes.js` (3198 bytes)
+- `frontend/src/components/users/LinkedAccountsTab.jsx` (18014 bytes)
+- `frontend/src/services/relationshipService.js` (1740 bytes)
 
 ---
 
@@ -254,6 +322,7 @@ HealthGuard/
 
 | Date       | Version | Changes                                                                                                                                                                                                                                               |
 | ---------- | ------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-03-15 | v2.9    | CHECK Phase 1: Added DASHBOARD, HEALTH, and RELATIONSHIP modules based on source scan. Updated byte sizes. |
 | 2026-03-11 | v2.8    | CHECK scan: Update EMERGENCY module (UC029 full implementation), updated 9 file sizes, added Export CSV/JSON endpoints, changed PUT→PATCH for status, added DeviceManagementPageTest.jsx |
 | 2026-03-11 | v2.7    | CHECK scan: +EMERGENCY module (#7), DEVICES/CONFIG/LOGS now ✅ Built, +device/emergency/logs/settings controllers+services+routes+tests, +8 device components, +7 emergency components, +5 logs components, +3 settings components, +3 frontend services, +5 admin pages, 16 test files, updated all byte sizes |
 | 2026-03-08 | v2.6    | CHECK scan: updated byte sizes for auth.controller.js, user.service.js, schema.prisma                                                                                                                                                                 |

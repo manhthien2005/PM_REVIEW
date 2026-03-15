@@ -1,6 +1,6 @@
 # MASTER INDEX — HealthGuard Project Review
 
-> **Last Updated**: 2026-03-11  
+> **Last Updated**: 2026-03-15  
 > **Purpose**: AI navigation map — READ THIS FIRST before any review task  
 > **Usage**: AI reads this file → identifies target module → reads only the relevant summary file
 
@@ -30,6 +30,9 @@
 | 5   | **LOGS** — View/Detail/Export System Logs (CSV+JSON)                      | S4     | UC026              | [LOGS_summary.md](REVIEW_ADMIN/summaries/LOGS_summary.md)               | ✅ Done       | 85/100 | ✅ Pass | [View](REVIEW_ADMIN/VIEW_SYSTEM_LOGS_LOGS_review.md)    | 2026-03-11  |
 | 6   | **INFRA** — DB Setup, Express Project, CORS, Health Check, Swagger        | S1     | N/A                | [INFRA_summary.md](REVIEW_ADMIN/summaries/INFRA_summary.md)             | ⬜ Pending    | —      | —       | —                                                       | —           |
 | 7   | **EMERGENCY** — Summary, Active/History Events, Status Update, Contact    | S3-S4  | UC010-UC015        | [EMERGENCY_summary.md](REVIEW_ADMIN/summaries/EMERGENCY_summary.md)     | ✅ Done       | 95/100 | ✅ Pass        | [View](REVIEW_ADMIN/EMERGENCY_MANAGEMENT_EMERGENCY_review.md) | 2026-03-11  |
+| 8   | **DASHBOARD** — Admin Dashboard                                           | S4     | N/A                | [DASHBOARD_summary.md](REVIEW_ADMIN/summaries/DASHBOARD_summary.md)     | ✅ Built      | —      | —       | —                                                       | —           |
+| 9   | **HEALTH** — Health Management                                            | S4     | N/A                | [HEALTH_summary.md](REVIEW_ADMIN/summaries/HEALTH_summary.md)           | ✅ Built      | —      | —       | —                                                       | —           |
+| 10  | **RELATIONSHIP** — User Relationships                                     | S4     | N/A                | [RELATIONSHIP_summary.md](REVIEW_ADMIN/summaries/RELATIONSHIP_summary.md)| ✅ Built      | —      | —       | —                                                       | —           |
 
 ---
 
@@ -107,6 +110,7 @@
 
 | Date       | Version | Changes                                                                                                                                                                                                                     |
 | ---------- | ------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-03-15 | v2.10   | CHECK ADMIN: Added DASHBOARD, HEALTH, RELATIONSHIP modules from source scan. Updated 10 summaries to standard format with true byte sizes and endpoints. |
 | 2026-03-11 | v2.9    | CHECK ADMIN: Update EMERGENCY module to ✅ Done (95/100, ✅ Pass). Updated byte sizes, endpoints (Export), and structure tree. |
 | 2026-03-11 | v2.8    | CHECK ADMIN: Update EMERGENCY module (UC029 full implementation), updated 9 file sizes, added Export CSV/JSON endpoints, changed PUT→PATCH for status, added DeviceManagementPageTest.jsx |
 | 2026-03-08 | v2.5    | CHECK ADMIN: split UserManagementPage into smaller components, updated file sizes in Project_Structure and summaries                                                                                                        |

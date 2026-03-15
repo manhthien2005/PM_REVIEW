@@ -8,35 +8,33 @@
 - Validation via `sanitize-html` based custom middleware on create/update/assign
 
 ## API Index
-| Endpoint                         | Method | Note                              |
-| -------------------------------- | ------ | --------------------------------- |
-| /api/v1/devices                  | POST   | Create device (validated)         |
-| /api/v1/devices                  | GET    | List devices (paginated)          |
-| /api/v1/devices/:id              | GET    | Device detail                     |
-| /api/v1/devices/:id              | PATCH  | Update device metadata            |
-| /api/v1/devices/:id/assign       | PATCH  | Assign device to user (userId)    |
-| /api/v1/devices/:id/unassign     | PATCH  | Unassign device from user         |
-| /api/v1/devices/:id/lock         | PATCH  | Toggle lock/unlock                |
-
+| Endpoint | Method | Note |
+| -------- | ------ | ---- |
+| /api/v1/devices | POST | Auth+Admin, rate limit 100/min |
+| /api/v1/devices | GET | Paginated, auth required |
+| /api/v1/devices/:id | GET |  |
+| /api/v1/devices/:id | PATCH | name, type, model, firmware, cal. |
+| /api/v1/devices/:id/assign | PATCH | Requires userId in body |
+| /api/v1/devices/:id/unassign | PATCH |  |
+| /api/v1/devices/:id/lock | PATCH | Toggle lock |
 ## File Index
-| Path                                                        | Role                                |
-| ----------------------------------------------------------- | ----------------------------------- |
-| backend/src/controllers/device.controller.js                | All device route handlers (3101B)   |
-| backend/src/services/device.service.js                      | Device CRUD + assign logic (7781B)  |
-| backend/src/routes/device.routes.js                         | Route definitions + validation (3174B) |
-| backend/src/__tests__/controllers/device.controller.test.js | Controller tests (4258B)            |
-| backend/src/__tests__/services/device.service.test.js       | Service tests (9806B)               |
-| frontend/src/pages/admin/DeviceManagementPage.jsx           | Device management page (10887B)     |
-| frontend/src/components/devices/AssignDeviceModal.jsx       | Assign device modal (6841B)         |
-| frontend/src/components/devices/DeviceFormModal.jsx         | Create/Edit device modal (9403B)    |
-| frontend/src/components/devices/DevicesConstants.js         | Device module constants (1483B)     |
-| frontend/src/components/devices/DevicesPagination.jsx       | Pagination component (3450B)        |
-| frontend/src/components/devices/DevicesTable.jsx            | Devices data table (11054B)         |
-| frontend/src/components/devices/DevicesToolbar.jsx          | Toolbar and search (3699B)          |
-| frontend/src/components/devices/LockDeviceModal.jsx         | Lock confirmation (845B)            |
-| frontend/src/components/devices/UnassignDeviceModal.jsx     | Unassign confirmation (685B)        |
-| frontend/src/services/deviceService.js                      | Frontend device API calls (2374B)   |
-
+| Path | Role |
+| ---- | ---- |
+| backend/src/controllers/device.controller.js | Component (3101 bytes) |
+| backend/src/services/device.service.js | Component (7781 bytes) |
+| backend/src/routes/device.routes.js | Component (3174 bytes) |
+| backend/src/__tests__/controllers/device.controller.test.js | Component (4258 bytes) |
+| backend/src/__tests__/services/device.service.test.js | Component (9806 bytes) |
+| frontend/src/pages/admin/DeviceManagementPage.jsx | Component (10887 bytes) |
+| frontend/src/components/devices/AssignDeviceModal.jsx | Component (6841 bytes) |
+| DeviceFormModal.jsx | Component (9403 bytes) |
+| DevicesConstants.js | Component (1483 bytes) |
+| DevicesPagination.jsx | Component (3450 bytes) |
+| DevicesTable.jsx | Component (11054 bytes) |
+| DevicesToolbar.jsx | Component (3699 bytes) |
+| LockDeviceModal.jsx | Component (845 bytes) |
+| UnassignDeviceModal.jsx | Component (685 bytes) |
+| frontend/src/services/deviceService.js | Component (2374 bytes) |
 ## Cross-References
 | Type           | Ref                                       |
 | -------------- | ----------------------------------------- |

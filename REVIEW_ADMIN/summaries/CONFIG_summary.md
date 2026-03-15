@@ -8,23 +8,21 @@
 - ADMIN role JWT required; settings validated via custom middleware
 
 ## API Index
-| Endpoint             | Method | Note                                    |
-| -------------------- | ------ | --------------------------------------- |
-| /api/v1/settings     | GET    | Get all global settings                 |
-| /api/v1/settings     | PUT    | Update settings (password + body req.)  |
-
+| Endpoint | Method | Note |
+| -------- | ------ | ---- |
+| /api/v1/settings | GET | Vital thresholds, AI config |
+| /api/v1/settings | PUT | Requires admin password + body |
 ## File Index
-| Path                                                       | Role                                  |
-| ---------------------------------------------------------- | ------------------------------------- |
-| backend/src/controllers/settings.controller.js             | Settings route handlers (920B)        |
-| backend/src/services/settings.service.js                   | Settings CRUD logic (3750B)           |
-| backend/src/routes/settings.routes.js                      | Route definitions + validation (849B) |
-| backend/src/__tests__/services/settings.service.test.js    | Service tests (4950B)                 |
-| frontend/src/pages/admin/SystemSettingsPage.jsx            | Settings UI page (5155B)              |
-| frontend/src/components/settings/PasswordConfirmModal.jsx  | Password confirm modal (3504B)        |
-| frontend/src/components/settings/SettingsConstants.js      | Settings constants (2641B)            |
-| frontend/src/components/settings/SettingsForm.jsx          | Settings form component (9454B)       |
-
+| Path | Role |
+| ---- | ---- |
+| backend/src/controllers/settings.controller.js | Component (920 bytes) |
+| backend/src/services/settings.service.js | Component (3750 bytes) |
+| backend/src/routes/settings.routes.js | Component (849 bytes) |
+| backend/src/__tests__/services/settings.service.test.js | Component (4950 bytes) |
+| frontend/src/pages/admin/SystemSettingsPage.jsx | Component (5155 bytes) |
+| frontend/src/components/settings/PasswordConfirmModal.jsx | Component (3504 bytes) |
+| SettingsConstants.js | Component (2641 bytes) |
+| SettingsForm.jsx | Component (9454 bytes) |
 ## Cross-References
 | Type      | Ref                                          |
 | --------- | -------------------------------------------- |

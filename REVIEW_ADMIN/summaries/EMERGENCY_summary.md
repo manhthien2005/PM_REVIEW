@@ -8,34 +8,32 @@
 - Tech: Express with Prisma ORM, React for UI, rate limiting, and audit logging for sensitive actions.
 
 ## API Index
-| Endpoint                             | Method | Note                               |
-| ------------------------------------ | ------ | ---------------------------------- |
-| /api/v1/emergencies/summary          | GET    | Dashboard summary data             |
-| /api/v1/emergencies/active           | GET    | Active emergency events            |
-| /api/v1/emergencies/history          | GET    | Past events + date range filter    |
-| /api/v1/emergencies/export/csv       | GET    | Export history to CSV              |
-| /api/v1/emergencies/export/json      | GET    | Export history to JSON             |
-| /api/v1/emergencies/:id              | GET    | Event detail with timeline/vitals  |
-| /api/v1/emergencies/:id/status       | PATCH  | Update status (responded/resolved) |
-| /api/v1/emergencies/:id/contact      | POST   | Log contact notification           |
-
+| Endpoint | Method | Note |
+| -------- | ------ | ---- |
+| /api/v1/emergencies/summary | GET | Dashboard summary data |
+| /api/v1/emergencies/active | GET | Currently active emergencies |
+| /api/v1/emergencies/history | GET | Past events + date range filter |
+| /api/v1/emergencies/export/csv | GET | Export with filters (BR-029-05) |
+| /api/v1/emergencies/export/json | GET | Export with filters (BR-029-05) |
+| /api/v1/emergencies/:id | GET | Refactored with timeline & vitals |
+| /api/v1/emergencies/:id/status | PATCH | PATCH per REST conventions |
+| /api/v1/emergencies/:id/contact | POST | Log notification to contacts |
 ## File Index
-| Path                                                     | Role                                 |
-| -------------------------------------------------------- | ------------------------------------ |
-| backend/src/controllers/emergency.controller.js          | Route handlers (3509 bytes)          |
-| backend/src/services/emergency.service.js                | Business logic (11732 bytes)         |
-| backend/src/routes/emergency.routes.js                   | Route definitions (3501 bytes)       |
-| backend/src/__tests__/services/emergency.service.test.js | Service tests (8528 bytes)           |
-| frontend/src/pages/admin/EmergencyPage.jsx               | Main management page (11671 bytes)   |
-| frontend/src/components/emergency/EmergencyConstants.js  | Constants (781 bytes)                |
-| frontend/src/components/emergency/EmergencyDetailModal.jsx| Detail view modal (12329 bytes)      |
-| frontend/src/components/emergency/EmergencyPagination.jsx | Pagination control (1964 bytes)      |
-| frontend/src/components/emergency/EmergencyStatusPrompt.jsx| Status change prompt (3460 bytes)    |
-| frontend/src/components/emergency/EmergencySummaryBar.jsx | Summary stats bar (2496 bytes)       |
-| frontend/src/components/emergency/EmergencyTable.jsx      | Events list table (5673 bytes)       |
-| frontend/src/components/emergency/EmergencyToolbar.jsx    | Search and filters (5383 bytes)      |
-| frontend/src/services/emergencyService.js                  | API client (2977 bytes)              |
-
+| Path | Role |
+| ---- | ---- |
+| backend/src/controllers/emergency.controller.js | Component (3509 bytes) |
+| backend/src/services/emergency.service.js | Component (11732 bytes) |
+| backend/src/routes/emergency.routes.js | Component (3501 bytes) |
+| backend/src/__tests__/services/emergency.service.test.js | Component (8528 bytes) |
+| frontend/src/pages/admin/EmergencyPage.jsx | Component (11671 bytes) |
+| frontend/src/components/emergency/EmergencyConstants.js | Component (781 bytes) |
+| EmergencyDetailModal.jsx | Component (12324 bytes) |
+| EmergencyPagination.jsx | Component (1964 bytes) |
+| EmergencyStatusPrompt.jsx | Component (3460 bytes) |
+| EmergencySummaryBar.jsx | Component (2496 bytes) |
+| EmergencyTable.jsx | Component (5673 bytes) |
+| EmergencyToolbar.jsx | Component (5383 bytes) |
+| frontend/src/services/emergencyService.js | Component (2977 bytes) |
 ## Cross-References
 | Type           | Ref                                           |
 | -------------- | --------------------------------------------- |
