@@ -29,10 +29,47 @@
   - `AppBar` → title, back button
   - `Body` → ...
 
+## 4.5. Visual Design Spec
+### Colors
+| Role       | Token / Value       | Usage in this screen |
+| ---------- | ------------------- | -------------------- |
+| Primary BG | `Colors.surface`    | Scaffold background  |
+| Accent     | `AppColors.primary` | CTA button           |
+
+### Typography
+| Element    | Size | Weight  | Color            |
+| ---------- | ---- | ------- | ---------------- |
+| Page title | 24sp | Bold    | onSurface        |
+| Body text  | 16sp | Regular | onSurfaceVariant |
+
+### Spacing
+- Screen padding: `16dp` horizontal
+- Card gap: `12dp`
+- Section gap: `24dp`
+
+## 4.6. Interaction & Animation Spec
+| Trigger            | Animation / Behavior  | Duration |
+| ------------------ | --------------------- | -------- |
+| Screen enter       | Slide from right      | 300ms    |
+| Button press       | Scale 0.95 + ripple   | 150ms    |
+| Swipe left on card | Dismiss with fade-out | 200ms    |
+
+## 4.7. Accessibility Checklist
+- [ ] Min font 16sp (body), 14sp (caption) — no exceptions
+- [ ] Min touch target 48dp × 48dp for all interactive elements
+- [ ] Contrast ratio ≥ 4.5:1 (text), ≥ 3:1 (icons/graphics)
+- [ ] TalkBack/VoiceOver: all interactive elements have semantic label
+- [ ] No information conveyed by color alone
+- [ ] Elderly UX: key actions reachable with one thumb (bottom half of screen)
+
+## 4.8. Design Rationale
+| Decision | Reason |
+| -------- | ------ |
+| [e.g., Red background] | [e.g., Universal emergency color] |
+
 ## 5. Edge Cases Handled
 - [ ] Network loss mid-operation
 - [ ] Data too long / too short
-- [ ] Accessibility (min font 16sp)
 
 ## 6. Dependencies
 - Shared widgets needed: [list]

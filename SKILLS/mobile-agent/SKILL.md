@@ -197,11 +197,39 @@ When running `TASK full`, also check if reference skill files in `references/` a
 
 # Examples
 
-## Example 1: Mode PLAN — SOS Screen Design
+## Example 1: Full Pipeline — SOS Screen (TASK → PLAN → BUILD)
 
-**Input:** `@mobile-agent mode PLAN "Design the fall detection confirmation and SOS trigger screen — UC010, UC011"`
+This example demonstrates the complete flow across all 3 templates using the Fall Detection / SOS screen.
 
-**Output:**
+### Step 1: TASK mode generates screen spec
+
+**Input:** `@mobile-agent mode TASK generate EMERGENCY`
+
+**Output (EMERGENCY_FallAlert.md — relevant excerpt):**
+
+```markdown
+## Design Context
+- **Target audience**: Elderly patient (Monitored Person profile)
+- **Usage context**: Emergency — triggered automatically by fall detection
+- **Key UX priority**: Speed (confirm safe or trigger SOS within 30s) + Clarity (no ambiguity)
+- **Specific constraints**: User may be lying down, panicking, hands trembling, screen may be wet
+
+## Pipeline Status
+| Stage  | Status        | File      |
+| ------ | ------------- | --------- |
+| TASK   | ✅ Done        | This file |
+| PLAN   | ⬜ Not started | —         |
+| BUILD  | ⬜ Not started | —         |
+| REVIEW | ⬜ Not started | —         |
+```
+
+---
+
+### Step 2: PLAN mode reads screen spec → generates plan
+
+**Input:** `@mobile-agent mode PLAN "Design EMERGENCY_FallAlert — UC010, UC011"`
+
+**Output (EMERGENCY_FallAlert_plan.md):**
 
 ```markdown
 # 📐 UI Plan: Fall Detection Confirmation & SOS
@@ -227,30 +255,137 @@ When running `TASK full`, also check if reference skill files in `references/` a
 | Network Error  | No connection     | Yellow banner "Retrying..."                  |
 
 ## 4. Widget Tree (proposed)
-- `Scaffold` (backgroundColor: Colors.red.shade900)
+- `Scaffold`
   - `SafeArea`
     - `Column`
       - `CountdownCircle` (custom — AnimatedBuilder + CustomPainter)
-      - `Text` "Fall Detected!" (fontSize: 28sp, bold, white)
-      - `Text` countdown seconds (fontSize: 48sp, bold, white)
+      - `Text` "Fall Detected!"
+      - `Text` countdown seconds
       - `Row`
-        - `ElevatedButton` "I'm OK" (green, minHeight: 56, minWidth: 150)
-        - `ElevatedButton` "Call SOS" (white on red, minHeight: 56, minWidth: 150)
+        - `ElevatedButton` "I'm OK"
+        - `SOSButton` "Call SOS" (hold-to-activate, 3s)
+
+## 4.5. Visual Design Spec
+### Colors
+| Role          | Token / Value           | Usage in this screen              |
+| ------------- | ----------------------- | --------------------------------- |
+| Background    | `Colors.red.shade900`   | Scaffold — conveys emergency      |
+| OK button     | `Colors.green.shade700` | Positive action                   |
+| SOS button    | `Colors.white`          | High contrast on red background   |
+| Text primary  | `Colors.white`          | All text on red background        |
+| Network error | `Colors.amber.shade700` | Warning banner (non-red = notice) |
+
+### Typography
+| Element          | Size | Weight | Color         |
+| ---------------- | ---- | ------ | ------------- |
+| "Fall Detected!" | 28sp | Bold   | white         |
+| Countdown digits | 48sp | Bold   | white         |
+| Button labels    | 18sp | Bold   | white / green |
+| Network banner   | 14sp | Medium | black         |
+
+### Spacing
+- Screen padding: `24dp` horizontal (wider than standard for panic tapping)
+- Button gap: `16dp`
+- Button min height: `56dp` (trembling hands + WCAG)
+
+## 4.6. Interaction & Animation Spec
+| Trigger              | Animation / Behavior                          | Duration  |
+| -------------------- | --------------------------------------------- | --------- |
+| Screen enter         | Fade in (no slide — faster + less disorienting) | 200ms   |
+| Countdown tick       | CountdownCircle arc shrinks each second       | 1000ms    |
+| "I'm OK" press       | Scale 0.95 + haptic feedback (light)          | 150ms     |
+| "Call SOS" hold      | Hold-to-activate progress ring (3s)           | 3000ms    |
+| SOS triggered        | Screen flashes red → fade to SOS Active       | 300ms     |
+| Network error banner | Slide down from top                           | 250ms     |
+
+## 4.7. Accessibility Checklist
+- [x] Min font 16sp — smallest text is 14sp banner (caption exception, acceptable)
+- [x] Min touch target: buttons 56dp height × 150dp width — ✅ exceeds 48dp minimum
+- [x] Contrast: white text on red.shade900 → ratio 5.9:1 — ✅ WCAG AA
+- [x] TalkBack: CountdownCircle announces "X seconds until SOS is triggered"
+- [x] No information by color alone: buttons labeled by text, not just color
+- [x] Elderly UX: both action buttons in bottom 40% of screen (thumb zone)
+
+## 4.8. Design Rationale
+| Decision                        | Reason                                                    |
+| ------------------------------- | --------------------------------------------------------- |
+| Red background (red.shade900)   | Universal emergency color — instant recognition, no reading required |
+| 48sp countdown font             | Readable when screen is far away or user is lying down    |
+| Hold-to-activate SOS (3s)       | Prevents accidental trigger from wet/trembling hands      |
+| Fade-in (not slide) transition  | Faster on-screen presence in emergency; slide feels slow  |
+| 56dp button height              | Trembling hands need larger targets than the 48dp minimum |
 
 ## 5. Edge Cases Handled
-- [x] Elderly trembling hands → Button min 56dp height, spacing 16dp
-- [x] Wet screen → Hold-to-activate (3s) instead of tap for SOS
-- [x] Network loss → Cache + retry queue
-- [x] Countdown font 48sp → Readable when lying down / panicking
-- [x] Accessibility: TalkBack reads "X seconds until SOS is triggered"
+- [x] Network loss → Cache SOS request + retry queue + yellow banner
+- [x] Countdown reaches 0 → Auto-trigger SOS (no user action needed)
+- [x] App backgrounded during countdown → Foreground notification keeps countdown alive
 
 ## 6. Dependencies
-- Shared widgets: `CountdownCircle` (NEW), `SOSButton` (NEW)
+- Shared widgets: `CountdownCircle` (NEW), `SOSButton` (NEW, hold-to-activate)
 - API: `POST /api/mobile/fall-events/{id}/confirm`, `POST /api/mobile/fall-events/{id}/trigger-sos`
 - Packages: `flutter_local_notifications` (push on fall detect)
+
+## 7. Confidence Score
+- **Plan Confidence: 92%**
+- Reasoning: UC010/011 are detailed; hold-to-activate interaction well-scoped
+- Uncertainties: Exact CountdownCircle stroke width needs design system review
 ```
 
-> 📚 **More examples:** See [examples.md](./references/examples.md) for BUILD, REVIEW, and full pipeline (PLAN→BUILD→REVIEW) examples.
+---
+
+### Step 3: BUILD mode generates code → verification report
+
+**Input:** `@mobile-agent mode BUILD EMERGENCY_FallAlert`
+
+**Output (BUILD Report excerpt):**
+
+```
+📦 BUILD Report: Fall Detection Confirmation & SOS
+Plan ref: PM_REVIEW/REVIEW_MOBILE/Screen/build-plan/EMERGENCY_FallAlert_plan.md
+
+## Files Created / Modified
+- lib/features/emergency/presentation/screens/fall_alert_screen.dart (NEW)
+- lib/shared/widgets/countdown_circle.dart (NEW)
+- lib/shared/widgets/sos_button.dart (NEW)
+
+## Plan Coverage Checklist
+
+### Functional
+- [x] UI State: Countdown → implemented
+- [x] UI State: Confirmed Safe → implemented
+- [x] UI State: SOS Triggered → implemented
+- [x] UI State: Network Error → implemented (yellow banner)
+- [x] Widget Tree matches plan proposal
+- [x] Edge Cases handled: 3/3
+
+### Design
+- [x] Colors applied per §4.5 (red.shade900, green.shade700, amber.shade700)
+- [x] Typography applied — smallest text 14sp (network banner, caption exception)
+- [x] Spacing applied — 24dp horizontal, 56dp button height, 16dp gap
+
+### Interaction & Animation
+- [x] Screen enter: fade 200ms
+- [x] Countdown arc animation: 1000ms per tick
+- [x] Hold-to-activate SOS: 3s progress ring
+- [x] Network error banner: slide-down 250ms
+
+### Accessibility
+- [x] Touch targets: 56dp height × 150dp width ✅
+- [x] Contrast: 5.9:1 white on red.shade900 ✅
+- [x] TalkBack semantic labels added to CountdownCircle and SOSButton
+- [x] Both buttons in bottom 40% of screen ✅
+
+## Static Analysis
+flutter analyze result: PASS — 0 warnings
+
+## Deviations from Plan
+| Plan spec                    | Actual implementation          | Reason                            |
+| CountdownCircle stroke: TBD  | strokeWidth: 8dp               | Design system default; consistent |
+
+## Confidence: 95% — All plan items implemented. Minor deviation on stroke width documented.
+```
+
+> 📚 **More examples:** See [examples.md](./references/examples.md) for REVIEW mode and standalone examples.
 
 ---
 

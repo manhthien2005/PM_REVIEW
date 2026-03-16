@@ -45,6 +45,20 @@
 - When [Screen A] changes X → This screen needs to update Y
 - Shared widgets used: ...
 
+## Design Context
+- **Target audience**: [Elderly patient / All users / Caregiver only]
+- **Usage context**: [Emergency / Routine monitoring / Setup / Configuration]
+- **Key UX priority**: [Speed / Clarity / Calm / Trust]
+- **Specific constraints**: [e.g., "Used while panicking", "Dark room possible", "Hands may be trembling"]
+
+## Pipeline Status
+| Stage  | Status        | File      |
+| ------ | ------------- | --------- |
+| TASK   | ✅ Done        | This file |
+| PLAN   | ⬜ Not started | —         |
+| BUILD  | ⬜ Not started | —         |
+| REVIEW | ⬜ Not started | —         |
+
 ## Changelog
 | Version | Date       | Author  | Changes          |
 | ------- | ---------- | ------- | ---------------- |
