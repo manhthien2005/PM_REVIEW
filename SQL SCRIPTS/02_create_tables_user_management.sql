@@ -67,6 +67,7 @@ CREATE TABLE IF NOT EXISTS user_relationships (
     -- Relationship
     relationship_type VARCHAR(50) CHECK (relationship_type IN ('family', 'friend', 'doctor', 'nurse', 'other')),
     is_primary BOOLEAN DEFAULT false,  -- Primary emergency contact
+    status VARCHAR(20) DEFAULT 'pending' CHECK (status IN ('pending', 'accepted', 'rejected')),
     
     -- Permissions (GDPR - fine-grained access control)
     can_view_vitals BOOLEAN DEFAULT true,
@@ -86,6 +87,7 @@ CREATE TABLE IF NOT EXISTS user_relationships (
 
 COMMENT ON TABLE user_relationships IS 'Mối quan hệ bệnh nhân - người giám sát (nhiều-nhiều)';
 COMMENT ON COLUMN user_relationships.is_primary IS 'Người liên hệ khẩn cấp chính (gọi đầu tiên khi SOS)';
+COMMENT ON COLUMN user_relationships.status IS 'Trạng thái yêu cầu liên kết: pending, accepted, rejected';
 COMMENT ON COLUMN user_relationships.can_view_location IS 'Quyền xem vị trí GPS thời gian thực';
 
 -- ============================================================================
