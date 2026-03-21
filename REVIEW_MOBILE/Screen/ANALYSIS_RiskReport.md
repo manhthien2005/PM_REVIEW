@@ -6,7 +6,7 @@
 
 ## Purpose
 
-Điểm rủi ro AI 0–100. Màu xanh/cam/đỏ theo mức. 1 câu tóm tắt. Nhận `profileId` qua route (optional, null = self). Link "Xem giải thích" → RiskReportDetail, "Lịch sử" → RiskHistory.
+Điểm rủi ro AI 0–100. Màu xanh/cam/đỏ theo mức. 1 câu tóm tắt. Đây là màn hình **contextual**: nhận `profileId` qua route (optional, null = self; có giá trị = linked profile từ `HOME_FamilyDashboard`). Link "Xem giải thích" → RiskReportDetail, "Lịch sử" → RiskHistory.
 
 ---
 
@@ -25,11 +25,12 @@
 ## User Flow
 
 1. Nhận `profileId` (optional) từ route.
-2. Hiển thị điểm 0–100 + màu (xanh / cam / đỏ).
-3. 1 câu tóm tắt (XAI).
-4. Fallback: "Đang phân tích" khi model chưa có output.
-5. Nút "Xem giải thích" → RiskReportDetail (breakdown).
-6. Nút "Lịch sử" → RiskHistory.
+2. Nếu `profileId = null` → load risk của bản thân từ `HOME_Dashboard`; nếu có `profileId` → load risk của linked profile từ `HOME_FamilyDashboard`.
+3. Hiển thị điểm 0–100 + màu (xanh / cam / đỏ).
+4. 1 câu tóm tắt (XAI).
+5. Fallback: "Đang phân tích" khi model chưa có output.
+6. Nút "Xem giải thích" → RiskReportDetail (breakdown).
+7. Nút "Lịch sử" → RiskHistory.
 
 ---
 
@@ -57,13 +58,15 @@
 ## Data Requirements
 
 - **API endpoint**: `GET /api/mobile/risk-report/latest` với query `?profile_id={profileId}`
-- **Input**: Route arg `profileId?`; Header/query `target_profile_id`
+- **Input**: Route arg `profileId?` (contextual route arg, không dùng global profile switcher)
 - **Output**: `{ score, level, summary, analyzed_at }`
 
 ---
 
 ## Sync Notes
 
+- `HOME_Dashboard` → mở màn này với `profileId = null` (self).
+- `HOME_FamilyDashboard` → mở màn này với `profileId` của linked profile.
 - Khi ANALYSIS_RiskReportDetail thay đổi → link "Xem giải thích" truyền `profileId`, `reportId`
 - Khi ANALYSIS_RiskHistory thay đổi → link "Lịch sử" truyền `profileId`
 - Shared: RiskScoreDisplay, RiskLevelBadge
@@ -84,11 +87,15 @@
 | Stage | Status | File |
 | --- | --- | --- |
 | TASK | ✅ Done | This file |
-| PLAN | ⬜ Not started | — |
+| PLAN | ✅ Done | `build-plan/ANALYSIS_01_RiskReport_plan.md` |
 | BUILD | ⬜ Not started | — |
 | REVIEW | ⬜ Not started | — |
 
 ---
+
+## Companion Docs
+
+- `build-plan/ANALYSIS_01_RiskReport_plan.md`
 
 ## Changelog
 
@@ -96,3 +103,5 @@
 | --- | --- | --- | --- |
 | v1.0 | 2026-03-17 | AI | Initial creation |
 | v2.0 | 2026-03-17 | AI | Regen: full template, profileId, links Detail + History |
+| v2.1 | 2026-03-17 | AI | Cross-check sync: xác nhận contextual self/linked flow và bỏ dấu vết `target_profile_id` |
+| v2.2 | 2026-03-20 | AI | Added prioritized build plan `build-plan/ANALYSIS_01_RiskReport_plan.md`, khóa vai trò màn entry từ banner điểm sức khỏe |

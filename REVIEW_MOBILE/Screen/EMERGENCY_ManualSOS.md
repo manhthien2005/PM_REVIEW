@@ -15,7 +15,7 @@ User bấm nút SOS thủ công. **Hold-to-confirm** (giữ 2–3s) hoặc Count
 | Từ màn hình | Thao tác | Đến màn hình |
 | --- | --- | --- |
 | [HOME_Dashboard](./HOME_Dashboard.md) | Bấm FAB SOS | → This screen |
-| [MONITORING_VitalDetail](./MONITORING_VitalDetail.md) | Chỉ số critical → "Gọi SOS" | → This screen |
+| [MONITORING_VitalDetail](./MONITORING_VitalDetail.md) | Chỉ số critical của self → "Gọi SOS" | → This screen |
 | This screen | Countdown xong / Hold confirm | → [EMERGENCY_LocalSOSActive](./EMERGENCY_LocalSOSActive.md) |
 | This screen | Slide-to-cancel | → Back (Dashboard) |
 
@@ -94,3 +94,4 @@ User bấm nút SOS thủ công. **Hold-to-confirm** (giữ 2–3s) hoặc Count
 | --- | --- | --- | --- |
 | v1.0 | 2026-03-17 | AI | Initial creation |
 | v2.0 | 2026-03-17 | AI | Regen: full template, Edge Cases (network loss, countdown=0, app background), hold-to-confirm |
+| v2.1 | 2026-03-17 | AI | Cross-check sync: làm rõ entry từ `VitalDetail` chỉ áp dụng cho self flow |

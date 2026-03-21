@@ -84,6 +84,7 @@ flowchart TD
     FAMILY --> FAMILY_CARD{Card người thân}
     FAMILY_CARD -->|"Bấm chỉ số"| VITAL_DETAIL_LINKED["Chi tiết chỉ số (profileId)"]
     FAMILY_CARD -->|"Bấm giấc ngủ"| SLEEP_LINKED["Báo cáo giấc ngủ (profileId)"]
+    FAMILY_CARD -->|"Bấm risk"| RISK_LINKED["Điểm rủi ro AI (profileId)"]
     FAMILY_CARD -->|"SOS Badge đỏ"| SOS_DETAIL_C[Chi tiết SOS + Bản đồ]
     SOS_DETAIL_C --> SAFETY_CONFIRM
 
@@ -127,7 +128,7 @@ flowchart TD
 | #   | Screen Name | File | Phase | UC Ref | Ngữ cảnh | Status | Linked Screens |
 | --- | --- | --- | :---: | --- | --- | --- | --- |
 | 8   | Tab: Sức khoẻ của tôi | `HOME_Dashboard.md` | 2 | UC006, UC007, UC016, UC020 | Self | ✅ Done | → VitalDetail, → SleepReport, → RiskReport, → ManualSOS |
-| 8a  | Tab: Gia đình | `HOME_FamilyDashboard.md` | 5 | UC006, UC015, UC030 | Linked | ✅ Done | → VitalDetail(profileId), → SleepReport(profileId), → SOSReceivedDetail |
+| 8a  | Tab: Gia đình | `HOME_FamilyDashboard.md` | 5 | UC006, UC015, UC030 | Linked | ✅ Done | → VitalDetail(profileId), → SleepReport(profileId), → RiskReport(profileId), → SOSReceivedDetail |
 
 > **Kiến trúc Hybrid (v3.0)**: Không còn dùng Profile Switcher toàn cục. `HOME_Dashboard` luôn là Self-only. `HOME_FamilyDashboard` là bird's-eye view người thân liên kết.
 
@@ -236,7 +237,7 @@ Kiến trúc Hybrid giải quyết vấn đề cốt lõi của Profile Switcher
 ### Nguyên tắc thiết kế cốt lõi
 
 1. **Tab "Sức khoẻ của tôi"** = Luôn là bản thân. Không context switching.
-2. **Tab "Gia đình"** = Tổng quan tất cả người thân có quyền xem. Bấm vào ai → xem chi tiết của người đó.
+2. **Tab "Gia đình"** = Tổng quan tất cả người thân có quyền xem. Bấm vào chỉ số, giấc ngủ, hoặc risk summary của ai → xem chi tiết của người đó.
 3. **Drill-down qua Route argument** `profileId`: Màn hình `VitalDetail`, `SleepReport`, `RiskReport` nhận `profileId` qua parameter. Nếu không có `profileId` → mặc định là bản thân.
 4. **SOS luôn ưu tiên tuyệt đối**: FCM `IncomingSOSAlarm` có Z-Index P0 đè lên mọi màn hình, bất kể user đang ở tab nào.
 
@@ -254,7 +255,7 @@ Kiến trúc Hybrid giải quyết vấn đề cốt lõi của Profile Switcher
 📋 TASK Report (2026-03-17) — Post-Regenerate Sync:
 - Total screens: 41
 - Spec files: 41/41 ✅ (all regenerated per screen_spec_template v3.0)
-- Cross-link validation: ✅ No broken links (all [X_Y](./X_Y.md) resolve to existing files)
+- Cross-link validation: ✅ No broken links (all `./MODULE_Screen.md` links resolve to existing files)
 - Orphan screens: 0
 - Missing screens: 0
 - One-way links: Some (acceptable — e.g. HOME_Dashboard → many; back via Back button)
@@ -279,3 +280,5 @@ Sync Summary:
 | v3.2    | 2026-03-17 | AI (TASK verify)            | Tạo 6 AUTH spec files từ health_system. Thêm PROGRESS_REPORT.md. |
 | v3.3    | 2026-03-17 | AI (Phase 2–7 review)      | Tạo đầy đủ spec cho Phase 2–7: DEVICE (3), MONITORING (2), SLEEP (4), ANALYSIS (3), EMERGENCY (6), PROFILE (5), NOTIFICATION (5), AUTH_Onboarding. Tổng 41 spec files. Cập nhật acceptance gates. |
 | v3.4    | 2026-03-17 | AI (TASK sync)            | Regenerate 41/41 screens theo template v3.0. Cross-link validation: 0 broken. README cập nhật status Done cho tất cả. Xóa MONITORING_HealthMetrics (không tồn tại). |
+| v3.5    | 2026-03-17 | AI (TASK sync)            | Sync validation: 0 broken links, 0 orphans, 0 missing. Fixed TASK Report placeholder text. |
+| v3.6    | 2026-03-17 | AI (Cross-check sync)    | Đồng bộ Risk flow theo Hybrid Architecture: FamilyDashboard có drill-down sang `RiskReport(profileId)`; giữ nguyên nguyên tắc không dùng Profile Switcher. |

@@ -15,6 +15,7 @@ Tab thứ 2 của thanh điều hướng chính (Bottom Navigation Bar). Hiển 
 | `HOME_Dashboard` (Tab "Sức khoẻ của tôi") | Bấm tab "Gia đình" ở Bottom Nav | → This screen |
 | This screen | Bấm vào Card của người thân → Chỉ số | → [MONITORING_VitalDetail](./MONITORING_VitalDetail.md) (kèm `profileId`) |
 | This screen | Bấm vào Card của người thân → Giấc ngủ | → [SLEEP_Report](./SLEEP_Report.md) (kèm `profileId`) |
+| This screen | Bấm vào Card của người thân → Điểm rủi ro AI | → [ANALYSIS_RiskReport](./ANALYSIS_RiskReport.md) (kèm `profileId`) |
 | This screen | Bấm SOS Badge đỏ trên Card | → [EMERGENCY_SOSReceivedDetail](./EMERGENCY_SOSReceivedDetail.md) |
 | This screen | Bấm "Thêm người thân" (Empty State) | → [PROFILE_ContactList](./PROFILE_ContactList.md) |
 | This screen | Bấm nút "Quản lý quyền theo dõi" | → [PROFILE_ContactList](./PROFILE_ContactList.md) |
@@ -27,12 +28,14 @@ Tab thứ 2 của thanh điều hướng chính (Bottom Navigation Bar). Hiển 
 3. Mỗi người thân hiển thị dưới dạng **Card dọc** (Full-width) theo thứ tự tuỳ chỉnh:
    - Ảnh đại diện + Tên hiển thị + Nhãn dán (VD: "Bố", "Mẹ", "Ông nội").
    - 3-4 chỉ số sức khoẻ quan trọng nhất (Nhịp tim, SpO₂, Huyết áp, Nhiệt độ) — số to, rõ ràng.
+   - **Risk summary**: điểm rủi ro AI + level + 1 dòng tóm tắt ngắn.
    - Thời điểm cập nhật lần cuối ("Vừa xong", "3 phút trước").
    - **Badge SOS đỏ** nổi góc phải nếu người này đang có SOS active.
 4. App tự động **polling mỗi 30 giây** để làm mới chỉ số. Không dùng WebSocket liên tục (tiết kiệm pin).
 5. Khi có SOS mới của người thân → FCM đẩy về, App cập nhật badge trực tiếp mà không cần đợi polling.
 6. User bấm vào bất kỳ chỉ số nào trên Card → Drill-down sang màn `VitalDetail` của người đó với `profileId` được truyền qua.
-7. User bấm SOS Badge → Mở thẳng `SOSReceivedDetail` (War Room) của sự kiện khẩn cấp đang diễn ra.
+7. User bấm vào khu vực `Risk summary` trên Card → mở `ANALYSIS_RiskReport` của đúng người đó với `profileId`.
+8. User bấm SOS Badge → Mở thẳng `SOSReceivedDetail` (War Room) của sự kiện khẩn cấp đang diễn ra.
 
 ---
 
@@ -61,6 +64,9 @@ Tab thứ 2 của thanh điều hướng chính (Bottom Navigation Bar). Hiển 
 │  🌡️ Nhiệt độ    😴 Giấc ngủ hôm qua     │
 │    36.5°C        6h12m - Trung bình      │
 │ ─────────────────────────────────────── │
+│  🤖 Risk: 62/100 - Cần theo dõi          │
+│  "SpO₂ thấp hơn bình thường nhẹ"         │
+│ ─────────────────────────────────────── │
 │  🕐 Cập nhật: 2 phút trước   [Xem chi tiết →] │
 └─────────────────────────────────────────┘
 ```
@@ -79,7 +85,7 @@ Tab thứ 2 của thanh điều hướng chính (Bottom Navigation Bar). Hiển 
 
 ## Data Requirements
 - **API Endpoint:**
-  - `GET /api/mobile/family-dashboard` → Trả về `[{ profile_id, display_name, avatar_url, label, latest_vitals: { hr, spo2, bp_sys, bp_dia, temp }, sleep_summary: { duration_min, quality }, last_updated, active_sos_id? }]`
+  - `GET /api/mobile/family-dashboard` → Trả về `[{ profile_id, display_name, avatar_url, label, latest_vitals: { hr, spo2, bp_sys, bp_dia, temp }, sleep_summary: { duration_min, quality }, risk_summary: { score, level, summary, analyzed_at }, last_updated, active_sos_id? }]`
   - `GET /api/mobile/access-profiles` → Dùng để biết danh sách cần hiển thị (reuse từ Profile logic cũ).
 - **Polling:** 30 giây/lần khi tab đang active. Dừng polling khi tab ẩn (AppLifecycleState.paused).
 - **FCM Topic:** `user_{userId}_sos_alerts` → Nhận badge SOS mà không cần chờ polling.
@@ -88,7 +94,7 @@ Tab thứ 2 của thanh điều hướng chính (Bottom Navigation Bar). Hiển 
 
 ## Sync Notes
 - **Không dùng Global Profile Switcher** ở màn này. Mỗi Card đại diện một người, không có khái niệm "đang xem hồ sơ của ai".
-- Khi drill-down sang `VitalDetail` hoặc `SleepReport`, truyền `profileId` qua Route argument. Màn đó tự render dữ liệu của đúng người.
+- Khi drill-down sang `VitalDetail`, `SleepReport`, hoặc `RiskReport`, truyền `profileId` qua Route argument. Màn đó tự render dữ liệu của đúng người.
 - Shared widgets dùng chung: `FamilyProfileCard`, `SOSActiveBadge`, `VitalMiniChip`, `OfflineBanner`.
 - Thứ tự sắp xếp Card: SOS active → Trạng thái cần theo dõi → Bình thường. Cho phép user kéo thả để đổi thứ tự ưu tiên.
 - Nếu `active_sos_id` có giá trị → Nút "XEM NGAY" trỏ thẳng đến `EMERGENCY_SOSReceivedDetail` với `sosId` đó.
@@ -109,9 +115,13 @@ Tab thứ 2 của thanh điều hướng chính (Bottom Navigation Bar). Hiển 
 | Stage | Status | File |
 | --- | --- | --- |
 | TASK | ✅ Done | This file |
-| PLAN | ⬜ Not started | — |
+| PLAN | ✅ Done | `build-plan/HOME_FamilyDashboard_plan.md` |
 | BUILD | ⬜ Not started | — |
 | REVIEW | ⬜ Not started | — |
+
+### Companion Docs
+
+- `build-plan/HOME_FamilyDashboard_plan.md`
 
 ---
 
@@ -120,3 +130,5 @@ Tab thứ 2 của thanh điều hướng chính (Bottom Navigation Bar). Hiển 
 | ------- | ---------- | ------ | ---------------- |
 | v1.0    | 2026-03-16 | AI     | Initial creation — Hybrid Architecture (tách khỏi Profile Switcher) |
 | v2.0    | 2026-03-17 | AI     | Regen: bổ sung Design Context, Pipeline Status theo template chuẩn mới |
+| v2.1    | 2026-03-17 | AI     | Cross-check sync: thêm Risk summary trên Family card và luồng drill-down sang `ANALYSIS_RiskReport(profileId)` |
+| v2.2    | 2026-03-18 | AI     | Added detailed build plan `build-plan/HOME_FamilyDashboard_plan.md`, đồng bộ visual direction với `HOME_Dashboard` và cụm Family / Contacts |

@@ -70,9 +70,13 @@ Hiển thị cài đặt quyền lợi cho một Liên hệ cụ thể. **Perspe
 | Stage | Status | File |
 | --- | --- | --- |
 | TASK | ✅ Done | This file |
-| PLAN | ⬜ Not started | — |
+| PLAN | ✅ Done | `build-plan/PROFILE_LinkedContactDetail_plan.md` |
 | BUILD | 🔄 In Progress | — |
 | REVIEW | ⬜ Not started | — |
+
+### Companion Docs
+
+- `build-plan/PROFILE_LinkedContactDetail_plan.md`
 
 ---
 
@@ -81,3 +85,4 @@ Hiển thị cài đặt quyền lợi cho một Liên hệ cụ thể. **Perspe
 | ------- | ---------- | ------- | ---------------- |
 | v1.0    | 2026-03-16 | AI      | Initial creation |
 | v2.0    | 2026-03-17 | AI      | Regen: Design Context, Pipeline Status, architecture (Linked Profiles, Family Dashboard thay Profile Switcher) |
+| v2.1    | 2026-03-18 | AI      | Added detailed build plan `build-plan/PROFILE_LinkedContactDetail_plan.md`, chuẩn hoá permission center UX và đồng bộ style với `DEVICE_Configure` |

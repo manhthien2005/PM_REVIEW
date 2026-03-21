@@ -66,9 +66,13 @@ Cho phép người dùng thêm liên hệ mới bằng cách quét QR Code (ngư
 | Stage | Status | File |
 | --- | --- | --- |
 | TASK | ✅ Done | This file |
-| PLAN | ⬜ Not started | — |
+| PLAN | ✅ Done | `build-plan/PROFILE_AddContact_plan.md` |
 | BUILD | 🔄 In Progress | — |
 | REVIEW | ⬜ Not started | — |
+
+### Companion Docs
+
+- `build-plan/PROFILE_AddContact_plan.md`
 
 ---
 
@@ -77,3 +81,4 @@ Cho phép người dùng thêm liên hệ mới bằng cách quét QR Code (ngư
 | ------- | ---------- | ------- | ---------------- |
 | v1.0    | 2026-03-16 | AI      | Initial creation |
 | v2.0    | 2026-03-17 | AI      | Regen: Design Context, Pipeline Status, architecture (Linked Profiles) |
+| v2.1    | 2026-03-18 | AI      | Added detailed build plan `build-plan/PROFILE_AddContact_plan.md`, chuẩn hoá 2-mode QR/PIN flow và đồng bộ style với `DEVICE_Connect` |

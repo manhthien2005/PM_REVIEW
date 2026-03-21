@@ -11,6 +11,8 @@ Phase 7 là **polishing** — thêm cuối cùng. AUTH_Onboarding không blockin
 
 **Unlock:** App hoàn chỉnh. User có thể quản lý thông báo, SĐT khẩn cấp gọi ngoài app khi SOS, và cài đặt nâng cao.
 
+**Lưu ý sau cross-check:** Phase 7 không chỉ phụ thuộc vào self flow. Notification deep-link và các history screen phải tôn trọng luôn cả `linked profile context`.
+
 ---
 
 ## Dependency Matrix
@@ -18,6 +20,7 @@ Phase 7 là **polishing** — thêm cuối cùng. AUTH_Onboarding không blockin
 | Prerequisite | Source | Hard Stop? |
 | --- | --- | --- |
 | Phase 3 (Sleep, Risk) | Phase 3 | Yes — Sleep History, Risk History |
+| Phase 5 (Family linked flow) | Phase 5 | Partial — notification deep-link cho linked profile |
 | Phase 2 (Device) | Phase 2 | Yes — DEVICE_Configure |
 | Phase 4 (SOS) | Phase 4 | Partial — Emergency Contacts gọi khi SOS |
 | FCM | App config | Yes — Notification Settings |
@@ -35,6 +38,7 @@ Phase 7 là **polishing** — thêm cuối cùng. AUTH_Onboarding không blockin
 - **NOTIFICATION_Settings phải sync FCM topic subscription** — không chỉ là UI toggle. Mỗi toggle OFF → unsubscribe. ON → subscribe.
 - SLEEP_TrackingSettings: Giờ đi ngủ dự kiến, nhắc nhở — cần local notification permission.
 - ANALYSIS_RiskHistory: Lazy load. Không load toàn bộ lịch sử 1 lần.
+- NOTIFICATION_Detail deep-link tới `SLEEP_Report` / `ANALYSIS_RiskReport` phải truyền tiếp `profileId` nếu notification thuộc linked profile.
 
 ### User Advocate
 - Notification Center: Mỗi item có icon theo loại (SOS, Sleep, Risk, System). Tap → deep-link vào màn tương ứng.
@@ -75,7 +79,7 @@ Nhóm 3 — ANALYSIS, DEVICE, AUTH (3 màn):
 
 ---
 
-Context: Architecture Hybrid v3.0. Link từ PROFILE_Overview, HOME_Dashboard. Notification Center có icon theo loại. Emergency Contacts: SĐT format VN 10 số.
+Context: Architecture Hybrid v3.0. Link từ PROFILE_Overview, HOME_Dashboard. Notification Center có icon theo loại. Emergency Contacts: SĐT format VN 10 số. Nếu notification thuộc linked profile, payload phải giữ được `profileId`.
 ```
 
 ---
@@ -104,6 +108,7 @@ Context: Architecture Hybrid v3.0. Link từ PROFILE_Overview, HOME_Dashboard. N
 - [x] SLEEP_History, ANALYSIS_RiskHistory có ghi chú lazy load
 - [x] Emergency Contacts có validation SĐT VN
 - [x] Cross-links từ PROFILE_Overview, HOME_Dashboard
+- [ ] Notification deep-link self/linked đều truyền đúng context (`profileId`, `reportId`, `date` khi cần)
 - [ ] `TASK sync` không báo broken link
 
 > **health_system**: Phase 7 chưa implement. Tất cả spec-only.

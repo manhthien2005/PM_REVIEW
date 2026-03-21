@@ -75,9 +75,13 @@ Quản lý **Linked Profiles** (không dùng patient/caregiver — unified User 
 | Stage | Status | File |
 | --- | --- | --- |
 | TASK | ✅ Done | This file |
-| PLAN | ⬜ Not started | — |
+| PLAN | ✅ Done | `build-plan/PROFILE_ContactList_plan.md` |
 | BUILD | 🔄 In Progress | — |
 | REVIEW | ⬜ Not started | — |
+
+### Companion Docs
+
+- `build-plan/PROFILE_ContactList_plan.md`
 
 ---
 
@@ -86,3 +90,4 @@ Quản lý **Linked Profiles** (không dùng patient/caregiver — unified User 
 | ------- | ---------- | ------- | ---------------- |
 | v1.0    | 2026-03-16 | AI      | Initial creation |
 | v2.0    | 2026-03-17 | AI      | Regen: Design Context, Pipeline Status, architecture (Linked Profiles, no patient/caregiver) |
+| v2.1    | 2026-03-18 | AI      | Added detailed build plan `build-plan/PROFILE_ContactList_plan.md`, chuẩn hoá hierarchy pending/contact hub và đồng bộ style với Home / Device |

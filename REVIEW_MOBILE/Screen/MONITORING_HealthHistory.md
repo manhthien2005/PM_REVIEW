@@ -15,20 +15,20 @@ Xu hướng dài hạn 7/30 ngày. Timeline events + Thống kê. Nhận `profil
 | Từ màn hình | Thao tác | Đến màn hình |
 | --- | --- | --- |
 | [HOME_Dashboard](./HOME_Dashboard.md) | Bấm "Xem lịch sử chỉ số" | → This screen (profileId = null) |
-| [HOME_FamilyDashboard](./HOME_FamilyDashboard.md) | Bấm "Lịch sử" trên Card | → This screen (profileId từ Card) |
 | [MONITORING_VitalDetail](./MONITORING_VitalDetail.md) | Bấm "Xu hướng" | → This screen |
 | This screen | Bấm event / Chỉ số | → [MONITORING_VitalDetail](./MONITORING_VitalDetail.md) |
-| This screen | Back | → [HOME_Dashboard](./HOME_Dashboard.md) hoặc [HOME_FamilyDashboard](./HOME_FamilyDashboard.md) |
+| This screen | Back | → [HOME_Dashboard](./HOME_Dashboard.md) hoặc [MONITORING_VitalDetail](./MONITORING_VitalDetail.md) |
 
 ---
 
 ## User Flow
 
 1. Nhận `profileId` (optional) từ route.
-2. Tab "Nhật ký" — Timeline events theo ngày (HR, SpO₂, BP, Temp).
-3. Tab "Thống kê" — Xu hướng 7/30 ngày, aggregation.
-4. Bấm event → drill-down VitalDetail với vitalType + timestamp.
-5. Pagination — không fetch toàn bộ raw data 1 lần.
+2. Nếu là self flow, user thường vào từ `HOME_Dashboard`; nếu là linked profile flow, user vào qua `MONITORING_VitalDetail(profileId)`.
+3. Tab "Nhật ký" — Timeline events theo ngày (HR, SpO₂, BP, Temp).
+4. Tab "Thống kê" — Xu hướng 7/30 ngày, aggregation.
+5. Bấm event → drill-down VitalDetail với vitalType + timestamp.
+6. Pagination — không fetch toàn bộ raw data 1 lần.
 
 ---
 
@@ -66,7 +66,7 @@ Xu hướng dài hạn 7/30 ngày. Timeline events + Thống kê. Nhận `profil
 ## Sync Notes
 
 - Khi MONITORING_VitalDetail thay đổi → link "Xu hướng" truyền `profileId`
-- Khi HOME_Dashboard / HOME_FamilyDashboard thay đổi → link "Lịch sử" truyền `profileId`
+- Khi HOME_Dashboard thay đổi → link "Lịch sử" truyền `profileId = null`
 - Shared: `TimelineEventCard`, `TrendChart`, tab selector
 - Bấm event → navigate VitalDetail với `vitalType`, `profileId`, `timestamp` (optional)
 
@@ -99,6 +99,7 @@ Xu hướng dài hạn 7/30 ngày. Timeline events + Thống kê. Nhận `profil
 | --- | --- | --- | --- |
 | v1.0 | 2026-03-17 | AI | Initial creation |
 | v2.0 | 2026-03-17 | AI | Regen: full template với UI States, Edge Cases, Data Requirements, Sync Notes, Design Context (profileId/audience), Pipeline Status, Changelog |
+| v2.1 | 2026-03-17 | AI | Cross-check sync: linked profile flow đi qua `VitalDetail(profileId)`, bỏ entry trực tiếp chưa tồn tại từ FamilyDashboard |
 
 ---
 

@@ -6,7 +6,7 @@
 
 ## Purpose
 
-Drill-down 1 chỉ số (HR, SpO₂, BP, Temp) với biểu đồ 24h. **Giải thích bằng tiếng người** bên cạnh số (VD: "82 BPM — Bình thường"). Nhận `profileId` qua route (optional, null = self) — UC007: xem chỉ số của người được monitor.
+Drill-down 1 chỉ số (HR, SpO₂, BP, Temp) với biểu đồ 24h. **Giải thích bằng tiếng người** bên cạnh số (VD: "82 BPM — Bình thường"). Đây là màn hình **contextual**: nhận `profileId` qua route (optional, null = self) — UC007: xem chỉ số của người được monitor.
 
 ---
 
@@ -17,7 +17,7 @@ Drill-down 1 chỉ số (HR, SpO₂, BP, Temp) với biểu đồ 24h. **Giải 
 | [HOME_Dashboard](./HOME_Dashboard.md) | Bấm Card chỉ số | → This screen (profileId = null, self) |
 | [HOME_FamilyDashboard](./HOME_FamilyDashboard.md) | Bấm chỉ số trên Card | → This screen (profileId từ Card) |
 | [MONITORING_HealthHistory](./MONITORING_HealthHistory.md) | Bấm event | → This screen |
-| This screen | Chỉ số critical → SOS | → [EMERGENCY_ManualSOS](./EMERGENCY_ManualSOS.md) |
+| This screen | Chỉ số critical của self → SOS | → [EMERGENCY_ManualSOS](./EMERGENCY_ManualSOS.md) |
 | This screen | Bấm "Xu hướng" | → [MONITORING_HealthHistory](./MONITORING_HealthHistory.md) |
 | This screen | Back | → [HOME_Dashboard](./HOME_Dashboard.md) hoặc [HOME_FamilyDashboard](./HOME_FamilyDashboard.md) |
 
@@ -30,7 +30,8 @@ Drill-down 1 chỉ số (HR, SpO₂, BP, Temp) với biểu đồ 24h. **Giải 
 3. Biểu đồ 24h (line chart).
 4. Giải thích: "82 BPM — Bình thường".
 5. Chỉ số ngoài vùng hợp lệ → `"--"` + icon cảnh báo.
-6. Chỉ số critical → nút "Gọi SOS" / link ManualSOS.
+6. Nếu là self và chỉ số critical → hiển thị nút "Gọi SOS" / link ManualSOS.
+7. Nếu là linked profile và chỉ số critical → hiển thị cảnh báo rõ ràng, nhưng **không** cho gửi `ManualSOS` thay người khác.
 
 ---
 
@@ -54,14 +55,15 @@ Drill-down 1 chỉ số (HR, SpO₂, BP, Temp) với biểu đồ 24h. **Giải 
 - [ ] 403 Forbidden (không có quyền xem profile) → message "Bạn không có quyền xem" → Back
 - [ ] Chỉ số HR=0, sensor rời → hiển thị `"--"` + "Kiểm tra thiết bị"
 - [ ] Không có data 24h (đồng hồ mới kết nối) → Empty state, vẫn hiển thị giá trị mới nhất nếu có
-- [ ] User bấm "Gọi SOS" khi critical → navigate ManualSOS (có countdown, không gửi ngay)
+- [ ] Self + bấm "Gọi SOS" khi critical → navigate ManualSOS (có countdown, không gửi ngay)
+- [ ] Linked profile + critical → chỉ hiển thị cảnh báo / CTA liên hệ phù hợp, không gửi SOS thay người khác
 
 ---
 
 ## Data Requirements
 
 - **API endpoint**: `GET /api/mobile/vitals/:vitalType/detail` với query `?profile_id={profileId}` (omit = self)
-- **Input**: Route args: `vitalType`, `profileId?`; Header/query: `target_profile_id` khi xem người thân
+- **Input**: Route args: `vitalType`, `profileId?` (contextual route arg, không dùng global profile switcher)
 - **Output**: `{ current: { value, unit, status }, chartData: [{ timestamp, value }], educationText }`
 
 ---
@@ -90,7 +92,7 @@ Drill-down 1 chỉ số (HR, SpO₂, BP, Temp) với biểu đồ 24h. **Giải 
 | Stage | Status | File |
 | --- | --- | --- |
 | TASK | ✅ Done | This file |
-| PLAN | ⬜ Not started | — |
+| PLAN | ✅ Done | [build-plan/MONITORING_VitalDetail_plan.md](./build-plan/MONITORING_VitalDetail_plan.md) |
 | BUILD | ✅ Done | health_system |
 | REVIEW | ⬜ Not started | — |
 
@@ -102,6 +104,8 @@ Drill-down 1 chỉ số (HR, SpO₂, BP, Temp) với biểu đồ 24h. **Giải 
 | --- | --- | --- | --- |
 | v1.0 | 2026-03-17 | AI | Initial creation |
 | v2.0 | 2026-03-17 | AI | Regen: full template với UI States, Edge Cases, Data Requirements, Sync Notes, Design Context (profileId/audience), Pipeline Status, Changelog |
+| v2.1 | 2026-03-17 | AI | Cross-check sync: bỏ `target_profile_id`, làm rõ self/linked flow và giới hạn `ManualSOS` cho self |
+| v2.2 | 2026-03-18 | AI | PLAN done: build-plan/MONITORING_VitalDetail_plan.md — gap analysis, reuse existing screen, phased implementation |
 
 ---
 

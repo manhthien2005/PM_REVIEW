@@ -9,7 +9,9 @@
 
 Đây là **lý do user dùng app mỗi ngày**. Phase 3 cung cấp drill-down chi tiết từng chỉ số (HR, SpO₂...), biểu đồ 24h, xu hướng 7/30 ngày, báo cáo giấc ngủ, và điểm rủi ro AI (USP của sản phẩm).
 
-**Unlock cho phase sau:** VitalDetail, SleepDetail, RiskReport nhận `profileId` qua route — dùng cho cả Self và Family drill-down (Phase 5).
+**Cách build khuyến nghị:** triển khai **self flow trước** từ `HOME_Dashboard`, nhưng tất cả màn phải giữ kiến trúc **contextual** (`profileId?`) ngay từ đầu.
+
+**Unlock cho phase sau:** Sau khi Phase 5 có FamilyDashboard + linked permissions, quay lại verify linked flow cho `VitalDetail`, `SleepReport`, `RiskReport`.
 
 ---
 
@@ -20,6 +22,7 @@
 | Phase 2 (Device + Dashboard) | Phase 2 | Yes — cần data từ đồng hồ |
 | HOME_Dashboard | Screen/ | Yes |
 | API: vitals timeseries, sleep, risk score | Backend | Yes |
+| Phase 5 (Family + permissions) | Phase 5 | Partial — cần để test linked flow thật sự |
 
 ---
 
@@ -33,6 +36,7 @@
 ### Constraint Guardian
 - Biểu đồ 24h: Không fetch toàn bộ raw data 1 lần. Cần aggregation/pagination.
 - SLEEP_History (Phase 7) cần lazy load — không fetch 30 đêm cùng lúc. Ghi chú trong spec.
+- RiskReport phải tách rõ 2 lớp build: `self risk` là P0 ở Phase 3, còn `linked risk entry` được verify sau khi Phase 5 có FamilyDashboard card + `profileId`.
 
 ### User Advocate
 - **Người già cần biểu đồ đơn giản** — không dùng chart phức tạp. Line chart rõ ràng, font to.
@@ -46,31 +50,27 @@
 ```
 @mobile-agent mode TASK
 
-TASK generate cho Phase 3 — Health Core. Tạo spec cho 5 màn hình còn thiếu:
+TASK implement / sync cho Phase 3 — Health Core theo 2 pass:
 
-1. MONITORING_VitalDetail — Drill-down 1 chỉ số (HR, SpO₂, BP, Temp) + biểu đồ 24h
-   - Nhận profileId qua route (optional, null = self)
-   - Có "giải thích bằng tiếng người" bên cạnh số
-   - UC Ref: UC007
+Pass 1 — Self flow P0:
+1. MONITORING_VitalDetail — verify/build self flow từ HOME_Dashboard
+2. MONITORING_HealthHistory — verify/build self flow từ HOME_Dashboard / VitalDetail
+3. SLEEP_Detail — tách màn detail riêng từ SLEEP_Report
+4. ANALYSIS_RiskReport — implement màn risk overview cho self
+5. ANALYSIS_RiskReportDetail — implement màn XAI detail cho self
 
-2. MONITORING_HealthHistory — Xu hướng dài hạn 7/30 ngày
-   - Nhận profileId qua route (optional)
-   - UC Ref: UC008
+Pass 2 — Context-ready:
+6. Giữ `profileId?` trong route cho tất cả màn trên, dù Pass 1 mới build self
+7. Sau khi Phase 5 xong, quay lại verify linked flow từ HOME_FamilyDashboard:
+   - VitalDetail(profileId)
+   - SLEEP_Report(profileId)
+   - ANALYSIS_RiskReport(profileId)
 
-3. SLEEP_Detail — Timeline từng giai đoạn giấc ngủ (deep, light, REM, awake)
-   - Nhận profileId qua route (optional)
-   - Link từ SLEEP_Report
-   - UC Ref: UC021
-
-4. ANALYSIS_RiskReport — Điểm rủi ro AI 0–100, màu xanh/cam/đỏ, 1 câu tóm tắt
-   - Nhận profileId qua route (optional)
-   - UC Ref: UC016
-
-5. ANALYSIS_RiskReportDetail — XAI giải thích tại sao điểm cao/thấp
-   - Link từ RiskReport
-   - UC Ref: UC017
-
-Context: Architecture Hybrid v3.0. Tất cả màn drill-down nhận profileId. HOME_Dashboard và HOME_FamilyDashboard link đến các màn này. SLEEP_Report đã có spec.
+Context:
+- Architecture Hybrid v3.0
+- Self tab và Family tab không dùng profile switcher
+- `profileId = null` -> self; có giá trị -> linked profile
+- Risk là core value, nhưng linked risk entry chỉ test được sau khi FamilyDashboard có risk summary card
 ```
 
 ---
@@ -93,6 +93,8 @@ Context: Architecture Hybrid v3.0. Tất cả màn drill-down nhận profileId. 
 - [x] Mọi màn drill-down có `profileId` optional trong spec
 - [x] VitalDetail có "giải thích bằng tiếng người"
 - [x] Cross-links: HOME_Dashboard, HOME_FamilyDashboard, SLEEP_Report → các màn Phase 3
+- [ ] Self flow hoạt động end-to-end từ `HOME_Dashboard`
+- [ ] Sau Phase 5, linked flow được verify từ `HOME_FamilyDashboard` với `profileId`
 - [ ] `TASK sync` không báo broken link
 
 > **health_system**: VitalDetailScreen, HealthReportScreen, SleepScreen built. RiskReport chưa có.

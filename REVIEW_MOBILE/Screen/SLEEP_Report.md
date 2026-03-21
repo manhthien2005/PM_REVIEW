@@ -18,7 +18,7 @@ Báo cáo giấc ngủ đêm qua (hoặc đêm được chọn). Tổng thời g
 | [HOME_FamilyDashboard](./HOME_FamilyDashboard.md) | Bấm Giấc ngủ trên Card | → This screen (profileId từ Card) |
 | This screen | Bấm "Xem chi tiết" / Timeline | → [SLEEP_Detail](./SLEEP_Detail.md) |
 | This screen | Bấm "Chọn ngày khác" | → [SLEEP_History](./SLEEP_History.md) hoặc date picker |
-| This screen | Bấm "Cài đặt" | → [SLEEP_TrackingSettings](./SLEEP_TrackingSettings.md) |
+| This screen | Bấm "Cài đặt" (self only) | → [SLEEP_TrackingSettings](./SLEEP_TrackingSettings.md) |
 | This screen | Back | → [HOME_Dashboard](./HOME_Dashboard.md) hoặc [HOME_FamilyDashboard](./HOME_FamilyDashboard.md) |
 
 ---
@@ -31,6 +31,7 @@ Báo cáo giấc ngủ đêm qua (hoặc đêm được chọn). Tổng thời g
 4. Phase composition (deep, light, REM, awake).
 5. Timeline bar → tap → SLEEP_Detail.
 6. **Trước 6:00 sáng, chọn "đêm nay"** → State "No data tonight yet".
+7. Nếu là self (`profileId = null`) → hiển thị nút "Cài đặt". Nếu là linked profile → ẩn nút này.
 
 ---
 
@@ -52,6 +53,7 @@ Báo cáo giấc ngủ đêm qua (hoặc đêm được chọn). Tổng thời g
 - [ ] `profileId` null → self; `profileId` có → linked profile, cần `can_view_vitals`
 - [ ] Đêm chưa kết thúc (đang ngủ) → "Đang theo dõi..." hoặc ẩn
 - [ ] Date picker: giới hạn không chọn tương lai
+- [ ] Linked profile flow → không hiển thị `SLEEP_TrackingSettings` vì đây là cấu hình self-only
 
 ---
 
@@ -67,7 +69,7 @@ Báo cáo giấc ngủ đêm qua (hoặc đêm được chọn). Tổng thời g
 
 - Khi SLEEP_Detail thay đổi → link "Xem chi tiết" truyền `profileId`, `date`
 - Khi SLEEP_History thay đổi → chọn ngày → refetch Report
-- Khi SLEEP_TrackingSettings thay đổi → tracking off có thể ẩn data mới
+- Khi SLEEP_TrackingSettings thay đổi → tracking off có thể ẩn data mới (self flow only)
 - Shared: SleepHeroCard, PhaseCompositionChart, SleepTimelineBar
 
 ---
@@ -98,6 +100,7 @@ Báo cáo giấc ngủ đêm qua (hoặc đêm được chọn). Tổng thời g
 | --- | --- | --- | --- |
 | v1.0 | 2026-03-17 | AI | Initial creation |
 | v2.0 | 2026-03-17 | AI | Regen: full template, UI State "No data tonight yet" trước 6:00 sáng |
+| v2.1 | 2026-03-17 | AI | Cross-check sync: `SLEEP_TrackingSettings` chỉ hiển thị trong self flow, không áp dụng cho linked profile |
 
 ---
 
