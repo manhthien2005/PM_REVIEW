@@ -75,14 +75,14 @@ Báo cáo này phản ánh **source Flutter `health_system` hiện tại trong w
 
 ## Phase 5 — Family & Relationship
 
-| Flow / Màn hình                         |               UI / Route               |   Data / API   | Ghi chú theo source                                                             |
-| :-------------------------------------- | :------------------------------------: | :------------: | :------------------------------------------------------------------------------ |
-| `FAMILY_Shell`                          |   `✅ ROUTED` (`/family-management`)   | `🧪 MOCK-ONLY` | Shell 3 tab: Theo dõi / Liên hệ / SOS.                                          |
-| `FAMILY_Dashboard`                      |   `✅ ROUTED` (`/family-dashboard`)    | `🧪 MOCK-ONLY` | Dùng `SharedFamilyMockProvider.generateDashboardSnapshots()`.                   |
-| `FAMILY_ContactList`                    |             `✅ IN SHELL`              | `🧪 MOCK-ONLY` | Dùng shared mock provider, không có API thật.                                   |
-| `FAMILY_AddMember`                      |      `✅ ROUTED` (`/add-contact`)      | `🧪 MOCK-ONLY` | Thêm liên hệ qua `SharedFamilyMockProvider.sendRequest()`, scan/share đều mock. |
-| `FAMILY_LinkedContactDetail / Settings` | `✅ ROUTED` (`/linked-contact-detail`) | `🧪 MOCK-ONLY` | Quyền chia sẻ, tags, unlink đều qua `LinkedContactDetailMockProvider`.          |
-| `FAMILY_PersonDetail`                   |     `✅ ROUTED` (`/person-detail`)     | `🧪 MOCK-ONLY` | Chi tiết người thân đang dựng từ snapshot mock.                                 |
+| Flow / Màn hình                         |               UI / Route               |   Data / API   | Ghi chú theo source                                                        |
+| :-------------------------------------- | :------------------------------------: | :------------: | :------------------------------------------------------------------------- |
+| `FAMILY_Shell`                          |   `✅ ROUTED` (`/family-management`)   | `🧪 MOCK-ONLY` | Shell 3 tab: Theo dõi / Liên hệ / SOS.                                     |
+| `FAMILY_Dashboard`                      |   `✅ ROUTED` (`/family-dashboard`)    | `🧪 MOCK-ONLY` | Dùng `SharedFamilyMockProvider.generateDashboardSnapshots()`.              |
+| `FAMILY_ContactList`                    |             `✅ IN SHELL`              |   `✅ LIVE`    | Dùng `GET /relationships` để lấy danh sách liên hệ.                        |
+| `FAMILY_AddMember`                      |      `✅ ROUTED` (`/add-contact`)      |   `✅ LIVE`    | Gửi request qua `POST /relationships/request` kèm lựa chọn Tags.           |
+| `FAMILY_LinkedContactDetail / Settings` | `✅ ROUTED` (`/linked-contact-detail`) |   `✅ LIVE`    | Quyền chia sẻ, Tags, Unlink đều gọi API thật (PUT/DELETE `relationships`). |
+| `FAMILY_PersonDetail`                   |     `✅ ROUTED` (`/person-detail`)     | `🧪 MOCK-ONLY` | Chi tiết người thân đang dựng từ snapshot mock.                            |
 
 ---
 
@@ -124,4 +124,5 @@ Báo cáo này phản ánh **source Flutter `health_system` hiện tại trong w
 
 | Ngày       | Người cập nhật | Nội dung thay đổi                                                                                                                                                                                                                                                                                                     |
 | :--------- | :------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-03-24 | Minh6625       | Chuyển trạng thái sang `✅ LIVE` cho các màn hình `FAMILY_ContactList`, `FAMILY_AddMember`, `FAMILY_LinkedContactDetail` (đã tích hợp đầy đủ API backend để lấy danh sách liên hệ, gửi lời mời có Tags, và cập nhật phân quyền/Nhãn).                                                                                 |
 | 2026-03-22 | Codex          | Viết lại toàn bộ báo cáo theo source `health_system` hiện tại; sửa endpoint sai, cập nhật đúng trạng thái mock/live, và bổ sung các flow bị thiếu như `risk_history`, `sleep_history`, `device_configure`, `linked_contact_detail`, `person_detail`, `medical_info`, `change-password`, `sos_confirm`, `sos_resolve`. |
