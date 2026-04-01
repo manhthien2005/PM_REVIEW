@@ -30,12 +30,12 @@ Dựa trên quá trình rà soát, hiện tại hệ thống còn **~22 endpoint
 
 ### [Phase 3: Family & Sharing](./03_FAMILY_AND_SHARING.md) (7 APIs)
 
-- [ ] `GET /family/dashboard` : Trạng thái sức khỏe người thân đang liên kết - `🧪 MOCK-ONLY`
+- [x] `GET /family/dashboard` : Trạng thái sức khỏe người thân đang liên kết - `✅ LIVE`
 - [x] `GET /family/contacts` : Danh sách người đang được theo dõi / người theo dõi - `✅ LIVE`
 - [x] `POST /family/contacts/request` : Gửi yêu cầu theo dõi người mới - `✅ LIVE`
 - [x] `PUT /family/contacts/request/accept` : Chấp nhận yêu cầu theo dõi - `✅ LIVE`
 - [x] `DELETE /family/contacts/{id}/unlink` : Xóa liên kết tài khoản - `✅ LIVE`
-- [ ] `GET /family/contacts/{id}/detail` : Xem bản sao dữ liệu sức khỏe của người thân - `🧪 MOCK-ONLY`
+- [x] `GET /family/contacts/{id}/detail` : Xem bản sao dữ liệu sức khỏe của người thân - `✅ LIVE`
 - [x] `PUT /family/contacts/{id}/permissions` : Điều chỉnh quyền riêng tư, nhãn và tags - `✅ LIVE`
 
 ---
@@ -48,3 +48,4 @@ Dựa trên quá trình rà soát, hiện tại hệ thống còn **~22 endpoint
 | :------------ | :-------: | :------------- | :------------------------------------------------------------------------------ |
 | 2026-03-22    |   v1.0    | Codex          | Khởi tạo tài liệu thống kê số lượng API; Phân rã tiến độ thành 3 Phase ưu tiên. |
 | 2026-03-24    |   v1.1    | Minh6625       | Hoàn thành 5/7 APIs Phase 3 (Quản lý liên hệ, Quyền riêng tư, Labels & Tags).   |
+| 2026-04-01    |   v1.2    | Agent          | Hoàn thành 7/7 APIs Phase 3 (Thêm Dashboard Snapshot & Contact Detail API).     |
