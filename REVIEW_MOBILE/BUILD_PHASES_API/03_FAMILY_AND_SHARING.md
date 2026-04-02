@@ -1,6 +1,6 @@
 # Phase 3: Family & Sharing
 
-Phase này hiện tại đang Mock 100%. Đây là chức năng mạng xã hội/kết nối thu nhỏ, phụ thuộc vào dữ liệu Vitals và Analytics đã có.
+Phase này đã ĐƯỢC KẾT NỐI API THẬT 100%. Đây là chức năng mạng xã hội/kết nối thu nhỏ, phụ thuộc vào dữ liệu Vitals và Analytics đã có.
 
 ## 1. Family Dashboard
 
@@ -17,3 +17,4 @@ Phase này hiện tại đang Mock 100%. Đây là chức năng mạng xã hội
 
 - **GET /family/contacts/{id}/detail**: Lấy chi tiết hồ sơ sức khỏe hiện tại của một thành viên (nếu được cấp quyền).
 - **PUT /family/contacts/{id}/permissions**: (LinkedContact Settings) Thay đổi quyền được xem (ví dụ: chỉ cho xem SOS, không cho xem Vitals chi tiết).
+
