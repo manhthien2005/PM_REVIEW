@@ -1,9 +1,13 @@
 -- ============================================================================
 -- File: 05_create_tables_events_alerts.sql
 -- Description: Tạo bảng cho events (fall, SOS) và alerts
--- Tables: fall_events, sos_events, alerts
+-- Tables: fall_events, sos_events, alerts, (+ trigger alerts.updated_at)
 -- Author: HealthGuard Development Team
 -- Date: 02/02/2026
+-- ============================================================================
+-- Migrations incorporated (không cần chạy riêng nữa):
+--   19_align_alerts_schema_with_runtime_model.sql → alerts.updated_at + trigger
+--   20_migration.sql (alert_type_alignment)       → expanded alert_type CHECK
 -- ============================================================================
 
 -- ============================================================================
@@ -108,11 +112,17 @@ CREATE TABLE IF NOT EXISTS alerts (
     -- Alert Type
     alert_type VARCHAR(50) NOT NULL CHECK (alert_type IN (
         'vital_abnormal',      -- SpO2 < 92%, HR > 120
+        'vitals_threshold',    -- Vitals threshold breach (runtime alias)
         'fall_detected',       -- Té ngã
+        'fall_detection',      -- Té ngã (runtime alias v2)
+        'sos',                 -- SOS (runtime alias)
         'sos_triggered',       -- SOS khẩn cấp
         'device_offline',      -- Thiết bị mất kết nối
         'low_battery',         -- Pin dưới 20%
-        'high_risk_score'      -- Risk score cao
+        'high_risk_score',     -- Risk score cao
+        'risk_high',           -- Risk score cao (runtime alias)
+        'risk_critical',       -- Risk score critical
+        'generic_alert'        -- Alert chung fallback
     )),
     
     -- Content
@@ -139,19 +149,29 @@ CREATE TABLE IF NOT EXISTS alerts (
     
     -- Metadata
     created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW(),
     expires_at TIMESTAMPTZ  -- Auto-cleanup old alerts
 );
 
 COMMENT ON TABLE alerts IS 'Bảng central cho tất cả notifications (push, SMS, email)';
-COMMENT ON COLUMN alerts.alert_type IS 'Loại cảnh báo: vital_abnormal, fall_detected, sos_triggered, etc.';
+COMMENT ON COLUMN alerts.alert_type IS 'Loại cảnh báo: vital_abnormal, vitals_threshold, fall_detected, fall_detection, sos, sos_triggered, device_offline, low_battery, high_risk_score, risk_high, risk_critical, generic_alert';
 COMMENT ON COLUMN alerts.severity IS 'Mức độ nghiêm trọng: low, medium, high, critical';
 COMMENT ON COLUMN alerts.data IS 'JSONB snapshot dữ liệu tại thời điểm alert (để audit sau này)';
 COMMENT ON COLUMN alerts.sent_via IS 'Array các kênh gửi: push, sms, email';
+COMMENT ON COLUMN alerts.updated_at IS 'Timestamp lần cập nhật cuối của alert; đồng bộ với runtime ORM model Alert';
+
+-- Trigger auto-update updated_at khi UPDATE alert row
+DROP TRIGGER IF EXISTS update_alerts_updated_at ON alerts;
+CREATE TRIGGER update_alerts_updated_at
+    BEFORE UPDATE ON alerts
+    FOR EACH ROW
+    EXECUTE FUNCTION update_updated_at_column();
 
 -- Print confirmation
 DO $$
 BEGIN
     RAISE NOTICE '✓ Created table: fall_events';
     RAISE NOTICE '✓ Created table: sos_events';
-    RAISE NOTICE '✓ Created table: alerts';
+    RAISE NOTICE '✓ Created table: alerts (12 alert_types, updated_at + trigger)';
+    RAISE NOTICE '  Incorporated: migration 19 (alerts.updated_at) + migration 20 (alert_type_alignment)';
 END $$;

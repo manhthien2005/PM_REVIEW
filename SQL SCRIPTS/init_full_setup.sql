@@ -1,7 +1,9 @@
 -- ============================================================================
 -- FULL DATABASE SETUP SCRIPT
--- Combined from 13 individual scripts
--- Date: 2026-03-14
+-- Combined from 18 individual scripts (01 → 18)
+-- Date: 2026-03-14  |  Last updated: 2026-04-28
+-- All migrations incorporated — scripts 19 & 20 are DEPRECATED (merged into 05)
+-- Health system backend migrations merged into 06 (risk_scores, risk_explanations)
 -- ============================================================================
 
 -- ############################################################################
@@ -376,6 +378,7 @@ END $$;
 -- ############################################################################
 -- SECTION 05: create_tables_events_alerts.sql
 -- Description: Tạo bảng cho events (fall, SOS) và alerts
+-- Incorporated: migration 19 (alerts.updated_at + trigger), migration 20 (alert_type_alignment)
 -- ############################################################################
 
 CREATE TABLE IF NOT EXISTS fall_events (
@@ -429,8 +432,18 @@ CREATE TABLE IF NOT EXISTS alerts (
     user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     device_id INT REFERENCES devices(id) ON DELETE SET NULL,
     alert_type VARCHAR(50) NOT NULL CHECK (alert_type IN (
-        'vital_abnormal', 'fall_detected', 'sos_triggered', 
-        'device_offline', 'low_battery', 'high_risk_score'
+        'vital_abnormal',
+        'vitals_threshold',
+        'fall_detected',
+        'fall_detection',
+        'sos',
+        'sos_triggered',
+        'device_offline',
+        'low_battery',
+        'high_risk_score',
+        'risk_high',
+        'risk_critical',
+        'generic_alert'
     )),
     title VARCHAR(255) NOT NULL,
     message TEXT,
@@ -444,19 +457,28 @@ CREATE TABLE IF NOT EXISTS alerts (
     acknowledged_at TIMESTAMPTZ,
     sent_via TEXT[] DEFAULT ARRAY['push'],
     created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW(),
     expires_at TIMESTAMPTZ
 );
+
+DROP TRIGGER IF EXISTS update_alerts_updated_at ON alerts;
+CREATE TRIGGER update_alerts_updated_at
+    BEFORE UPDATE ON alerts
+    FOR EACH ROW
+    EXECUTE FUNCTION update_updated_at_column();
 
 -- Print confirmation
 DO $$
 BEGIN
-    RAISE NOTICE '✓ Created events and alerts tables';
+    RAISE NOTICE '✓ Created events and alerts tables (12 alert_types, updated_at)';
 END $$;
 
 
 -- ############################################################################
 -- SECTION 06: create_tables_ai_analytics.sql
--- Description: Tạo bảng cho AI/ML (risk scores, XAI explanations)
+-- Description: Tạo bảng cho AI/ML (risk scores, XAI explanations, risk alert responses)
+-- Incorporated: 20260416_risk_alert_escalation, 20260424_shap_explanation_columns,
+--              20260427_model_request_id, 20260427_audience_payload_json, 20260427_sleep_risk_type
 -- ############################################################################
 
 CREATE TABLE IF NOT EXISTS risk_scores (
@@ -464,9 +486,9 @@ CREATE TABLE IF NOT EXISTS risk_scores (
     user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     device_id INT REFERENCES devices(id) ON DELETE SET NULL,
     calculated_at TIMESTAMPTZ NOT NULL,
-    risk_type VARCHAR(50) NOT NULL CHECK (risk_type IN ('stroke', 'heartattack', 'afib', 'general')),
+    risk_type VARCHAR(50) NOT NULL CHECK (risk_type IN ('stroke', 'heartattack', 'afib', 'general', 'sleep')),
     score DECIMAL(5,2) NOT NULL CHECK (score >= 0 AND score <= 100),
-    risk_level VARCHAR(20) CHECK (risk_level IN ('low', 'medium', 'high', 'critical')),
+    risk_level VARCHAR(20) CHECK (risk_level IN ('low', 'medium', 'critical')),
     features JSONB NOT NULL,
     model_version VARCHAR(20),
     algorithm VARCHAR(50),
@@ -480,13 +502,49 @@ CREATE TABLE IF NOT EXISTS risk_explanations (
     feature_importance JSONB,
     xai_method VARCHAR(50) CHECK (xai_method IN ('shap', 'lime', 'rule_based', 'permutation')),
     recommendations TEXT[],
+    top_features_json JSONB,
+    ai_explanation_json JSONB,
+    shap_details_json JSONB,
+    model_request_id VARCHAR(36),
+    audience_payload_json JSONB,
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+CREATE INDEX IF NOT EXISTS idx_risk_explanations_model_request_id
+    ON risk_explanations (model_request_id)
+    WHERE model_request_id IS NOT NULL;
+
+CREATE INDEX IF NOT EXISTS idx_risk_explanations_audience_payload_present
+    ON risk_explanations ((audience_payload_json IS NOT NULL))
+    WHERE audience_payload_json IS NOT NULL;
+
+CREATE TABLE IF NOT EXISTS risk_alert_responses (
+    id BIGSERIAL PRIMARY KEY,
+    notification_id BIGINT NOT NULL UNIQUE REFERENCES alerts(id) ON DELETE CASCADE,
+    response_action VARCHAR(32) NOT NULL,
+    risk_score_id BIGINT NULL,
+    source VARCHAR(32) NOT NULL,
+    device_id BIGINT NULL,
+    latitude DOUBLE PRECISION NULL,
+    longitude DOUBLE PRECISION NULL,
+    address TEXT NULL,
+    responded_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    sos_event_id BIGINT NULL REFERENCES sos_events(id) ON DELETE SET NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    CONSTRAINT check_risk_alert_response_action
+        CHECK (response_action IN ('safe', 'help_requested', 'timeout_escalated')),
+    CONSTRAINT check_risk_alert_response_source
+        CHECK (source IN ('overlay', 'push_tap'))
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS uq_risk_alert_responses_notification_id
+    ON risk_alert_responses (notification_id);
 
 -- Print confirmation
 DO $$
 BEGIN
-    RAISE NOTICE '✓ Created AI analytics tables';
+    RAISE NOTICE '✓ Created AI analytics tables: risk_scores, risk_explanations, risk_alert_responses';
 END $$;
 
 
@@ -690,10 +748,172 @@ INSERT INTO system_settings (setting_key, setting_group, setting_value, descript
 ('system_security', 'security', '{"maintenance_mode": false, "session_timeout_minutes": 60}', 'Bảo mật hệ thống')
 ON CONFLICT (setting_key) DO NOTHING;
 
+
+-- ############################################################################
+-- SECTION 14: add_verification_codes_to_users.sql
+-- Description: Thêm cột mã PIN 6 số vào users (thay JWT token)
+-- ############################################################################
+
+ALTER TABLE users
+    ADD COLUMN IF NOT EXISTS verification_code       VARCHAR(6),
+    ADD COLUMN IF NOT EXISTS verification_code_expires_at TIMESTAMPTZ(6);
+
+ALTER TABLE users
+    ADD COLUMN IF NOT EXISTS reset_code              VARCHAR(6),
+    ADD COLUMN IF NOT EXISTS reset_code_expires_at   TIMESTAMPTZ(6);
+
+CREATE INDEX IF NOT EXISTS idx_users_verification_code
+    ON users (email, verification_code)
+    WHERE verification_code IS NOT NULL;
+
+CREATE INDEX IF NOT EXISTS idx_users_reset_code
+    ON users (email, reset_code)
+    WHERE reset_code IS NOT NULL;
+
+
+-- ############################################################################
+-- SECTION 15: add_table_models.sql
+-- Description: Tạo bảng quản lý AI model registry
+-- ############################################################################
+
+CREATE TABLE IF NOT EXISTS ai_models (
+    id SERIAL NOT NULL,
+    uuid UUID NOT NULL DEFAULT gen_random_uuid(),
+    key VARCHAR(100) NOT NULL,
+    display_name VARCHAR(255) NOT NULL,
+    task VARCHAR(50) NOT NULL,
+    description TEXT,
+    is_active BOOLEAN DEFAULT true,
+    active_version_id INTEGER,
+    created_at TIMESTAMPTZ(6) DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ(6) DEFAULT CURRENT_TIMESTAMP,
+    deleted_at TIMESTAMPTZ(6),
+    CONSTRAINT ai_models_pkey PRIMARY KEY (id)
+);
+
+CREATE TABLE IF NOT EXISTS ai_model_versions (
+    id SERIAL NOT NULL,
+    uuid UUID NOT NULL DEFAULT gen_random_uuid(),
+    model_id INTEGER NOT NULL,
+    version VARCHAR(50) NOT NULL,
+    artifact_path VARCHAR(500) NOT NULL,
+    artifact_sha256 VARCHAR(64) NOT NULL,
+    artifact_size_bytes BIGINT,
+    format VARCHAR(20) NOT NULL,
+    status VARCHAR(20) NOT NULL DEFAULT 'draft',
+    release_notes TEXT,
+    created_by INTEGER,
+    created_at TIMESTAMPTZ(6) DEFAULT CURRENT_TIMESTAMP,
+    deleted_at TIMESTAMPTZ(6),
+    CONSTRAINT ai_model_versions_pkey PRIMARY KEY (id)
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS ai_models_uuid_key ON ai_models(uuid);
+CREATE UNIQUE INDEX IF NOT EXISTS ai_models_key_key ON ai_models(key);
+CREATE INDEX IF NOT EXISTS idx_ai_models_key ON ai_models(key);
+CREATE INDEX IF NOT EXISTS idx_ai_models_task ON ai_models(task);
+CREATE UNIQUE INDEX IF NOT EXISTS ai_model_versions_uuid_key ON ai_model_versions(uuid);
+CREATE INDEX IF NOT EXISTS idx_ai_model_versions_model ON ai_model_versions(model_id);
+CREATE UNIQUE INDEX IF NOT EXISTS unique_ai_model_version ON ai_model_versions(model_id, version);
+
+ALTER TABLE ai_models ADD CONSTRAINT ai_models_active_version_id_fkey
+    FOREIGN KEY (active_version_id) REFERENCES ai_model_versions(id) ON DELETE SET NULL;
+ALTER TABLE ai_model_versions ADD CONSTRAINT ai_model_versions_model_id_fkey
+    FOREIGN KEY (model_id) REFERENCES ai_models(id) ON DELETE CASCADE;
+ALTER TABLE ai_model_versions ADD CONSTRAINT ai_model_versions_created_by_fkey
+    FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL;
+
+
+-- ############################################################################
+-- SECTION 16: verify_bp_columns_and_fcm_tokens.sql
+-- Description: Xác nhận BP columns tồn tại + tạo bảng user_fcm_tokens
+-- ############################################################################
+
+CREATE TABLE IF NOT EXISTS user_fcm_tokens (
+    id          SERIAL PRIMARY KEY,
+    user_id     INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    token       TEXT NOT NULL,
+    platform    VARCHAR(10) DEFAULT 'android'
+                    CHECK (platform IN ('android', 'ios', 'web')),
+    is_active   BOOLEAN DEFAULT TRUE,
+    created_at  TIMESTAMPTZ DEFAULT NOW(),
+    updated_at  TIMESTAMPTZ DEFAULT NOW(),
+    CONSTRAINT uq_user_fcm_token UNIQUE (user_id, token)
+);
+
+CREATE INDEX IF NOT EXISTS idx_fcm_tokens_user_active
+    ON user_fcm_tokens (user_id)
+    WHERE is_active = TRUE;
+
+
+-- ############################################################################
+-- SECTION 17: sleep_threshold_settings.sql
+-- Description: Thêm ngưỡng sinh tồn ban ngày (cập nhật) và khi ngủ (AASM)
+-- ############################################################################
+
+INSERT INTO system_settings (setting_key, setting_group, setting_value, description, is_editable)
+VALUES (
+    'vitals_default_thresholds',
+    'clinical',
+    '{
+        "hr_critical_min": 50, "hr_critical_max": 120,
+        "hr_warning_min": 55,  "hr_warning_max": 110,
+        "spo2_critical": 90,   "spo2_warning": 94,
+        "rr_critical_min": 10, "rr_critical_max": 25,
+        "bp_sys_critical": 180, "bp_dia_critical": 120,
+        "bp_sys_warning": 140,  "bp_dia_warning": 90
+    }',
+    'Ngưỡng cảnh báo sinh tồn mặc định ban ngày (AHA 2023/WHO/ERS-ATS/ACC-AHA).',
+    true
+)
+ON CONFLICT (setting_key) DO UPDATE SET
+    setting_value = EXCLUDED.setting_value,
+    description   = EXCLUDED.description,
+    updated_at    = NOW();
+
+INSERT INTO system_settings (setting_key, setting_group, setting_value, description, is_editable)
+VALUES (
+    'vitals_sleep_thresholds',
+    'clinical',
+    '{
+        "hr_critical_min": 38,  "hr_critical_max": 100,
+        "hr_warning_min": 42,   "hr_warning_max": 90,
+        "spo2_critical": 85,    "spo2_warning": 90,
+        "rr_critical_min": 6,   "rr_critical_max": 25,
+        "bp_sys_critical": 180, "bp_dia_critical": 120,
+        "bp_sys_warning": 160,  "bp_dia_warning": 100,
+        "osa_alert_spo2_threshold": 88,
+        "nocturnal_tachy_hr": 120,
+        "apnea_rr_threshold": 6
+    }',
+    'Ngưỡng sinh tồn khi ngủ (AASM 2020). HR 40-55 bpm deep sleep bình thường.',
+    true
+)
+ON CONFLICT (setting_key) DO UPDATE SET
+    setting_value = EXCLUDED.setting_value,
+    description   = EXCLUDED.description,
+    updated_at    = NOW();
+
+
+-- ############################################################################
+-- SECTION 18: add_sleep_unique_constraint.sql
+-- Description: Thêm cột sleep_date và UNIQUE constraint vào sleep_sessions
+-- ############################################################################
+
+ALTER TABLE sleep_sessions
+    ADD COLUMN IF NOT EXISTS sleep_date DATE;
+
+CREATE UNIQUE INDEX IF NOT EXISTS uq_sleep_user_device_date
+    ON sleep_sessions (user_id, device_id, sleep_date);
+
+
+-- ############################################################################
 -- Print completion
+-- ############################################################################
 DO $$
 BEGIN
     RAISE NOTICE '==================================================';
     RAISE NOTICE '✓ DATABASE SETUP COMPLETED SUCCESSFULLY';
+    RAISE NOTICE '  Sections 01-18 applied (all migrations incorporated)';
     RAISE NOTICE '==================================================';
 END $$;
