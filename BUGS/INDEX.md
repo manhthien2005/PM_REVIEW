@@ -40,7 +40,8 @@ Ví dụ: `HG-001`, `HS-005`, `XR-002`.
 
 | ID | Repo | Module | Title | Severity | Created | Last attempt | Status |
 |---|---|---|---|---|---|---|---|
-| _(none yet — chúc anh giữ được mục này empty lâu nhất có thể)_ | | | | | | | |
+| [HG-001](./HG-001-admin-web-alerts-always-unread.md) | HealthGuard | health.service (admin) | Admin web hiển thị tất cả alerts là 'unread' do code wrong assumption | Medium | 2026-05-11 | _(deferred Phase 4)_ | 🔴 Open |
+| [IS-001](./IS-001-sleep-ai-client-wrong-path.md) | Iot_Simulator_clean | simulator_core/sleep_ai_client | Sleep AI client POST tới /predict (404) thay vì /api/v1/sleep/predict | Critical | 2026-05-11 | _(deferred Phase 4)_ | 🔴 Open |
 
 ## In progress
 
@@ -80,11 +81,11 @@ Bugs affecting ≥ 2 repos require special handling. Track repo-impact matrix:
 
 ## Quick stats
 
-- Total open: 0
-- Total in progress: 0
+- Total open: 2 (HG-001, IS-001)
+- Total in progress: 1 (PM-001)
 - Total resolved: 0
 - Avg attempts to resolve: N/A
-- Most-affected module: N/A
+- Most-affected module: spec drift + admin alerts + IoT sleep AI broken
 
 > Update stats sau mỗi sprint hoặc theo demand.
 

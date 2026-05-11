@@ -26,6 +26,7 @@ Ví dụ: `001-workspace-tooling-host.md`.
 | 001 | Workspace tooling host | 🟢 Accepted | 2026-05-11 | workspace, tooling |
 | 002 | Bug log + ADR centralized in PM_REVIEW | 🟢 Accepted | 2026-05-11 | workspace, anti-loop |
 | 003 | HealthGuard trunk = develop (deploy user-owned) | 🟢 Accepted | 2026-05-11 | git, branching, healthguard, workflow |
+| 004 | Standardize API prefix `/api/v1/{domain}/*` cho all backend services | 🟢 Accepted | 2026-05-11 | api, cross-repo, backend, refactor, workflow |
 
 ## By tag
 
@@ -50,6 +51,7 @@ Ví dụ: `001-workspace-tooling-host.md`.
 
 ### workflow
 - 003-healthguard-trunk-strategy
+- 004-api-prefix-standardization
 
 ### security
 _(none yet)_
@@ -58,13 +60,19 @@ _(none yet)_
 _(none yet)_
 
 ### backend
-_(none yet)_
+- 004-api-prefix-standardization
 
 ### database
 _(none yet)_
 
 ### cross-repo
-_(none yet)_
+- 004-api-prefix-standardization
+
+### api
+- 004-api-prefix-standardization
+
+### refactor
+- 004-api-prefix-standardization
 
 ---
 
