@@ -1,5 +1,6 @@
 ---
-trigger: always_on
+trigger: glob
+globs: backend/src/**/*.{js,ts},backend/prisma/**/*.prisma,backend/prisma/migrations/**/*.sql,backend/package.json,backend/jest.config.{js,ts}
 ---
 
 # Express + Prisma Rules — HealthGuard/backend

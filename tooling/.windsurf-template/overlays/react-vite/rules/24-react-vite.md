@@ -1,5 +1,6 @@
 ---
-trigger: always_on
+trigger: glob
+globs: frontend/src/**/*.{js,jsx,ts,tsx},frontend/package.json,frontend/vite.config.{js,ts},frontend/tailwind.config.{js,ts}
 ---
 
 # React + Vite Rules — HealthGuard/frontend

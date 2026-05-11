@@ -1,0 +1,25 @@
+chore(.windsurf): apply audit fixes - sync from template
+
+Re-sync .windsurf/ from PM_REVIEW/tooling/.windsurf-template after audit fixes.
+
+## Changes (audit-driven, see PM_REVIEW commit for full detail)
+
+Round 1 (P0):
+- HealthGuard trunk now develop (per ADR-003)
+- Hooks upgraded: branch guard, content secret scan, destructive DB guard
+- Rules trigger types converted: 3 always_on + 5 model_decision + 5 glob
+
+Round 2 (P1):
+- README counts updated (8 rules, 22 skills, 14+1 workflows)
+- Stale skills removed (flutter-firebase-patterns, nodejs-ts-backend)
+- cd replaced with cwd notation in 5 workflows
+- Meep examples replaced with VSmartwatch (SOS/fall/vital) in 6 skills
+- New workflow /close-task added
+
+Round 3 (P2):
+- Rule 10: UC requirement scoped to domain bugs only
+- Rule 00: infra guard paths clarified
+
+## Source
+- Template: PM_REVIEW/tooling/.windsurf-template
+- Sync: .\sync.ps1 (UPDATE mode) + earlier .\sync.ps1 -Mirror to clean stale

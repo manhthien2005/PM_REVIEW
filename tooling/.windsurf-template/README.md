@@ -13,9 +13,10 @@ Source-of-truth cho `.windsurf/` config của 5 repo trong workspace VSmartwatch
 ├── topology.md              # Cross-repo data flow reference
 ├── sync.ps1                 # Deploy script (template -> repos)
 ├── shared/                  # Áp dụng cho mọi repo
-│   ├── rules/               # 00-50: operating mode, context, conventions, testing, security, token
-│   ├── skills/              # 19 skills (10 từ Meep + 9 custom của anh)
-│   ├── workflows/           # 9 slash commands (/plan /build /test ...)
+│   ├── NOTICE.md            # Do-not-edit notice for deployed copies
+│   ├── rules/               # 8 shared rules (00, 10, 11, 20, 30, 40, 50, 60)
+│   ├── skills/              # 22 skills (engineering + stack patterns + PM/QA + anti-loop)
+│   ├── workflows/           # 14 slash commands
 │   └── hooks/               # Python pre-command hooks (security)
 │   └── hooks.json
 └── overlays/                # Áp dụng theo stack
@@ -92,17 +93,40 @@ Nếu 1 repo cần rule custom không có trong template:
 
 Sau khi sync, từ bất kỳ repo nào anh có thể invoke:
 
+### Per-task lifecycle
+
 | Command | Tác dụng |
 |---|---|
-| `/plan` | Decompose spec → ordered tasks với TDD |
-| `/build` | Execute plan task-by-task |
-| `/test` | Run + verify tests |
+| `/start` | Bootstrap new task — load context, check blockers, create branch |
+| `/spec` | Write/refine feature spec — UC-driven, propose 2-3 approaches |
+| `/plan` | Decompose spec → ordered vertical-slice tasks |
+| `/build` | Execute plan task-by-task with TDD |
+| `/test` | Write/extend tests (unit/widget/integration/contract) |
+| `/review` | Self code review — 5 axes |
+| `/close-task` | Post-merge cleanup — pull trunk, delete branches, update trackers |
+
+### Diagnostic / fix
+
+| Command | Tác dụng |
+|---|---|
 | `/debug` | Systematic root-cause debugging |
-| `/fix-issue` | End-to-end fix với regression test |
-| `/review` | Self code review |
-| `/spec` | Write/refine feature spec |
-| `/deploy` | Deploy checklist |
-| `/start` | Bootstrap new feature |
+| `/fix-issue` | End-to-end fix with regression test |
+| `/stuck` | Anti-loop force re-evaluation when 3+ failed attempts |
+
+### Refactor / scope
+
+| Command | Tác dụng |
+|---|---|
+| `/audit` | Audit module's current state before refactoring |
+| `/refactor-module` | Convert audit findings to actionable refactor plan |
+| `/cross-repo-feature` | Orchestrate feature spanning multiple repos |
+| `/sync-spec` | Ripple UC/SRS/SQL changes to code/tests/JIRA |
+
+### Documentation
+
+| Command | Tác dụng |
+|---|---|
+| `/deploy` | Deploy checklist (documentation only — anh runs commands manually) |
 
 Xem `<repo>/.windsurf/workflows/<command>.md` cho detailed steps.
 
@@ -110,7 +134,7 @@ Xem `<repo>/.windsurf/workflows/<command>.md` cho detailed steps.
 
 Em sẽ auto-invoke skill khi gặp keyword tương ứng. Anh cũng có thể explicit:
 
-**Engineering skills (từ Meep):**
+**Engineering core (universal):**
 - `tdd` — Test-first development
 - `systematic-debugging` — 4-phase root-cause
 - `writing-plans` — Vertical slice planning
@@ -119,20 +143,26 @@ Em sẽ auto-invoke skill khi gặp keyword tương ứng. Anh cũng có thể e
 - `code-review-five-axis` — 5-axis review framework
 - `brainstorming` — Multi-perspective ideation
 - `caveman-vi` — Ultra-compressed Vietnamese mode
-- `flutter-mobile-patterns` — Riverpod + dio + GoRouter + FCM (VSmartwatch native)
+
+**Stack patterns (codebase-specific):**
+- `flutter-mobile-patterns` — Riverpod + dio + GoRouter + FCM (health_system mobile)
 - `express-prisma-patterns` — Prisma + JWT + Postgres + Socket.IO (HealthGuard admin)
 - `fastapi-patterns` — FastAPI + Pydantic v2 + asyncpg (3 Python BE repos)
 
-**PM/QA skills (custom của anh):**
+**Anti-loop infrastructure:**
+- `bug-log` — Track every fix attempt to prevent retry of failed approaches
+- `decision-log` — ADR-lite for cross-session architectural decisions
+
+**PM/QA skills (project-specific):**
 - `UC_AUDIT` — Audit Use Cases vs SQL vs JIRA
 - `TEST_CASE_GEN` — Generate/execute test cases
 - `task-manager` — Sprint planning + Epic breakdown
 - `backlog-auditor` — Sprint progress audit
-- `detailed-feature-review` — 8-criteria code review
+- `detailed-feature-review` — 8-criteria deep audit (Vietnamese report)
 - `doc-gen` — Generate SRS/SDD
-- `mobile-agent` — Flutter UI design/build/review
-- `TongQuan` — Project overview assessment
-- `CHECK` — Project structure sync
+- `mobile-agent` — Manage screen spec lifecycle (TASK mode only)
+- `TongQuan` — Project-level overview assessment
+- `CHECK` — Sync PM_REVIEW docs with code reality
 
 ## Verification sau sync
 
@@ -142,10 +172,24 @@ Get-ChildItem d:\DoAn2\VSmartwatch\HealthGuard\.windsurf -Recurse -Directory | S
 ```
 
 Expected per repo:
-- `.windsurf/rules/` — 7 shared + 1-2 overlay rules
-- `.windsurf/skills/` — 19 skills
-- `.windsurf/workflows/` — 9 workflows
-- `.windsurf/hooks/` — 2 Python scripts
+- `.windsurf/NOTICE.md` — do-not-edit notice (deployed copy)
+- `.windsurf/rules/` — 8 shared + 1-2 overlay rules
+- `.windsurf/skills/` — 22 skills
+- `.windsurf/workflows/` — 14 workflows (or 15 with /close-task after R2)
+- `.windsurf/hooks/` — 2 Python scripts (block_dangerous_commands, protect_secrets)
 - `.windsurf/hooks.json`
 - `.windsurf/topology.md`
-- `.windsurf/repo-context.md`
+- `.windsurf/repo-context.md` — auto-generated per sync
+
+## Rule activation modes (Windsurf)
+
+Rules use 4 trigger types per Windsurf docs:
+
+| Mode | When loaded | Used for |
+|---|---|---|
+| `always_on` | Every message (full content in prompt) | Foundational behavior — `00-operating-mode`, `40-security-guardrails`, `60-context-continuity` |
+| `model_decision` | When AI deems relevant (description-based) | Reference info — `10-project-context`, `11-cross-repo-topology`, `20-stack-conventions`, `30-testing-discipline`, `50-token-discipline` |
+| `glob` | When file matching pattern is read/edited | Stack overlays — `21-flutter`, `22-fastapi`, `23-express-prisma`, `24-react-vite`, `25-docs-sql` |
+| `manual` | Explicit @mention | (none currently) |
+
+Reducing always_on count = less context bloat per message but rules still available when needed.
