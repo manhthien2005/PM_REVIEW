@@ -49,7 +49,7 @@ $RepoConfig = @{
         Path = Join-Path $ROOT 'HealthGuard'
         Overlays = @('express-prisma', 'react-vite')
         Stack = 'Express+Prisma (BE), Vite+React (FE)'
-        Trunk = 'deploy'
+        Trunk = 'develop'
     }
     'health_system' = @{
         Path = Join-Path $ROOT 'health_system'
@@ -270,7 +270,17 @@ function Sync-Repo {
         }
     }
 
-    # 7. Generate repo-context.md
+    # 7. Copy NOTICE.md (do-not-edit notice for deployed copy)
+    $noticeSrc = Join-Path $TEMPLATE 'shared\NOTICE.md'
+    if (Test-Path $noticeSrc) {
+        if ($DryRun) {
+            Write-Action 'COPY' "NOTICE.md"
+        } else {
+            Copy-Item $noticeSrc (Join-Path $windsurfDir 'NOTICE.md') -Force
+        }
+    }
+
+    # 8. Generate repo-context.md
     Write-RepoContext -RepoName $Name -Config $Config -WindsurfDir $windsurfDir -DryRun:$DryRun
 
     Write-Host "  Done: $Name`n" -ForegroundColor Green
