@@ -25,6 +25,7 @@ Ví dụ: `001-workspace-tooling-host.md`.
 |---|---|---|---|---|
 | 001 | Workspace tooling host | 🟢 Accepted | 2026-05-11 | workspace, tooling |
 | 002 | Bug log + ADR centralized in PM_REVIEW | 🟢 Accepted | 2026-05-11 | workspace, anti-loop |
+| 003 | HealthGuard trunk = develop (deploy user-owned) | 🟢 Accepted | 2026-05-11 | git, branching, healthguard, workflow |
 
 ## By tag
 
@@ -37,6 +38,18 @@ Ví dụ: `001-workspace-tooling-host.md`.
 
 ### anti-loop
 - 002-bug-log-centralized
+
+### git
+- 003-healthguard-trunk-strategy
+
+### branching
+- 003-healthguard-trunk-strategy
+
+### healthguard
+- 003-healthguard-trunk-strategy
+
+### workflow
+- 003-healthguard-trunk-strategy
 
 ### security
 _(none yet)_
