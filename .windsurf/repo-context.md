@@ -9,7 +9,7 @@ trigger: always_on
 ## This repo
 
 - **Name:** `PM_REVIEW`
-- **Path:** `d:\DoAn2\VSmartwatch\PM_REVIEW`
+- **Path:** `D:\DoAn2\VSmartwatch\PM_REVIEW`
 - **Stack:** Docs + SQL canonical schema + custom skills
 - **Overlays applied:** `docs-sql`
 - **Trunk branch:** `main`
@@ -32,4 +32,4 @@ trigger: always_on
 
 ## Last sync
 
-Generated: 2026-05-11 19:20
+Generated: 2026-05-11 20:38

@@ -119,8 +119,9 @@ Em sẽ auto-invoke skill khi gặp keyword tương ứng. Anh cũng có thể e
 - `code-review-five-axis` — 5-axis review framework
 - `brainstorming` — Multi-perspective ideation
 - `caveman-vi` — Ultra-compressed Vietnamese mode
-- `flutter-firebase-patterns` — (legacy, replace với flutter overlay)
-- `nodejs-ts-backend` — (legacy, replace với express overlay)
+- `flutter-mobile-patterns` — Riverpod + dio + GoRouter + FCM (VSmartwatch native)
+- `express-prisma-patterns` — Prisma + JWT + Postgres + Socket.IO (HealthGuard admin)
+- `fastapi-patterns` — FastAPI + Pydantic v2 + asyncpg (3 Python BE repos)
 
 **PM/QA skills (custom của anh):**
 - `UC_AUDIT` — Audit Use Cases vs SQL vs JIRA
