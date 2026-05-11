@@ -21,3 +21,18 @@ CLAUDE.md
 progress.md
 task_plan.md
 
+
+# Python bytecode cache
+__pycache__/
+*.pyc
+*.pyo
+
+
+# Cascade temp helper scripts (commit msgs, fix scripts)
+.commit-msg-*.txt
+.commit-*.ps1
+.fix-*.ps1
+.clean-*.ps1
+.verify*.ps1
+.hook_test.py
+

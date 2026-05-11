@@ -1,6 +1,6 @@
 ---
 trigger: glob
-globs: Resources/**/*.md,REVIEW_*/**/*.md,SQL SCRIPTS/**/*.sql,ADR/**/*.md,BUGS/**/*.md,*.md
+globs: **/*.md
 ---
 
 # Docs + SQL Rules — PM_REVIEW

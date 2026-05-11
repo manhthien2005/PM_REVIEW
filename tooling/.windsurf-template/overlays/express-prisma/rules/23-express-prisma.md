@@ -1,6 +1,6 @@
 ---
 trigger: glob
-globs: backend/src/**/*.{js,ts},backend/prisma/**/*.prisma,backend/prisma/migrations/**/*.sql,backend/package.json,backend/jest.config.{js,ts}
+globs: backend/**
 ---
 
 # Express + Prisma Rules — HealthGuard/backend
