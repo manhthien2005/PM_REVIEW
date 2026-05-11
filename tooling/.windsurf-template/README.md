@@ -44,8 +44,8 @@ Khi sửa template, anh có thể:
 ## Cách sync
 
 ```pwsh
-# Cd to template (or use absolute path)
-cd d:\DoAn2\VSmartwatch\PM_REVIEW\tooling\.windsurf-template
+# cwd: d:\DoAn2\VSmartwatch\PM_REVIEW\tooling\.windsurf-template
+# (use Cwd parameter when invoking from AI tool, or cd manually for human runs)
 
 # Sync tất cả repo, update mode (preserve extras)
 .\sync.ps1
