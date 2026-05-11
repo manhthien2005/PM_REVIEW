@@ -1,0 +1,300 @@
+<#
+.SYNOPSIS
+  Deploy .windsurf-template -> per-repo .windsurf/
+
+.DESCRIPTION
+  Sync shared + appropriate overlay từ d:\DoAn2\VSmartwatch\.windsurf-template
+  vào từng repo's .windsurf/ folder.
+
+  Default: UPDATE mode (overwrite source files, keep extras trong dest)
+  Flag -Mirror: MIRROR mode (delete extras trước khi copy)
+
+.PARAMETER Repo
+  Tên repo cần sync. Default: all repos.
+  Values: HealthGuard, health_system, Iot_Simulator_clean, healthguard-model-api, PM_REVIEW, all
+
+.PARAMETER Mirror
+  Nếu set, xóa file trong dest không có ở source (clean sync).
+
+.PARAMETER DryRun
+  Chỉ show preview, không thực sự copy.
+
+.EXAMPLE
+  .\sync.ps1                          # Sync all repos, update mode
+  .\sync.ps1 -Repo HealthGuard        # Sync 1 repo
+  .\sync.ps1 -Mirror                  # Clean sync all repos
+  .\sync.ps1 -DryRun                  # Preview changes only
+#>
+
+param(
+    [ValidateSet('HealthGuard','health_system','Iot_Simulator_clean','healthguard-model-api','PM_REVIEW','all')]
+    [string]$Repo = 'all',
+
+    [switch]$Mirror,
+
+    [switch]$DryRun
+)
+
+$ErrorActionPreference = 'Stop'
+
+# === Config ===
+# Template location resolves from script's own directory (portable).
+$TEMPLATE = $PSScriptRoot
+# Workspace root: 2 levels up (PM_REVIEW/tooling/.windsurf-template -> VSmartwatch)
+$ROOT = Split-Path (Split-Path (Split-Path $TEMPLATE -Parent) -Parent) -Parent
+
+# Repo → stack overlays mapping
+$RepoConfig = @{
+    'HealthGuard' = @{
+        Path = Join-Path $ROOT 'HealthGuard'
+        Overlays = @('express-prisma', 'react-vite')
+        Stack = 'Express+Prisma (BE), Vite+React (FE)'
+        Trunk = 'deploy'
+    }
+    'health_system' = @{
+        Path = Join-Path $ROOT 'health_system'
+        Overlays = @('flutter', 'fastapi')
+        Stack = 'Flutter (mobile), FastAPI (BE)'
+        Trunk = 'develop'
+    }
+    'Iot_Simulator_clean' = @{
+        Path = Join-Path $ROOT 'Iot_Simulator_clean'
+        Overlays = @('fastapi')
+        Stack = 'Python FastAPI (api_server + simulator-web)'
+        Trunk = 'develop'
+    }
+    'healthguard-model-api' = @{
+        Path = Join-Path $ROOT 'healthguard-model-api'
+        Overlays = @('fastapi')
+        Stack = 'Python FastAPI (ML model serving)'
+        Trunk = 'master'
+    }
+    'PM_REVIEW' = @{
+        Path = Join-Path $ROOT 'PM_REVIEW'
+        Overlays = @('docs-sql')
+        Stack = 'Docs + SQL canonical schema + custom skills'
+        Trunk = 'main'
+    }
+}
+
+# === Helpers ===
+
+function Write-Step($Message) {
+    Write-Host ">> $Message" -ForegroundColor Cyan
+}
+
+function Write-Action($Verb, $Path) {
+    $color = switch ($Verb) {
+        'COPY'   { 'Green' }
+        'SKIP'   { 'DarkGray' }
+        'DELETE' { 'Yellow' }
+        default  { 'White' }
+    }
+    Write-Host ("  [{0,-6}] {1}" -f $Verb, $Path) -ForegroundColor $color
+}
+
+function Sync-Directory {
+    param(
+        [string]$Source,
+        [string]$Dest,
+        [switch]$Mirror,
+        [switch]$DryRun
+    )
+    if (-not (Test-Path $Source)) {
+        Write-Action 'SKIP' "Source missing: $Source"
+        return
+    }
+
+    if (-not (Test-Path $Dest)) {
+        if ($DryRun) {
+            Write-Action 'COPY' "Create dir: $Dest"
+        } else {
+            New-Item -Path $Dest -ItemType Directory -Force | Out-Null
+        }
+    }
+
+    # Mirror mode: delete files trong dest không có trong source
+    if ($Mirror -and (Test-Path $Dest)) {
+        Get-ChildItem -Path $Dest -Recurse -File | ForEach-Object {
+            $relativePath = $_.FullName.Substring($Dest.Length).TrimStart('\','/')
+            $sourcePath = Join-Path $Source $relativePath
+            if (-not (Test-Path $sourcePath)) {
+                if ($DryRun) {
+                    Write-Action 'DELETE' $_.FullName
+                } else {
+                    Remove-Item $_.FullName -Force
+                    Write-Action 'DELETE' $_.FullName
+                }
+            }
+        }
+    }
+
+    # Copy/overwrite from source
+    Get-ChildItem -Path $Source -Recurse -File | ForEach-Object {
+        $relativePath = $_.FullName.Substring($Source.Length).TrimStart('\','/')
+        $destPath = Join-Path $Dest $relativePath
+        $destDir = Split-Path $destPath -Parent
+        if ($DryRun) {
+            Write-Action 'COPY' "$relativePath"
+        } else {
+            if (-not (Test-Path $destDir)) {
+                New-Item -Path $destDir -ItemType Directory -Force | Out-Null
+            }
+            Copy-Item $_.FullName $destPath -Force
+        }
+    }
+}
+
+function Write-RepoContext {
+    param(
+        [string]$RepoName,
+        [hashtable]$Config,
+        [string]$WindsurfDir,
+        [switch]$DryRun
+    )
+    $path = Join-Path $WindsurfDir 'repo-context.md'
+    $overlaysText = if ($Config.Overlays.Count -gt 0) { $Config.Overlays -join ', ' } else { '(none)' }
+    $content = @"
+---
+trigger: always_on
+---
+
+# Repo Context — $RepoName
+
+**Auto-generated by sync.ps1.** Edit `.windsurf-template/sync.ps1` để thay đổi template.
+
+## This repo
+
+- **Name:** ``$RepoName``
+- **Path:** ``$($Config.Path)``
+- **Stack:** $($Config.Stack)
+- **Overlays applied:** ``$overlaysText``
+- **Trunk branch:** ``$($Config.Trunk)``
+
+## Other repos in workspace
+
+| Repo | Path | Stack |
+|---|---|---|
+| HealthGuard | ``d:\DoAn2\VSmartwatch\HealthGuard`` | Admin web (Express + Prisma + Vite) |
+| health_system | ``d:\DoAn2\VSmartwatch\health_system`` | Mobile (Flutter) + BE (FastAPI) |
+| Iot_Simulator_clean | ``d:\DoAn2\VSmartwatch\Iot_Simulator_clean`` | IoT sim (Python FastAPI) |
+| healthguard-model-api | ``d:\DoAn2\VSmartwatch\healthguard-model-api`` | Model API (FastAPI) |
+| PM_REVIEW | ``d:\DoAn2\VSmartwatch\PM_REVIEW`` | Docs + SQL + custom skills |
+
+## When working trong repo này
+
+- Default action: stay within this repo's source code.
+- Khi feature chạm repo khác (xem ``topology.md``), flag rõ với anh + đề xuất task plan cross-repo.
+- ``PM_REVIEW`` luôn là source of truth cho spec — verify UC trước khi implement.
+
+## Last sync
+
+Generated: $(Get-Date -Format 'yyyy-MM-dd HH:mm')
+"@
+
+    if ($DryRun) {
+        Write-Action 'COPY' "repo-context.md (auto-generated)"
+    } else {
+        Set-Content -Path $path -Value $content -Encoding UTF8
+    }
+}
+
+function Sync-Repo {
+    param(
+        [string]$Name,
+        [hashtable]$Config,
+        [switch]$Mirror,
+        [switch]$DryRun
+    )
+    Write-Step "Syncing $Name ($($Config.Stack))"
+
+    if (-not (Test-Path $Config.Path)) {
+        Write-Host "  [ERROR] Repo path missing: $($Config.Path)" -ForegroundColor Red
+        return
+    }
+
+    $windsurfDir = Join-Path $Config.Path '.windsurf'
+
+    # 1. Sync shared rules → .windsurf/rules
+    Sync-Directory `
+        -Source (Join-Path $TEMPLATE 'shared\rules') `
+        -Dest (Join-Path $windsurfDir 'rules') `
+        -Mirror:$Mirror -DryRun:$DryRun
+
+    # 2. Overlay rules → .windsurf/rules (additive, không mirror-delete)
+    foreach ($overlay in $Config.Overlays) {
+        $overlayRulesDir = Join-Path $TEMPLATE "overlays\$overlay\rules"
+        if (Test-Path $overlayRulesDir) {
+            Sync-Directory `
+                -Source $overlayRulesDir `
+                -Dest (Join-Path $windsurfDir 'rules') `
+                -DryRun:$DryRun
+        }
+    }
+
+    # 3. Sync shared skills → .windsurf/skills
+    Sync-Directory `
+        -Source (Join-Path $TEMPLATE 'shared\skills') `
+        -Dest (Join-Path $windsurfDir 'skills') `
+        -Mirror:$Mirror -DryRun:$DryRun
+
+    # 4. Sync shared workflows → .windsurf/workflows
+    Sync-Directory `
+        -Source (Join-Path $TEMPLATE 'shared\workflows') `
+        -Dest (Join-Path $windsurfDir 'workflows') `
+        -Mirror:$Mirror -DryRun:$DryRun
+
+    # 5. Sync hooks
+    Sync-Directory `
+        -Source (Join-Path $TEMPLATE 'shared\hooks') `
+        -Dest (Join-Path $windsurfDir 'hooks') `
+        -Mirror:$Mirror -DryRun:$DryRun
+
+    $hooksJsonSrc = Join-Path $TEMPLATE 'shared\hooks.json'
+    if (Test-Path $hooksJsonSrc) {
+        $hooksJsonDest = Join-Path $windsurfDir 'hooks.json'
+        if ($DryRun) {
+            Write-Action 'COPY' "hooks.json"
+        } else {
+            Copy-Item $hooksJsonSrc $hooksJsonDest -Force
+        }
+    }
+
+    # 6. Copy topology.md
+    $topologySrc = Join-Path $TEMPLATE 'topology.md'
+    if (Test-Path $topologySrc) {
+        if ($DryRun) {
+            Write-Action 'COPY' "topology.md"
+        } else {
+            Copy-Item $topologySrc (Join-Path $windsurfDir 'topology.md') -Force
+        }
+    }
+
+    # 7. Generate repo-context.md
+    Write-RepoContext -RepoName $Name -Config $Config -WindsurfDir $windsurfDir -DryRun:$DryRun
+
+    Write-Host "  Done: $Name`n" -ForegroundColor Green
+}
+
+# === Main ===
+
+Write-Host ""
+Write-Host "VSmartwatch .windsurf-template sync" -ForegroundColor Magenta
+Write-Host "Template: $TEMPLATE" -ForegroundColor DarkGray
+if ($Mirror) { Write-Host "Mode: MIRROR (delete extras)" -ForegroundColor Yellow }
+else { Write-Host "Mode: UPDATE (preserve extras)" -ForegroundColor Green }
+if ($DryRun) { Write-Host "DryRun: ON" -ForegroundColor Yellow }
+Write-Host ""
+
+if (-not (Test-Path $TEMPLATE)) {
+    Write-Host "[ERROR] Template missing: $TEMPLATE" -ForegroundColor Red
+    exit 1
+}
+
+$repos = if ($Repo -eq 'all') { $RepoConfig.Keys } else { @($Repo) }
+
+foreach ($r in $repos) {
+    Sync-Repo -Name $r -Config $RepoConfig[$r] -Mirror:$Mirror -DryRun:$DryRun
+}
+
+Write-Host "Done." -ForegroundColor Magenta
