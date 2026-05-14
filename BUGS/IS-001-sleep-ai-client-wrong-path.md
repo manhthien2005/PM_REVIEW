@@ -112,7 +112,7 @@ _(Chưa attempt fix — bug surfaced trong Phase -1.C audit, defer Phase 4 refac
 
 _(Fill in when resolved — Phase 4 target)_
 
-**Fix approach (planned):**
+**Fix approach (planned, expanded 2026-05-13 per SLEEP_AI_CLIENT verify C1):**
 
 ```python
 # Line 53 — change from:
@@ -129,11 +129,19 @@ headers={
     "Content-Type": "application/json",
     "X-Internal-Service": "iot-simulator",   # ← add this
 }
+
+# NEW (verify C1 2026-05-13): Fix response schema parse — line 62:
+# From: prediction = body["predictions"][0]
+# To:   prediction = body["results"][0]
+# Model-api returns SleepPredictionResponse {"results": [...], "total": N},
+# NOT {"predictions": [...]}. Without this fix, KeyError fires even after path fix.
 ```
 
+**Fix scope summary:** 4 changes trong cung 1 commit: path + probe + header + response schema key. Est 35min (revised from 30min v1).
+
 **Test added (planned):**
-- `Iot_Simulator_clean/tests/simulator_core/test_sleep_ai_client.py::test_predict_correct_path`
-- Mock httpx response, assert request URL contains `/api/v1/sleep/predict`
+- `Iot_Simulator_clean/tests/simulator_core/test_sleep_ai_client.py::test_predict_correct_path_and_schema`
+- Mock httpx response với `{"results": [{"sleep_score": 82}], "total": 1}` shape, assert request URL contains `/api/v1/sleep/predict` AND `result["sleep_score"] == 82` parsed correctly.
 
 **Verification:**
 1. Run IoT sim sleep scenario

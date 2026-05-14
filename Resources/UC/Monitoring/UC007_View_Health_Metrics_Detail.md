@@ -1,4 +1,6 @@
-# UC007 - XEM CHI TIẾT CHỈ SỐ SỨC KHỎE
+# UC007 - XEM CHI TIẾT CHỈ SỐ SỨC KHỎE (v2 — Phase 0.5)
+
+> **v2 rationale (2026-05-13):** Main Flow step 5 range list sang 24h/7d/30d (match `_VITALS_TIMESERIES_RANGES` preset). Drop Alt 5.a "> 1 năm" + BR-007-03 "max 1 năm" vì code không expose custom range picker (3 preset max 30d). Drop Alt 6.a export CSV/PDF (D-MON-01, admin web đã có). Add BR-007-05 stats min/max/avg status chưa implement (Phase 5+).
 
 ## Bảng đặc tả Use Case
 
@@ -7,10 +9,10 @@
 | **Mã UC** | UC007 |
 | **Tên UC** | Xem chi tiết chỉ số sức khỏe |
 | **Tác nhân chính** | User |
-| **Mô tả** | Người dùng xem chi tiết một chỉ số sức khỏe (nhịp tim, SpO₂, huyết áp, nhiệt độ) với thống kê và biểu đồ theo khoảng thời gian linh hoạt. |
-| **Trigger** | Người dùng chọn 1 chỉ số cụ thể trên màn hình UC006 hoặc truy cập màn hình “Chi tiết chỉ số”. |
-| **Tiền điều kiện** | - Người dùng đã đăng nhập.<br>- Đã có thiết bị gán với tài khoản và có dữ liệu trong khoảng thời gian chọn. |
-| **Hậu điều kiện** | - Người dùng xem được thống kê chi tiết cho chỉ số đã chọn.<br>- (Tuỳ chọn) Người dùng có thể xuất dữ liệu hoặc thay đổi khoảng thời gian xem. |
+| **Mô tả** | Người dùng xem chi tiết một chỉ số sức khỏe (HR / SpO2 / BP / Temp / RR) với biểu đồ trend + safe range bar + education card. |
+| **Trigger** | Chọn 1 chỉ số trên UC006 hoặc truy cập `VitalDetailScreen` qua routing. |
+| **Tiền điều kiện** | - Người dùng đã đăng nhập.<br>- Thiết bị đã pair + có dữ liệu (trong 24h gần nhất mặc định). |
+| **Hậu điều kiện** | Người dùng xem được value hiện tại + 24h trend + safe range bar + education text. |
 
 ---
 
@@ -18,62 +20,88 @@
 
 | Bước | Người thực hiện | Hành động |
 |------|----------------|-----------|
-| 1 | Người dùng | Từ màn hình UC006, chọn 1 chỉ số (VD: Nhịp tim) hoặc chọn "Xem chi tiết". |
-| 2 | Hệ thống | Hiển thị màn hình "Chi tiết Nhịp tim" với khoảng thời gian mặc định (24 giờ gần nhất). |
-| 3 | Hệ thống | Truy vấn dữ liệu đã được tổng hợp tương ứng với khoảng thời gian (dữ liệu 5 phút, theo giờ, theo ngày). |
-| 4 | Hệ thống | Hiển thị:<br>- Biểu đồ đường (line chart)<br>- Giá trị min/max/avg<br>- Số lần vượt ngưỡng cảnh báo trong khoảng thời gian đó. |
-| 5 | Người dùng | Thay đổi khoảng thời gian (1h, 24h, 7 ngày, 30 ngày, tuỳ chỉnh from/to). |
-| 6 | Hệ thống | Nạp lại dữ liệu và cập nhật biểu đồ + thống kê theo khoảng thời gian mới. |
+| 1 | Người dùng | Từ UC006, tap vào 1 chỉ số (VD "Nhịp tim") hoặc mở trực tiếp Vital Detail Screen. |
+| 2 | Hệ thống | Open `VitalDetailScreen` với `vitalType` param (hr/spo2/bp/temp/rr). Default range 24h. |
+| 3 | Client | `VitalSignsProvider.startPolling()`: polling 5s cho latest vital + fetch timeseries 24h (idempotent, không re-fetch trên mỗi tick). |
+| 4 | Hệ thống | Hiển thị:<br>- Hero card: value 84sp + status pill (BR-006-01 color)<br>- Safe range bar (5 zones, `VitalSafeRangeBar`)<br>- Line chart 24h (`MiniLineChart` từ `timeseries.data`)<br>- Education card (`VitalEducationCard` per vital type) |
+| 5 | Người dùng | (Phase 4, D-MON-03) Thay đổi range: 24h / 7d / 30d. |
+| 6 | Client | Gọi `/metrics/vitals/timeseries?range=<key>` với range mới. Update chart. |
 
 ---
 
 ## Luồng thay thế (Alternative Flows)
 
-### 3.a - Không có dữ liệu trong khoảng thời gian chọn
+### 3.a - Không có dữ liệu trong 24h
 
 | Bước | Người thực hiện | Hành động |
 |------|----------------|-----------|
-| 3.a.1 | Hệ thống | Phát hiện không có bản ghi nào trong khoảng thời gian được chọn. |
-| 3.a.2 | Hệ thống | Hiển thị thông báo "Chưa có dữ liệu trong khoảng thời gian này" và gợi ý khoảng gần nhất có dữ liệu. |
+| 3.a.1 | Hệ thống (BE) | `/timeseries` trả `data: []` (defensive, không 500 nếu vitals hypertable empty). |
+| 3.a.2 | Client | `VitalSignsProvider.chartData = []` thì render `EmptyChartPlaceholder("Chưa có dữ liệu xu hướng")`. |
+| 3.a.3 | Client | Nếu latest vital cũng empty thì hero card hiển thị "--" + status unknown. |
 
-### 5.a - Khoảng thời gian quá dài (ảnh hưởng hiệu năng)
-
-| Bước | Người thực hiện | Hành động |
-|------|----------------|-----------|
-| 5.a.1 | Người dùng | Chọn khoảng thời gian quá dài (VD: > 1 năm). |
-| 5.a.2 | Hệ thống | Hiển thị cảnh báo "Khoảng thời gian quá dài, vui lòng thu hẹp phạm vi để hiển thị nhanh hơn". |
-| 5.a.3 | Hệ thống | Gợi ý các mốc: 1 tháng, 3 tháng, 6 tháng. |
-
-### 6.a - Xuất dữ liệu
+### 4.a - Vital stale (>5 phút không ingest)
 
 | Bước | Người thực hiện | Hành động |
 |------|----------------|-----------|
-| 6.a.1 | Người dùng | Chọn "Xuất dữ liệu" (CSV/PDF). |
-| 6.a.2 | Hệ thống | Tạo file theo khoảng thời gian hiện tại. |
-| 6.a.3 | Hệ thống | Cho phép tải file CSV hoặc chia sẻ PDF (qua email/zalo,...). |
+| 4.a.1 | Hệ thống (BE) | `VITALS_STALE_AFTER` check. `VitalSignsResponse.is_stale = TRUE`. |
+| 4.a.2 | Client | `_buildVitalValueCard` render stale banner "Thiết bị mất kết nối" (F-8 M-9 fix). |
+| 4.a.3 | Client | Force `extractStatus = VitalStatus.unknown` để không mis-classify stale reading thành critical/normal. |
+
+### 5.a - Critical status hiện SOS button
+
+| Bước | Người thực hiện | Hành động |
+|------|----------------|-----------|
+| 5.a.1 | Client | `vitalStatus == VitalStatus.critical` thì render `_buildCriticalAction` SOS CTA. |
+| 5.a.2 | Người dùng | Tap SOS thì cascade sang UC030 SOS trigger flow. |
 
 ---
 
 ## Business Rules
 
-- **BR-007-01**: Mặc định hiển thị 24 giờ gần nhất khi vào màn hình chi tiết lần đầu.
-- **BR-007-02**: Sử dụng dữ liệu từ các bảng tổng hợp (theo 5 phút, theo giờ, theo ngày) để tối ưu hiệu năng.
-- **BR-007-03**: Chỉ cho phép chọn khoảng thời gian tối đa 1 năm trong 1 lần truy vấn.
-- **BR-007-04**: Tôn trọng quyền truy cập của caregiver (chỉ xem bệnh nhân mà họ được gán quyền giám sát). 
+- **BR-007-01:** Mặc định hiển thị 24 giờ gần nhất khi mở Vital Detail Screen. Match code `VitalSignsProvider.loadTimeseries(range: '24h')` default.
+- **BR-007-02:** Sử dụng continuous aggregates TimescaleDB:
+  - 24h range: `time_bucket('15 minutes')` runtime query trên `vitals` (chưa dùng CA riêng, raw query downsample inline, OK cho 24h window).
+  - 7d range: `time_bucket('60 minutes')`.
+  - 30d range: `time_bucket('360 minutes')` (6h).
+  - Phase 5+ consider switch sang CA `vitals_5min` / `vitals_hourly` / `vitals_daily` nếu load cao.
+- **BR-007-03 (DROPPED v2):** UC cũ nói "max 1 năm". Drop, code không expose custom range picker, chỉ có 3 preset max 30d. Nếu Phase 5+ add custom range, revisit.
+- **BR-007-04:** Tôn trọng quyền truy cập caregiver. Enforce ở `get_target_profile_id` (tested in `test_monitoring_routes_http.py::test_caregiver_cannot_access_unauthorized_profile`).
+- **BR-007-05 (stats min/max/avg, UC cũ step 4 Main Flow):** Phase 5+ scope. Code hiện không tính min/max/avg cho từng chỉ số trong detail screen. FE chỉ render line chart + current value + safe range bar. UC007 v2 drop step "Giá trị min/max/avg" khỏi Main Flow step 4.
 
----
+## Business Rules - Phân quyền
 
-
-## Business Rules - Phân quyền (Authorization)
-- **BR-Auth-01**: User A chỉ được phép truy vấn/xem dữ liệu y tế của User B nếu ID của cả hai tồn tại trong bảng `user_relationships` và có cờ `can_view_vitals = true` (hoặc User A xem dữ liệu của chính mình).
+- **BR-Auth-01:** User A chỉ xem dữ liệu User B nếu `can_view_vitals = TRUE`.
 
 ## Yêu cầu phi chức năng
 
-- **Performance**: 
-  - Thời gian tải biểu đồ chi tiết < 2 giây cho 30 ngày dữ liệu.
-- **Usability**: 
-  - Biểu đồ có chú thích rõ ràng, có thể chạm vào điểm dữ liệu để xem giá trị chính xác.
-  - Hỗ trợ zoom/pan trên biểu đồ (trên mobile dùng pinch-to-zoom).
-- **Security**: 
-  - Các API lấy dữ liệu chi tiết phải xác thực JWT và kiểm tra quyền truy cập.
+- **Performance**:
+  - Thời gian tải chart 24h < 1 giây (96 bucket, payload <10 KB).
+  - Thời gian tải chart 30d < 2 giây (120 bucket).
+  - Polling 5s KHÔNG re-fetch timeseries (idempotent) để không overload BE.
+- **Usability**:
+  - Safe range bar 5-zone màu sắc dễ hiểu cho người lớn tuổi.
+  - Education card collapsible text giải thích y khoa tiếng Việt.
+  - Touch target >=48dp (medical app accessibility).
+  - Pinch-to-zoom chart là Phase 5+ (chart hiện chỉ hiển thị fixed range).
+- **Security**: API JWT auth + BR-Auth-01 enforce.
 
+---
+
+## Dropped features (UC cũ drop trong v2)
+
+- Alt 5.a "khoảng thời gian quá dài > 1 năm": Drop vì preset range max 30d, không cần validation edge case này.
+- Alt 6.a "Xuất CSV/PDF": Drop (D-MON-01). Admin web HealthGuard đã có export CSV. Mobile = view-only.
+- Main Flow step 4 "min/max/avg stats panel": Drop (xem BR-007-05). Phase 5+ scope.
+- Main Flow step 4 "Số lần vượt ngưỡng cảnh báo": Drop. Phase 5+ scope.
+
+---
+
+## Implementation references
+
+- Route BE: `health_system/backend/app/api/routes/monitoring.py` — `get_vitals_timeseries`
+- Service BE: `health_system/backend/app/services/monitoring_service.py` — `get_vitals_timeseries`, `_VITALS_TIMESERIES_RANGES`
+- FE screen: `health_system/lib/features/health_monitoring/screens/vital_detail_screen.dart`
+- FE widgets: `VitalSafeRangeBar`, `MiniLineChart`, `VitalEducationCard`, `EmptyChartPlaceholder`
+- FE provider: `health_system/lib/features/health_monitoring/providers/vital_signs_provider.dart`
+- FE repo: `health_system/lib/features/health_monitoring/repositories/monitoring_repository.dart` — `getVitalsTimeseries(range: '24h')`
+- Related UCs: UC006 (entry point), UC008 (longer history), UC030 (SOS trigger from critical)

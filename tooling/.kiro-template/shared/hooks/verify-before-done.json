@@ -1,0 +1,12 @@
+{
+  "name": "Verify Before Claiming Done",
+  "version": "1.0.0",
+  "description": "Khi agent dừng (hoàn thành task), nhắc nhở phải verify bằng evidence thực tế trước khi claim done.",
+  "when": {
+    "type": "agentStop"
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "TRƯỚC KHI KẾT THÚC, tự kiểm tra:\n\n1. Đã chạy test chưa? (flutter test / pytest / npm test) — output 0 fail?\n2. Đã chạy lint chưa? (flutter analyze / black --check / npm run lint) — 0 error?\n3. Nếu fix bug: đã verify regression test red→green→revert→red→restore→green?\n4. Nếu feature: đã check acceptance criteria line-by-line vs spec/UC?\n5. Có claim nào dùng 'should', 'probably', 'seems to' mà chưa verify?\n\nNếu chưa verify → chạy verification command ngay.\nNếu đã verify → tóm tắt: đã làm gì, đã test gì, còn gì chưa làm, flag rủi ro nếu có."
+  }
+}

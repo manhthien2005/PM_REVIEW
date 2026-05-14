@@ -27,6 +27,17 @@ Ví dụ: `001-workspace-tooling-host.md`.
 | 002 | Bug log + ADR centralized in PM_REVIEW | 🟢 Accepted | 2026-05-11 | workspace, anti-loop |
 | 003 | HealthGuard trunk = develop (deploy user-owned) | 🟢 Accepted | 2026-05-11 | git, branching, healthguard, workflow |
 | 004 | Standardize API prefix `/api/v1/{domain}/*` cho all backend services | 🟢 Accepted | 2026-05-11 | api, cross-repo, backend, refactor, workflow |
+| 005 | Internal service-to-service authentication strategy | 🟢 Accepted | 2026-05-12 | security, cross-repo, backend, healthguard, health_system, model-api, iot-sim |
+| 006 | MLOps workflow — mock implementation, defer real integration | 🟢 Accepted | 2026-05-12 | scope, mlops, healthguard, ai-models, graduation-project |
+| 007 | AI model artifact storage decouples from serving — defer R2-to-runtime integration | 🟢 Accepted | 2026-05-12 | architecture, ai-models, healthguard, model-api, cross-repo, scope |
+| 008 | Mobile BE không host system settings write — admin BE là single source of truth | 🟢 Accepted | 2026-05-12 | architecture, mobile-backend, health_system, healthguard, cross-repo, simplification, scope, dead-code |
+| 009 | Avatar storage = Supabase (mobile) — intentional cross-repo split với R2 (admin AI) | 🟢 Accepted | 2026-05-12 | architecture, mobile-frontend, health_system, healthguard, cross-repo, storage, scope |
+| 010 | Devices schema canonical = PM_REVIEW (user_id nullable, ON DELETE SET NULL) | 🟢 Accepted | 2026-05-13 | database, schema, cross-repo, health_system, iot-sim, canonical |
+| 011 | UC040 Connect Device = pair-create only (drop pair-claim flow) | 🟢 Accepted | 2026-05-13 | scope, uc, health_system, mobile, graduation-project |
+| 012 | Drop calibration offset fields (heart_rate_offset, spo2_calibration, temperature_offset) | 🟢 Accepted | 2026-05-13 | scope, schema, health_system, mobile, dead-code, graduation-project |
+| 013 | IoT Simulator direct-DB write cho vitals tick (bypass BE) | 🟢 Accepted | 2026-05-13 | architecture, iot-sim, health_system, cross-repo, performance, scope |
+| 014 | IoT Simulator profile taxonomy - unified HealthProfile | 🟢 Accepted | 2026-05-13 | architecture, iot-sim, persona, scope, simulator-web, phase4-prereq |
+| 015 | Alert severity taxonomy - clarify 4 layers + fix BE enum drift | 🟢 Accepted | 2026-05-13 | architecture, severity, cross-repo, health_system, iot-sim, healthguard, database, schema |
 
 ## By tag
 
@@ -48,31 +59,141 @@ Ví dụ: `001-workspace-tooling-host.md`.
 
 ### healthguard
 - 003-healthguard-trunk-strategy
+- 005-internal-service-secret-strategy
+- 006-mlops-mock-vs-real-integration
+- 007-r2-artifact-vs-model-api-serving-disconnect
+- 008-mobile-be-no-system-settings-write
+- 009-avatar-storage-supabase-mobile-only
 
 ### workflow
 - 003-healthguard-trunk-strategy
 - 004-api-prefix-standardization
 
 ### security
-_(none yet)_
+- 005-internal-service-secret-strategy
 
 ### mobile
-_(none yet)_
+- 011-uc040-pair-create-only
+- 012-drop-calibration-offset-fields
+
+### mobile-backend
+- 008-mobile-be-no-system-settings-write
+
+### mobile-frontend
+- 009-avatar-storage-supabase-mobile-only
+
+### health_system
+- 005-internal-service-secret-strategy
+- 008-mobile-be-no-system-settings-write
+- 009-avatar-storage-supabase-mobile-only
+- 010-devices-schema-canonical
+- 011-uc040-pair-create-only
+- 012-drop-calibration-offset-fields
+- 013-iot-sim-direct-db-write-vitals
 
 ### backend
 - 004-api-prefix-standardization
+- 005-internal-service-secret-strategy
 
 ### database
-_(none yet)_
+- 010-devices-schema-canonical
+- 012-drop-calibration-offset-fields
+
+### schema
+- 010-devices-schema-canonical
+- 012-drop-calibration-offset-fields
+
+### canonical
+- 010-devices-schema-canonical
+- 015-alert-severity-taxonomy-mapping
+
+### iot-sim
+- 005-internal-service-secret-strategy
+- 010-devices-schema-canonical
+- 013-iot-sim-direct-db-write-vitals
+- 014-profile-taxonomy-health-profile-unified
+- 015-alert-severity-taxonomy-mapping
+
+### uc
+- 011-uc040-pair-create-only
+
+### devices
+- 010-devices-schema-canonical
 
 ### cross-repo
 - 004-api-prefix-standardization
+- 005-internal-service-secret-strategy
+- 007-r2-artifact-vs-model-api-serving-disconnect
+- 008-mobile-be-no-system-settings-write
+- 009-avatar-storage-supabase-mobile-only
+- 010-devices-schema-canonical
+- 013-iot-sim-direct-db-write-vitals
+- 015-alert-severity-taxonomy-mapping
 
 ### api
 - 004-api-prefix-standardization
 
 ### refactor
 - 004-api-prefix-standardization
+
+### scope
+- 006-mlops-mock-vs-real-integration
+- 007-r2-artifact-vs-model-api-serving-disconnect
+- 008-mobile-be-no-system-settings-write
+- 009-avatar-storage-supabase-mobile-only
+- 011-uc040-pair-create-only
+- 012-drop-calibration-offset-fields
+- 013-iot-sim-direct-db-write-vitals
+- 014-profile-taxonomy-health-profile-unified
+
+### mlops
+- 006-mlops-mock-vs-real-integration
+
+### ai-models
+- 006-mlops-mock-vs-real-integration
+- 007-r2-artifact-vs-model-api-serving-disconnect
+
+### architecture
+- 007-r2-artifact-vs-model-api-serving-disconnect
+- 008-mobile-be-no-system-settings-write
+- 009-avatar-storage-supabase-mobile-only
+- 013-iot-sim-direct-db-write-vitals
+- 014-profile-taxonomy-health-profile-unified
+- 015-alert-severity-taxonomy-mapping
+
+### severity
+- 015-alert-severity-taxonomy-mapping
+
+### persona
+- 014-profile-taxonomy-health-profile-unified
+
+### simulator-web
+- 014-profile-taxonomy-health-profile-unified
+
+### phase4-prereq
+- 014-profile-taxonomy-health-profile-unified
+- 015-alert-severity-taxonomy-mapping
+
+### performance
+- 013-iot-sim-direct-db-write-vitals
+
+### storage
+- 009-avatar-storage-supabase-mobile-only
+
+### simplification
+- 008-mobile-be-no-system-settings-write
+
+### dead-code
+- 008-mobile-be-no-system-settings-write
+- 012-drop-calibration-offset-fields
+
+### model-api
+- 007-r2-artifact-vs-model-api-serving-disconnect
+
+### graduation-project
+- 006-mlops-mock-vs-real-integration
+- 011-uc040-pair-create-only
+- 012-drop-calibration-offset-fields
 
 ---
 
