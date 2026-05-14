@@ -1,0 +1,13 @@
+{
+  "name": "Trunk Branch Guard",
+  "version": "1.0.0",
+  "description": "Ngăn commit/push trực tiếp lên trunk branches (develop, main, master, deploy). Yêu cầu tạo feature branch.",
+  "when": {
+    "type": "preToolUse",
+    "toolTypes": ["shell"]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Nếu lệnh là `git commit` hoặc `git push`:\n1. Kiểm tra branch hiện tại (git branch --show-current)\n2. Nếu đang trên: develop, main, master, deploy, production, prod, release → BLOCK\n3. Yêu cầu: tạo branch `feat/<desc>` hoặc `fix/<desc>` từ trunk trước khi commit.\n\nNếu lệnh KHÔNG phải git commit/push → bỏ qua, cho phép thực thi."
+  }
+}
