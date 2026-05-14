@@ -1,12 +1,13 @@
 # Bug HS-002: Cross-user MAC duplicate bypass — BR-040-01 violation
 
-**Status:** 🔴 Open
+**Status:** ✅ Resolved
 **Repo(s):** health_system (mobile BE)
 **Module:** device
 **Severity:** High
 **Reporter:** ThienPDM (self) via Phase 0.5 DEVICE deep-dive
 **Created:** 2026-05-13
-**Resolved:** —
+**Resolved:** 2026-05-14
+**Fix commit:** `6ce10f1` (PM_REVIEW canonical SQL + 3 partial UNIQUE indexes) + `0a0b0c1` (health_system service drop user_id filter + cross-user 409 mapping)
 
 ## Symptom
 

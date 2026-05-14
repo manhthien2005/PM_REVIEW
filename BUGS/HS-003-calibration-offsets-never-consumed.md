@@ -1,12 +1,13 @@
 # Bug HS-003: Device calibration offsets never consumed (dead write-only data)
 
-**Status:** 🔴 Open
+**Status:** ✅ Resolved
 **Repo(s):** health_system (mobile BE + FE), cross-repo impact Iot_Simulator_clean
 **Module:** device
 **Severity:** Medium
 **Reporter:** ThienPDM (self) via Phase 0.5 DEVICE deep-dive
 **Created:** 2026-05-13
-**Resolved:** —
+**Resolved:** 2026-05-14
+**Fix commit:** `6ce10f1` (PM_REVIEW canonical comment cleanup + cleanup migration) + `0a0b0c1` (health_system schema drop 3 fields + service stop writing dead keys). Mobile FE consumer update is logged as deferred follow-up Phase 5+.
 
 ## Symptom
 
