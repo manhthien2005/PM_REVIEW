@@ -55,17 +55,23 @@ ALTER TABLE user_push_tokens
 ALTER TABLE user_push_tokens
     ADD COLUMN IF NOT EXISTS last_sync_at TIMESTAMPTZ;
 
--- 4. Rename UNIQUE constraint
+-- 4. Rename UNIQUE constraint - chi rename neu constraint THUOC table user_push_tokens
 DO $$
 BEGIN
     IF EXISTS (
         SELECT 1
-        FROM pg_constraint
-        WHERE conname = 'uq_user_fcm_token'
+        FROM pg_constraint c
+        JOIN pg_class t ON c.conrelid = t.oid
+        JOIN pg_namespace n ON t.relnamespace = n.oid
+        WHERE c.conname = 'uq_user_fcm_token'
+          AND t.relname = 'user_push_tokens'
+          AND n.nspname = 'public'
     ) THEN
         ALTER TABLE user_push_tokens
             RENAME CONSTRAINT uq_user_fcm_token TO uq_user_push_token;
         RAISE NOTICE 'Renamed constraint uq_user_fcm_token -> uq_user_push_token';
+    ELSE
+        RAISE NOTICE 'Skip rename constraint: uq_user_fcm_token not found on user_push_tokens';
     END IF;
 END $$;
 
