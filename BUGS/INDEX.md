@@ -53,8 +53,6 @@ Ví dụ: `HG-001`, `HS-005`, `XR-002`.
 | [IS-012](./IS-012-etl-silent-skip-masks-data-loss.md) | Iot_Simulator_clean | etl_pipeline/normalize | ETL silent skip mask data loss — pipeline exits success với 0 rows nếu tất cả subject fail | Low | 2026-05-13 | _(Phase 5 hygiene)_ | 🔴 Open |
 | [IS-013](./IS-013-etl-uses-vitaldb-private-method.md) | Iot_Simulator_clean | etl_pipeline/normalize + dataset_adapters/vitaldb | ETL truy cập `vitaldb._resolve_track` private method — encapsulation violation | Low | 2026-05-13 | _(Phase 5 hygiene)_ | 🔴 Open |
 | [HS-025](./HS-025-test-fixture-mock-drift.md) | health_system | backend/tests (multi-file) | 21 tests fail mock chain/fixture drift voi service impl - pre-existing test debt | Low | 2026-05-14 | _(defer Phase 5+ test cleanup)_ | 🔴 Open |
-| [HS-026](./HS-026-telemetry-tests-missing-internal-header.md) | health_system | backend/tests telemetry | 14 telemetry tests fail thieu X-Internal-Service header sau Phase 4 BLOCK 3 | Medium | 2026-05-14 | _(must fix truoc Phase 5)_ | 🔴 Open |
-| [HS-027](./HS-027-device-settings-schema-still-exposes-calibration.md) | health_system | schemas/device | DeviceSettingsRequest van expose 3 calibration field sau HS-003 partial fix | Medium | 2026-05-14 | _(must fix cung HS-026 batch)_ | 🔴 Open |
 
 ## In progress
 
@@ -103,6 +101,9 @@ Ví dụ: `HG-001`, `HS-005`, `XR-002`.
 | D-014 | healthguard-model-api | system | /health collide with /api/v1/health/* | 2026-05-14 | PR #7 (Session A BLOCK 4) |
 | D-015 | Iot_Simulator_clean | routers | 9 admin routers missing require_admin_key | 2026-05-14 | PR #12 (Session A BLOCK 6) |
 | D-020 | Iot_Simulator_clean | fall_ai_client | Fall AI client missing internal headers | 2026-05-14 | PR #11 (Session A BLOCK 5) |
+| HS-014 mobile | health_system | mobile/family | FamilyProfileSnapshot mobile parser align canonical (sleepQuality default + 21 field) | 2026-05-14 | PR #51 commit a719160 + parent BE Session B BLOCK 4 |
+| HS-026 | health_system | tests telemetry | 14 tests fail thieu X-Internal-Service header sau Phase 4 BLOCK 3 | 2026-05-14 | PR #50 commit c192bc0 |
+| HS-027 | health_system | schemas/device | DeviceSettingsRequest van expose 3 calibration field sau HS-003 partial | 2026-05-14 | PR #50 commit c192bc0 |
 
 ## Won't fix
 
@@ -126,11 +127,11 @@ Bugs affecting ≥ 2 repos require special handling. Track repo-impact matrix:
 
 ## Quick stats
 
-- Total open: 15 (HG-001, XR-001, XR-003, HS-008, HS-019, HS-022, HS-024, HS-025, HS-026, HS-027, IS-005, IS-008, IS-009, IS-012, IS-013)
+- Total open: 13 (HG-001, XR-001, XR-003, HS-008, HS-019, HS-022, HS-024, HS-025, IS-005, IS-008, IS-009, IS-012, IS-013)
 - Total in progress: 0
-- Total resolved: 30 (Session B: 12 + Session A: 18)
+- Total resolved: 33 (Session B: 12 + Session A: 18 + Phase 4 followup: 3)
 - Avg attempts to resolve: 1
-- Phase 4 reverify 2026-05-14 surface 3 follow-up bugs (HS-025, HS-026, HS-027) - chi tiet xem section Open
+- Phase 4 followup: HS-026 + HS-027 fixed PR #50, HS-014 mobile fixed PR #51, HS-025 defer Phase 5+
 
 > Update stats sau mỗi sprint hoặc theo demand.
 
