@@ -38,6 +38,8 @@ Ví dụ: `001-workspace-tooling-host.md`.
 | 013 | IoT Simulator direct-DB write cho vitals tick (bypass BE) | 🟢 Accepted | 2026-05-13 | architecture, iot-sim, health_system, cross-repo, performance, scope |
 | 014 | IoT Simulator profile taxonomy - unified HealthProfile | 🟢 Accepted | 2026-05-13 | architecture, iot-sim, persona, scope, simulator-web, phase4-prereq |
 | 015 | Alert severity taxonomy - clarify 4 layers + fix BE enum drift | 🟢 Accepted | 2026-05-13 | architecture, severity, cross-repo, health_system, iot-sim, healthguard, database, schema |
+| 016 | User push tokens canonical rename (fcm_tokens → push_tokens) | 🟢 Accepted | 2026-05-14 | database, schema, cross-repo, health_system, healthguard, canonical, push-notification |
+| 017 | UserRelationship default permission flip True (caregiver vitals + alerts) | 🟢 Accepted | 2026-05-14 | database, schema, health_system, mobile, uc, privacy |
 
 ## By tag
 
@@ -64,6 +66,7 @@ Ví dụ: `001-workspace-tooling-host.md`.
 - 007-r2-artifact-vs-model-api-serving-disconnect
 - 008-mobile-be-no-system-settings-write
 - 009-avatar-storage-supabase-mobile-only
+- 016-user-push-tokens-canonical-rename
 
 ### workflow
 - 003-healthguard-trunk-strategy
@@ -75,6 +78,7 @@ Ví dụ: `001-workspace-tooling-host.md`.
 ### mobile
 - 011-uc040-pair-create-only
 - 012-drop-calibration-offset-fields
+- 017-relationship-default-permission-true
 
 ### mobile-backend
 - 008-mobile-be-no-system-settings-write
@@ -90,6 +94,8 @@ Ví dụ: `001-workspace-tooling-host.md`.
 - 011-uc040-pair-create-only
 - 012-drop-calibration-offset-fields
 - 013-iot-sim-direct-db-write-vitals
+- 016-user-push-tokens-canonical-rename
+- 017-relationship-default-permission-true
 
 ### backend
 - 004-api-prefix-standardization
@@ -98,14 +104,19 @@ Ví dụ: `001-workspace-tooling-host.md`.
 ### database
 - 010-devices-schema-canonical
 - 012-drop-calibration-offset-fields
+- 016-user-push-tokens-canonical-rename
+- 017-relationship-default-permission-true
 
 ### schema
 - 010-devices-schema-canonical
 - 012-drop-calibration-offset-fields
+- 016-user-push-tokens-canonical-rename
+- 017-relationship-default-permission-true
 
 ### canonical
 - 010-devices-schema-canonical
 - 015-alert-severity-taxonomy-mapping
+- 016-user-push-tokens-canonical-rename
 
 ### iot-sim
 - 005-internal-service-secret-strategy
@@ -116,6 +127,7 @@ Ví dụ: `001-workspace-tooling-host.md`.
 
 ### uc
 - 011-uc040-pair-create-only
+- 017-relationship-default-permission-true
 
 ### devices
 - 010-devices-schema-canonical
@@ -129,6 +141,7 @@ Ví dụ: `001-workspace-tooling-host.md`.
 - 010-devices-schema-canonical
 - 013-iot-sim-direct-db-write-vitals
 - 015-alert-severity-taxonomy-mapping
+- 016-user-push-tokens-canonical-rename
 
 ### api
 - 004-api-prefix-standardization

@@ -43,23 +43,11 @@ Ví dụ: `HG-001`, `HS-005`, `XR-002`.
 | [HG-001](./HG-001-admin-web-alerts-always-unread.md) | HealthGuard | health.service (admin) | Admin web hiển thị tất cả alerts là 'unread' do code wrong assumption | Medium | 2026-05-11 | _(deferred Phase 4)_ | 🔴 Open |
 | [IS-001](./IS-001-sleep-ai-client-wrong-path.md) | Iot_Simulator_clean | simulator_core/sleep_ai_client | Sleep AI client POST tới /predict (404) thay vì /api/v1/sleep/predict | Critical | 2026-05-11 | _(deferred Phase 4)_ | 🔴 Open |
 | [XR-001](./XR-001-topology-steering-endpoint-prefix-drift.md) | Cross-repo (5) | Steering / docs | Topology steering claim `/api/internal/*` cho IoT sim → BE sai so với code (reality `/mobile/*`) | Medium | 2026-05-13 | _(pending chore branch)_ | 🔴 Open |
-| [HS-001](./HS-001-devices-schema-drift-canonical.md) | health_system (+ iot-sim) | device | Devices schema drift — user_id NOT NULL/CASCADE vs nullable/SET NULL | Critical | 2026-05-13 | _(Phase 4 scheduled per ADR-010)_ | 🔴 Open |
-| [HS-002](./HS-002-device-unique-mac-cross-user-bypass.md) | health_system | device | Cross-user MAC duplicate bypass — BR-040-01 violation | High | 2026-05-13 | _(Phase 4 scheduled)_ | 🔴 Open |
-| [HS-003](./HS-003-calibration-offsets-never-consumed.md) | health_system (+ iot-sim) | device | Device calibration offsets never consumed (dead write-only data) | Medium | 2026-05-13 | _(Phase 4 scheduled per ADR-012)_ | 🔴 Open |
 | [HS-004](./HS-004-telemetry-sleep-endpoints-no-auth.md) | health_system (+ iot-sim) | telemetry | Mobile telemetry endpoints (/sleep, /sleep-risk, /imu-window) thiếu auth guard | Critical | 2026-05-13 | _(Phase 4 scheduled per ADR-005)_ | 🔴 Open |
 | [HS-005](../AUDIT_2026/tier2/health_system/BE_M01_main_bootstrap_audit.md) | health_system | main_bootstrap | CORS wildcard origins cộng allow_credentials True trong main.py — anti-pattern Security=0 force Critical | Critical | 2026-05-13 | _(Phase 4 scheduled — flagged BE-M01 audit Phase 1)_ | 🔴 Open |
 | [HS-006](../AUDIT_2026/tier2/health_system/BE_M08_core_audit.md) | health_system | core/dependencies | `require_internal_service` fail-OPEN khi internal service secret env var unset — chỉ còn header match trivially spoofable; không align ADR-005 mandate | High | 2026-05-13 | _(Phase 4 scheduled — flagged BE-M08 audit Phase 1)_ | 🔴 Open |
 | [HS-007](../AUDIT_2026/tier2/health_system/BE_M09_utils_audit.md) | health_system | utils/jwt | JWT access TTL hardcoded 30 days, `settings.ACCESS_TOKEN_EXPIRE_DAYS` never consumed — config là dead value, ops không thể rotate TTL qua env | High | 2026-05-13 | _(Phase 4 scheduled — flagged BE-M09 audit Phase 1)_ | 🔴 Open |
 | [HS-008](../AUDIT_2026/tier2/health_system/BE_M09_utils_audit.md) | health_system | utils/rate_limiter | In-memory `defaultdict` rate limiter — multi-worker bypass + restart reset counter + check-then-act TOCTOU race | Medium | 2026-05-13 | _(Phase 4 scheduled — flagged BE-M09 audit Phase 1)_ | 🔴 Open |
-| [HS-009](../AUDIT_2026/tier2/health_system/BE_M04_models_audit.md) | health_system | models/push_token | `UserPushToken` ORM `__tablename__="user_push_tokens"` không match canonical `user_fcm_tokens` — deploy qua canonical SQL → ORM bind tới relation không tồn tại, FCM register/dispatch raise ProgrammingError | Critical | 2026-05-13 | _(Phase 4 scheduled — flagged BE-M04 audit Phase 1)_ | 🔴 Open |
-| [HS-010](../AUDIT_2026/tier2/health_system/BE_M04_models_audit.md) | health_system | models/alert | `Alert` ORM thiếu 7 field canonical (sos_event_id, sent_at, delivered_at, read_at, acknowledged_at, sent_via, expires_at) + thiếu CHECK alert_type 12 values | High | 2026-05-13 | _(Phase 4 scheduled — flagged BE-M04 audit Phase 1)_ | 🔴 Open |
-| [HS-011](../AUDIT_2026/tier2/health_system/BE_M04_models_audit.md) | health_system | models/audit_log | `AuditLog` ORM drift canonical: missing FK user_id+device_id, missing field device_id+error_message, type drift ip_address String(50) vs INET, missing CHECK status | High | 2026-05-13 | _(Phase 4 scheduled — flagged BE-M04 audit Phase 1)_ | 🔴 Open |
-| [HS-012](../AUDIT_2026/tier2/health_system/BE_M04_models_audit.md) | health_system | models/relationship | `UserRelationship` default permission flip canonical `true` → ORM `False` cho can_view_vitals+can_receive_alerts; caregiver mới link KHÔNG nhận alert mặc định, mâu thuẫn UC040 | Medium | 2026-05-13 | _(Phase 4 scheduled — ADR-016 proposed)_ | 🔴 Open |
-| [HS-013](../AUDIT_2026/tier2/health_system/BE_M04_models_audit.md) | health_system | models/risk_alert_response | `RiskAlertResponse` type drift: risk_score_id+device_id Integer vs BIGINT, latitude+longitude Float (REAL 4-byte) vs DOUBLE PRECISION; precision drift inconsistent với FallEvent.latitude Numeric(10,8) | Medium | 2026-05-13 | _(Phase 4 scheduled — flagged BE-M04 audit Phase 1)_ | 🔴 Open |
-| [HS-014](../AUDIT_2026/tier2/health_system/BE_M05_schemas_audit.md) | health_system | schemas/family+relationship | Duplicate `FamilyProfileSnapshot` định nghĩa 2 lần với field set khác (family.py 19 field vs relationship.py 21 field + default sleep_quality khác); 2 endpoint cùng response_model name shape khác nhau | High | 2026-05-13 | _(Phase 4 scheduled — flagged BE-M05 audit Phase 1)_ | 🔴 Open |
-| [HS-015](../AUDIT_2026/tier2/health_system/BE_M05_schemas_audit.md) | health_system | schemas (all Request) | Missing `model_config = ConfigDict(extra="forbid")` cho 12+ Request schema → silent drop unknown field, UX dev experience kém khi typo field name | Low | 2026-05-13 | _(Phase 4 scheduled — flagged BE-M05 audit Phase 1)_ | 🔴 Open |
-| [HS-016](../AUDIT_2026/tier2/health_system/BE_M05_schemas_audit.md) | health_system | schemas/auth | Password policy inconsistent: RegisterRequest min_length=8 vs ResetPasswordRequest+ChangePasswordRequest min_length=6; reset/change cho phép password yếu hơn original register | Low | 2026-05-13 | _(Phase 4 scheduled — flagged BE-M05 audit Phase 1)_ | 🔴 Open |
-| [HS-017](../AUDIT_2026/tier2/health_system/BE_M05_schemas_audit.md) | health_system | schemas/emergency | `PatientInfo.date_of_birth: Optional[str]` thay vì `date` → no format coercion/validation, accept "2026-13-45" hay "abcdef"; inconsistent với RegisterRequest.date_of_birth: Optional[date] | Low | 2026-05-13 | _(Phase 4 scheduled — flagged BE-M05 audit Phase 1)_ | 🔴 Open |
 | [HS-018](../AUDIT_2026/tier2/health_system/BE_M02_routes_audit.md) | health_system | routes/auth/deep-link-redirect | XSS reflected qua HTML f-string interpolation user query param trong deep_link_redirect; attacker craft email link execute JS trên BE domain → cookie/JWT exfiltration | Critical | 2026-05-13 | _(Phase 4 scheduled — flagged BE-M02 audit Phase 1)_ | 🔴 Open |
 | [HS-019](../AUDIT_2026/tier2/health_system/BE_M02_routes_audit.md) | health_system | routes/risk | Router risk.py execute SQL text() trực tiếp 5 endpoint helper — vi phạm layer separation steering 22-fastapi.md (business logic phải ở service, không ở router) | Medium | 2026-05-13 | _(Phase 4 scheduled — flagged BE-M02 audit Phase 1)_ | 🔴 Open |
 | [HS-020](../AUDIT_2026/tier2/health_system/BE_M06_repositories_db_audit.md) | health_system | db/memory_db | Plaintext admin credential committed git (admin email + weak password literal); no `# DEV ONLY` annotation + unclear consumer; auto-flag anti-pattern hardcoded credential committed git | Critical | 2026-05-13 | _(Phase 4 scheduled — flagged BE-M06 audit Phase 1)_ | 🔴 Open |
@@ -95,7 +83,18 @@ Ví dụ: `HG-001`, `HS-005`, `XR-002`.
 
 | ID | Repo | Module | Title | Resolved | Fix commit |
 |---|---|---|---|---|---|
-| _(none yet)_ | | | | | |
+| [HS-001](./HS-001-devices-schema-drift-canonical.md) | health_system | device | Devices schema drift — user_id NOT NULL/CASCADE vs nullable/SET NULL | 2026-05-14 | `6ce10f1` (PM_REVIEW) + `0a0b0c1` (HS BE) |
+| [HS-002](./HS-002-device-unique-mac-cross-user-bypass.md) | health_system | device | Cross-user MAC duplicate bypass — BR-040-01 violation | 2026-05-14 | `6ce10f1` + `0a0b0c1` |
+| [HS-003](./HS-003-calibration-offsets-never-consumed.md) | health_system | device | Device calibration offsets never consumed | 2026-05-14 | `6ce10f1` + `0a0b0c1` (mobile FE consumer deferred Phase 5+) |
+| HS-009 | health_system | models/push_token | `UserPushToken` table name canonical drift (fcm_tokens → push_tokens) | 2026-05-14 | `6ce10f1` (canonical rename + ADR-016) |
+| HS-010 | health_system | models/alert | Alert ORM 7 missing canonical fields + alert_type CHECK | 2026-05-14 | `782ac61` (BLOCK 3) |
+| HS-011 | health_system | models/audit_log | AuditLog FK + INET + CHECK status canonical | 2026-05-14 | `782ac61` |
+| HS-012 | health_system | models/relationship | UserRelationship default permission False vs canonical True | 2026-05-14 | `782ac61` + ADR-017 + migration `20260514_relationship_default_permission.sql` |
+| HS-013 | health_system | models/risk_alert_response | RiskAlertResponse Integer/Float vs canonical BigInteger/Numeric precision | 2026-05-14 | `782ac61` |
+| HS-014 | health_system | schemas/family+relationship | Duplicate FamilyProfileSnapshot 19 vs 21 field | 2026-05-14 | `0d832a4` (BLOCK 4 - mobile FE consumer task deferred) |
+| HS-015 | health_system | schemas (Request) | Missing extra=forbid on Request schemas | 2026-05-14 | `0d832a4` |
+| HS-016 | health_system | schemas/auth | Password min_length inconsistency 6 vs 8 | 2026-05-14 | `0d832a4` |
+| HS-017 | health_system | schemas/emergency | PatientInfo.date_of_birth Optional[str] vs Optional[date] | 2026-05-14 | `0d832a4` |
 
 ## Won't fix
 
@@ -119,11 +118,11 @@ Bugs affecting ≥ 2 repos require special handling. Track repo-impact matrix:
 
 ## Quick stats
 
-- Total open: 24 (HG-001, IS-001, IS-002, IS-003, IS-004, IS-005, IS-008, IS-009, IS-010, IS-011, IS-012, IS-013, XR-001, XR-002, XR-003, HS-001, HS-002, HS-003, HS-004, HS-005, HS-006, HS-007, HS-008, HS-024) — Phase 0.5 + Phase 1 + Phase 3 deep-dive complete
+- Total open: 26 (HG-001, IS-001, IS-002, IS-003, IS-004, IS-005, IS-008, IS-009, IS-010, IS-011, IS-012, IS-013, XR-001, XR-002, XR-003, HS-004, HS-005, HS-006, HS-007, HS-008, HS-018, HS-019, HS-020, HS-021, HS-022, HS-023, HS-024) — Session B Phase 4 closed 12 bugs (HS-001/2/3 + HS-009..017)
 - Total in progress: 1 (PM-001)
-- Total resolved: 0
-- Avg attempts to resolve: N/A
-- Most-affected module: sleep_service (3 bug IS-002/003/004), sim_admin_service (2 bug IS-008/009), http_publisher (2 bug IS-010/011), etl_pipeline (2 bug IS-012/013), device (3 bug), telemetry (1 bug HS-004 Critical), main_bootstrap (1 bug HS-005 Critical), core/dependencies (1 bug HS-006 High), utils (2 bug HS-007 High + HS-008 Medium), pre_model_trigger (1 cluster IS-005)
+- Total resolved: 12 (HS-001, HS-002, HS-003, HS-009, HS-010, HS-011, HS-012, HS-013, HS-014, HS-015, HS-016, HS-017)
+- Avg attempts to resolve: 1 (Session B closed all on first attempt with regression tests)
+- Most-affected module: schemas (4 bugs HS-014/15/16/17 batch closed), models (4 bugs HS-010/11/12/13 batch closed), device (3 bugs HS-001/002/003 closed); sleep_service (3 bug IS-002/003/004), sim_admin_service (2 bug IS-008/009), http_publisher (2 bug IS-010/011), etl_pipeline (2 bug IS-012/013), telemetry (1 bug HS-004 Critical), main_bootstrap (1 bug HS-005 Critical), core/dependencies (1 bug HS-006 High), utils (2 bug HS-007 High + HS-008 Medium), pre_model_trigger (1 cluster IS-005)
 
 > Update stats sau mỗi sprint hoặc theo demand.
 

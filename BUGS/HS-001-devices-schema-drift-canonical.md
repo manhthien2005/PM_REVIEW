@@ -1,12 +1,13 @@
 # Bug HS-001: Devices schema drift — user_id NOT NULL/CASCADE vs nullable/SET NULL
 
-**Status:** 🔴 Open
+**Status:** ✅ Resolved
 **Repo(s):** health_system (mobile BE), PM_REVIEW (canonical), cross-repo impact Iot_Simulator_clean
 **Module:** device
 **Severity:** Critical
 **Reporter:** ThienPDM (self) via Phase 0.5 DEVICE deep-dive
 **Created:** 2026-05-13
-**Resolved:** —
+**Resolved:** 2026-05-14
+**Fix commit:** `6ce10f1` (PM_REVIEW chore/canonical-sql-alignment) + `0a0b0c1` (health_system fix/devices-canonical-and-mac-v2)
 
 ## Symptom
 
