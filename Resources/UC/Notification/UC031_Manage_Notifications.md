@@ -7,10 +7,10 @@
 | **Mã UC**          | UC031                                                                                                                         |
 | **Tên UC**         | Quản lý thông báo                                                                                                             |
 | **Tác nhân chính** | Bệnh nhân, Người chăm sóc                                                                                                     |
-| **Mô tả**          | Người dùng quản lý trung tâm thông báo của mình: xem danh sách thông báo, đánh dấu đã đọc, cấu hình loại thông báo muốn nhận. |
-| **Trigger**        | Người dùng mở màn hình "Thông báo" hoặc "Cài đặt thông báo".                                                                  |
-| **Tiền điều kiện** | Người dùng đã đăng nhập.                                                                                                      |
-| **Hậu điều kiện**  | Trạng thái đọc/tham số cấu hình thông báo của người dùng được cập nhật.                                                       |
+| **Mô tả**          | Người dùng quản lý trung tâm thông báo của mình: xem danh sách thông báo, lọc theo mức độ/loại, đánh dấu đã đọc (từng mục hoặc tất cả). |
+| **Trigger**        | Người dùng mở màn hình "Thông báo".                                                                                            |
+| **Tiền điều kiện** | Người dùng đã đăng nhập.                                                                                                                      |
+| **Hậu điều kiện**  | Trạng thái đọc của thông báo (từng mục hoặc tất cả) được cập nhật.                                                              |
 
 ---
 
@@ -29,43 +29,30 @@
 
 ## Luồng thay thế (Alternative Flows)
 
-### 3.a - Lọc theo mức độ
+### 3.a - Lọc theo mức độ / loại thông báo (client-side)
 
-| Bước  | Người thực hiện | Hành động                                          |
-| ----- | --------------- | -------------------------------------------------- |
-| 3.a.1 | Người dùng      | Chọn filter: Tất cả / Chỉ critical / Chỉ chưa đọc. |
-| 3.a.2 | Hệ thống        | Lọc danh sách dựa trên `severity` và `read_at`.    |
+| Bước  | Người thực hiện | Hành động                                                                              |
+| ----- | --------------- | -------------------------------------------------------------------------------------- |
+| 3.a.1 | Người dùng      | Chọn filter mức độ (Tất cả / Chưa đọc / Đã đọc) hoặc loại (SOS / Sức khoẻ / Thuốc / Hệ thống).     |
+| 3.a.2 | Hệ thống        | Lọc danh sách client-side trên dữ liệu đã tải; chỉ filter "Chưa đọc" gửi query `unread_only=true` lên BE. |
+
+**Implementation note (Phase 0.5):** Client-side filter là intentional — dataset mobile nhỏ (< 100 notif/user), FE filter local nhanh hơn round-trip BE. BR-031-03 quick filter "critical only" thực thi qua type filter `sos`/`health` ở FE.
 
 ### 6.a - Đánh dấu tất cả là đã đọc
 
 | Bước  | Người thực hiện | Hành động                                                          |
 | ----- | --------------- | ------------------------------------------------------------------ |
 | 6.a.1 | Người dùng      | Chọn "Đánh dấu tất cả là đã đọc".                                  |
-| 6.a.2 | Hệ thống        | Cập nhật trạng thái đã đọc cho tất cả thông báo chưa đọc của user. |
-
-### 5.a - Xác nhận đã xem thông báo quan trọng
-
-| Bước  | Người thực hiện | Hành động                                                                                        |
-| ----- | --------------- | ------------------------------------------------------------------------------------------------ |
-| 5.a.1 | Người dùng      | Nhấn "Xác nhận đã xem" trên thông báo mức critical/high                                          |
-| 5.a.2 | Hệ thống        | Ghi nhận thời điểm xác nhận (khác với thời điểm đọc — acknowledge = hành động chủ động xác nhận) |
-
-### 1.a - Cấu hình loại thông báo muốn nhận
-
-| Bước  | Người thực hiện | Hành động                                                                                                                                                     |
-| ----- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1.a.1 | Người dùng      | Mở "Cài đặt thông báo".                                                                                                                                       |
-| 1.a.2 | Hệ thống        | Hiển thị các tuỳ chọn: nhận thông báo cho các loại `alert_type` (vital_abnormal, fall_detected, sos_triggered, high_risk_score, device_offline, low_battery). |
-| 1.a.3 | Người dùng      | Bật/tắt từng loại theo nhu cầu (VD: cho phép low_battery chỉ ở mức push, không SMS).                                                                          |
-| 1.a.4 | Hệ thống        | Lưu cấu hình vào bảng settings của user (có thể là JSON hoặc bảng riêng).                                                                                     |
+| 6.a.2 | Hệ thống        | Gửi `PUT /notifications/read-all` — BE set `read_at=NOW()` cho tất cả thông báo `read_at IS NULL` của user. |
+| 6.a.3 | Hệ thống        | Trả về số lượng notification đã update + refresh UI counter về 0. |
 
 ---
 
 ## Business Rules
 
-- **BR-031-01**: Các thông báo critical (sos_triggered, fall_detected) luôn phải gửi push; user chỉ có thể hạn chế SMS/email, không được tắt hoàn toàn. 
-- **BR-031-02**: Alert cũ hơn một khoảng thời gian nhất định (VD: 90 ngày) có thể tự động expire (`expires_at`) và ẩn khỏi UI mặc định. 
-- **BR-031-03**: Cho phép lọc nhanh "Chỉ sự kiện quan trọng" = `severity IN ('high', 'critical')`. 
+- **BR-031-01**: Các thông báo critical (sos_triggered, fall_detected, risk_critical) luôn được gửi qua kênh FCM riêng biệt (`sos_fullscreen_alerts`, `risk_alerts`) với `fullScreenIntent`; user có thể quản lý bật/tắt từng kênh ở cấp độ hệ điều hành (Android Settings > Apps > HealthGuard > Notifications per-channel) theo pattern consumer mobile app chuẩn.
+- **BR-031-02**: Alert cũ hơn 90 ngày tự động expire (`expires_at`) và ẩn khỏi UI mặc định qua APScheduler worker chạy hàng ngày; grace period 30 ngày trước khi hard delete.
+- **BR-031-03**: Lọc nhanh "Chỉ sự kiện quan trọng" (`severity IN ('high', 'critical')`) được thực thi client-side trên type filter (`sos` + `health`) theo Alt 3.a; không cần BE query param riêng.
 
 ---
 
