@@ -66,6 +66,8 @@ Ví dụ: `HG-001`, `HS-005`, `XR-002`.
 | [HS-021](../AUDIT_2026/tier2/health_system/BE_M03_services_audit.md) | health_system | services/model_api_client | model_api_client outbound httpx.Client chỉ set X-Internal-Service header — KHÔNG set X-Internal-Secret mandate per ADR-005; production deploy với model-api enforce → 401/403 silent fall back; với fail-open → cross-service auth bypass | Critical | 2026-05-13 | _(Phase 4 scheduled — flagged BE-M03 audit Phase 1)_ | 🔴 Open |
 | [HS-022](../AUDIT_2026/tier2/health_system/BE_M03_services_audit.md) | health_system | services/relationship_service | 4 instance except Exception default empty/None KHÔNG logger.exception line 480 547 575; caregiver dashboard render incomplete data without warning, vi phạm steering 22-fastapi.md anti-pattern | Medium | 2026-05-13 | _(Phase 4 scheduled — flagged BE-M03 audit Phase 1)_ | 🔴 Open |
 | [HS-023](../AUDIT_2026/tier2/health_system/BE_M11_scripts_audit.md) | health_system | app/scripts + backend/scripts | 4 instance hardcoded plaintext credential literal trong seed/test scripts committed git (create_caregiver_user + seed_home_dashboard_e2e 3 accounts); auto-flag anti-pattern; compound với HS-020 | Critical | 2026-05-13 | _(Phase 4 scheduled — flagged BE-M11 audit Phase 1)_ | 🔴 Open |
+| [HS-024](./HS-024-risk-inference-silent-default-fill.md) | health_system | services/risk_alert_service + adapters/model_api_health_adapter | Risk inference fill default silently khi vitals/profile NULL → score giả; 2 layer adapter fill độc lập + drift HRV value (40 vs 50); _fetch_latest_vitals chỉ reject khi cả HR+SpO2 NULL | High | 2026-05-14 | _(Phase 4 — flagged Phase 3 deep-dive BE-M03/M07)_ | 🔴 Open |
+| [XR-003](./XR-003-model-api-input-validation-contract.md) | Cross-repo (HS+MA) | Cross-service contract | Contract chưa định nghĩa cách handle missing vitals giữa mobile BE và model API; thiếu flag `is_synthetic_default` + structured error code; consumer không phân biệt record real vs default-fill | Medium | 2026-05-14 | _(blocked by HS-024 + cần ADR mới — flagged Phase 3 deep-dive)_ | 🔴 Open |
 | [IS-002](./IS-002-sleep-service-missing-internal-auth-headers.md) | Iot_Simulator_clean | api_server/services/sleep_service | SleepService _push_sleep_to_backend thiếu X-Internal-Service + X-Internal-Secret headers | Critical | 2026-05-13 | _(Phase 4 — batch with HS-004)_ | 🔴 Open |
 | [IS-003](./IS-003-sleep-session-exists-silent-db-failure.md) | Iot_Simulator_clean | api_server/services/sleep_service | _sleep_session_exists swallow DB error → potential double-write sleep_sessions row | Medium | 2026-05-13 | _(Phase 4)_ | 🔴 Open |
 | [IS-004](./IS-004-sleep-service-module-level-scenario-globals.md) | Iot_Simulator_clean | api_server/services/sleep_service | SLEEP_SCENARIO_PHASES/PROFILES là module-level globals, state leak across instances | Low | 2026-05-13 | _(Phase 4/5 defer)_ | 🔴 Open |
@@ -111,12 +113,13 @@ Bugs affecting ≥ 2 repos require special handling. Track repo-impact matrix:
 |---|---|---|---|---|
 | [XR-001](./XR-001-topology-steering-endpoint-prefix-drift.md) | Topology steering endpoint prefix drift | All 5 (HealthGuard, health_system, Iot_Simulator_clean, healthguard-model-api, PM_REVIEW) | 🔴 Open | References ADR-004, ADR-013 |
 | [XR-002](./XR-002-be-sqlalchemy-severity-checkconstraint-drift.md) | BE SQLAlchemy severity CheckConstraint drift | health_system + HealthGuard (Prisma canonical) | 🔴 Open | References ADR-015 |
+| [XR-003](./XR-003-model-api-input-validation-contract.md) | Model API input validation contract gap (missing vitals signaling) | health_system (backend) + healthguard-model-api | 🔴 Open | Cần ADR-018 (proposed) |
 
 ---
 
 ## Quick stats
 
-- Total open: 22 (HG-001, IS-001, IS-002, IS-003, IS-004, IS-005, IS-008, IS-009, IS-010, IS-011, IS-012, IS-013, XR-001, XR-002, HS-001, HS-002, HS-003, HS-004, HS-005, HS-006, HS-007, HS-008) — Phase 0.5 + Phase 1 macro audit baseline
+- Total open: 24 (HG-001, IS-001, IS-002, IS-003, IS-004, IS-005, IS-008, IS-009, IS-010, IS-011, IS-012, IS-013, XR-001, XR-002, XR-003, HS-001, HS-002, HS-003, HS-004, HS-005, HS-006, HS-007, HS-008, HS-024) — Phase 0.5 + Phase 1 + Phase 3 deep-dive complete
 - Total in progress: 1 (PM-001)
 - Total resolved: 0
 - Avg attempts to resolve: N/A
