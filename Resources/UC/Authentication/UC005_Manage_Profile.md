@@ -36,7 +36,7 @@
 | 3.a.1 | Người dùng      | Chạm vào ảnh đại diện                          |
 | 3.a.2 | Hệ thống        | Hiển thị tùy chọn: Chụp ảnh / Chọn từ thư viện |
 | 3.a.3 | Người dùng      | Chọn ảnh                                       |
-| 3.a.4 | Hệ thống        | Crop và upload ảnh, hiển thị preview           |
+| 3.a.4 | Hệ thống        | Upload ảnh, hiển thị preview                    |
 
 ### 3.b - Cập nhật tiền sử bệnh lý
 | Bước  | Người thực hiện | Hành động                                                                              |
@@ -110,7 +110,6 @@
 - **Privacy**: Tuân thủ các nguyên tắc bảo vệ dữ liệu cá nhân (tương đương HIPAA ở mức độ học thuật) — dữ liệu bệnh lý nhạy cảm
 - **Usability**: 
   - Form đơn giản, font lớn, phù hợp người cao tuổi
-  - Avatar crop tool tích hợp
 - **Performance**: Cập nhật profile < 2 giây, upload ảnh < 5 giây
 - **Security**: Chỉ user chủ tài khoản mới sửa được profile của mình
 

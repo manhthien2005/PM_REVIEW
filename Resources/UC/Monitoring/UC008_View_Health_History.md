@@ -1,4 +1,6 @@
-# UC008 - XEM LỊCH SỬ CHỈ SỐ SỨC KHỎE
+# UC008 - XEM LỊCH SỬ CHỈ SỐ SỨC KHỎE (v2 — Phase 0.5)
+
+> **v2 rationale (2026-05-13):** Minor update từ v1 "no change". Drop Alt 6.a "custom from/to" (code không expose custom range picker). BR-008-04 retention explicit 1 năm theo `09_create_policies.sql`. BR-008-05 note scope UC008 trong code hiện tại chỉ map với `/analysis/risk-history` (risk trend) hơn là raw vitals trend, clarify scope boundary UC007 vs UC008.
 
 ## Bảng đặc tả Use Case
 
@@ -7,10 +9,10 @@
 | **Mã UC** | UC008 |
 | **Tên UC** | Xem lịch sử chỉ số sức khỏe |
 | **Tác nhân chính** | User |
-| **Mô tả** | Người dùng xem lại lịch sử các chỉ số sức khỏe trong khoảng thời gian dài (ngày, tuần, tháng) để theo dõi xu hướng. **Phân biệt với UC007**: UC007 tập trung drill-down chi tiết một chỉ số cụ thể, UC008 cho phép xem xu hướng tổng hợp nhiều chỉ số, so sánh qua các ngày và phát hiện pattern dài hạn. |
-| **Trigger** | Người dùng chọn chức năng "Lịch sử sức khỏe" từ màn hình chính hoặc từ UC006. |
-| **Tiền điều kiện** | - Người dùng đã đăng nhập.<br>- Có ít nhất một khoảng thời gian đã được ghi nhận dữ liệu. |
-| **Hậu điều kiện** | Người dùng xem được biểu đồ và thống kê lịch sử chỉ số sức khỏe theo khoảng thời gian đã chọn. |
+| **Mô tả** | Người dùng xem lại xu hướng tổng hợp + lịch sử risk scores qua các ngày/tuần/tháng để phát hiện pattern dài hạn. Phân biệt với UC007: UC007 drill-down chi tiết 1 chỉ số trong 24h/7d/30d (vitals_timeseries), UC008 focus dài hạn risk + sleep history. |
+| **Trigger** | Người dùng mở tab "Lịch sử" / "Phân tích rủi ro" / Sleep History. |
+| **Tiền điều kiện** | Ít nhất 1 ngày dữ liệu risk_scores hoặc sleep_sessions đã tồn tại. |
+| **Hậu điều kiện** | User xem được biểu đồ xu hướng + thống kê theo khoảng thời gian đã chọn. |
 
 ---
 
@@ -18,61 +20,78 @@
 
 | Bước | Người thực hiện | Hành động |
 |------|----------------|-----------|
-| 1 | Người dùng | Truy cập màn hình "Lịch sử sức khỏe". |
-| 2 | Hệ thống | Hiển thị bộ lọc: Khoảng thời gian (7 ngày, 30 ngày, 3 tháng, tùy chọn from/to), loại chỉ số (Nhịp tim, SpO₂, Huyết áp, Nhiệt độ). |
-| 3 | Người dùng | Chọn khoảng thời gian và chỉ số cần xem. |
-| 4 | Hệ thống | Truy vấn dữ liệu từ các bảng tổng hợp (theo giờ, theo ngày). |
-| 5 | Hệ thống | Hiển thị biểu đồ xu hướng (line chart/area chart) cho chỉ số đã chọn kèm các giá trị min/max/avg theo từng ngày/giờ. |
-| 6 | Người dùng | Cuộn và quan sát xu hướng, có thể chuyển đổi giữa các chỉ số. |
+| 1 | Người dùng | Truy cập màn "Lịch sử sức khỏe" (risk + sleep). |
+| 2 | Hệ thống | Hiển thị bộ lọc preset range: 7d / 30d / 90d (`RISK_HISTORY_RANGE_DAYS`). Optional filter `risk_type`: all / general / sleep / fall (Phase 4A-full slice 3b). |
+| 3 | Người dùng | Chọn range + risk_type. |
+| 4 | Client | Gọi `/analysis/risk-history?range=<key>&page=1&limit=20[&risk_type=<type>]`. |
+| 5 | Hệ thống | BE query `risk_scores` với filter + pagination. Build summary (avg/highest/lowest/delta) + items list. |
+| 6 | Client | Render:<br>- Summary stats card<br>- Line/bar chart risk trend<br>- List chi tiết (risk_score, risk_level, display_status, reason_preview, analyzed_at)<br>- Pagination "Xem thêm" |
 
 ---
 
 ## Luồng thay thế (Alternative Flows)
 
-### 2.a - Người dùng chưa có đủ dữ liệu
+### 2.a - Chưa đủ dữ liệu (<24h usage)
 
 | Bước | Người thực hiện | Hành động |
 |------|----------------|-----------|
-| 2.a.1 | Hệ thống | Phát hiện thời gian sử dụng < 24 giờ hoặc không có dữ liệu trong khoảng mặc định. |
-| 2.a.2 | Hệ thống | Hiển thị thông báo "Chưa đủ dữ liệu lịch sử. Vui lòng sử dụng thiết bị ít nhất 24 giờ." |
+| 2.a.1 | Hệ thống (BE) | `/risk-history` trả `items: []` + `summary` với average=0/highest=0/lowest=0. |
+| 2.a.2 | Client | Render "Chưa đủ dữ liệu lịch sử. Vui lòng sử dụng thiết bị ít nhất 24 giờ." |
 
-### 5.a - Xem chi tiết 1 ngày
-
-| Bước | Người thực hiện | Hành động |
-|------|----------------|-----------|
-| 5.a.1 | Người dùng | Chạm vào 1 điểm/ngày trên biểu đồ. |
-| 5.a.2 | Hệ thống | Hiển thị popup chi tiết cho ngày đó (min, max, avg, số lần vượt ngưỡng, link sang UC007 để xem chi tiết hơn). |
-
-### 6.a - Lọc theo khoảng thời gian custom
+### 5.a - Tap 1 risk report trên timeline
 
 | Bước | Người thực hiện | Hành động |
 |------|----------------|-----------|
-| 6.a.1 | Người dùng | Chọn “Tuỳ chỉnh” và nhập ngày bắt đầu/kết thúc. |
-| 6.a.2 | Hệ thống | Validate khoảng thời gian (không vượt quá 1 năm, ngày bắt đầu <= ngày kết thúc). |
-| 6.a.3 | Hệ thống | Nếu hợp lệ: nạp lại dữ liệu; nếu không: hiển thị lỗi. |
+| 5.a.1 | Người dùng | Tap 1 item trong history list (VD risk report ngày hôm qua). |
+| 5.a.2 | Client | Gọi `/analysis/risk-reports/{id}` (UC028 detail view). |
+| 5.a.3 | Hệ thống | Render detail screen với SHAP breakdown + AI explanation + recommendations (cross-UC sang UC028). |
 
 ---
 
 ## Business Rules
 
-- **BR-008-01**: Mặc định hiển thị lịch sử 7 ngày gần nhất.
-- **BR-008-02**: Nếu chọn khoảng > 30 ngày, hệ thống sử dụng dữ liệu tổng hợp theo ngày để hiển thị (không dùng dữ liệu thô).
-- **BR-008-03**: Caregiver chỉ được xem lịch sử của bệnh nhân mà họ có quyền giám sát và được cấp quyền xem chỉ số sức khỏe.
-- **BR-008-04**: Không hiển thị dữ liệu vượt ngoài thời gian retention đã cấu hình (VD: > 1 năm có thể không còn dữ liệu chi tiết). 
+- **BR-008-01:** Mặc định range `7d` (match `get_risk_history` default `range_key="7d"`).
+- **BR-008-02:** Preset range cố định: 7d / 30d / 90d.
+  - `RISK_HISTORY_RANGE_DAYS = {"7d": 7, "30d": 30, "90d": 90}` (code canonical).
+  - Khác UC cũ nói "7 ngày, 30 ngày, 3 tháng, tùy chọn from/to": Drop custom from/to (xem Alt 6.a DROPPED). 3 tháng = 90 ngày match.
+- **BR-008-03 (DROPPED v2 Alt 6.a):** UC cũ có Alt 6.a "Lọc khoảng thời gian custom (ngày bắt đầu/kết thúc)". Drop vì:
+  - `get_risk_history` chỉ accept 3 preset range, không parse `from_date`/`to_date`.
+  - Scope mobile view-only, custom range là Phase 5+.
+- **BR-008-04 (retention):** Data retention theo `09_create_policies.sql`:
+  - `vitals`: 1 năm (compression after 7 days).
+  - `motion_data`: 3 tháng.
+  - `risk_scores`: keep long-term (không retention policy hiện tại).
+  - `audit_logs`: 2 năm.
+  - Query range >1 năm trả data có thể bị truncated/empty.
+- **BR-008-05 (scope clarification v2):** UC008 trong code hiện map với `/analysis/risk-history` (risk scores timeline). Không có endpoint riêng cho "vitals aggregated history" kiểu daily average heart rate, đó là cascade UC007 (dùng `/metrics/vitals/timeseries?range=30d` với bucket 6h). Sleep history map với `/metrics/sleep/history` (UC021). UC008 v2 chủ yếu focus risk trend + sleep history dashboard.
 
----
+## Business Rules - Phân quyền
 
-
-## Business Rules - Phân quyền (Authorization)
-- **BR-Auth-01**: User A chỉ được phép truy vấn/xem dữ liệu y tế của User B nếu ID của cả hai tồn tại trong bảng `user_relationships` và có cờ `can_view_vitals = true` (hoặc User A xem dữ liệu của chính mình).
+- **BR-Auth-01:** Caregiver chỉ xem lịch sử của patient nếu `can_view_vitals = TRUE` trong `user_relationships`.
 
 ## Yêu cầu phi chức năng
 
-- **Performance**: 
-  - Thời gian truy vấn và vẽ biểu đồ lịch sử 30 ngày < 3 giây.
-- **Usability**: 
-  - Biểu đồ rõ ràng, hỗ trợ xoay ngang màn hình để xem full width.
-  - Dùng màu sắc consistent với UC006 (xanh/vàng/đỏ) cho vùng bình thường/bất thường.
-- **Security & Privacy**: 
-  - Dữ liệu lịch sử được bảo vệ như dữ liệu hiện tại; bắt buộc dùng HTTPS/TLS.
+- **Performance**:
+  - Load `/risk-history` 30d < 3 giây với pagination 20 items.
+  - Summary stats precomputed trong query.
+- **Usability**:
+  - Chart dùng màu sắc consistent với UC006 (low=xanh, medium=vàng, high=cam, critical=đỏ).
+  - Hỗ trợ xoay ngang (landscape) cho chart full-width.
+- **Security**: BE auth + BR-Auth-01 enforce.
 
+---
+
+## Dropped features (UC cũ drop trong v2)
+
+- Alt 6.a "Lọc khoảng tùy chỉnh from/to": Drop. Code chỉ có 3 preset. Phase 5+ nếu có demand.
+- Main Flow step 2 "tùy chọn from/to": Drop cùng Alt 6.a.
+
+---
+
+## Implementation references
+
+- Route BE: `health_system/backend/app/api/routes/monitoring.py` — `get_risk_history`
+- Service BE: `health_system/backend/app/services/monitoring_service.py` — `get_risk_history`, `RISK_HISTORY_RANGE_DAYS`
+- FE screen: `health_system/lib/features/analysis/screens/risk_history_screen.dart` (nếu đã có trong AUDIT_2026 module inventory, Phase 0.5 cross-ref)
+- DB retention: `PM_REVIEW/SQL SCRIPTS/09_create_policies.sql`
+- Related UCs: UC006 (live view), UC007 (short-range drill-down), UC021 (sleep history companion), UC028 (risk report detail)

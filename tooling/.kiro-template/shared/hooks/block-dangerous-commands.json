@@ -1,0 +1,13 @@
+{
+  "name": "Block Dangerous Commands",
+  "version": "1.0.0",
+  "description": "Chặn các lệnh nguy hiểm trước khi thực thi: rm -rf, DROP TABLE, git push --force, flutter clean, prisma migrate reset, commit/push lên trunk.",
+  "when": {
+    "type": "preToolUse",
+    "toolTypes": ["shell"]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "TRƯỚC KHI THỰC THI LỆNH SHELL, kiểm tra xem lệnh có thuộc danh sách nguy hiểm không:\n\n## HARD BLOCK (KHÔNG BAO GIỜ chạy):\n- rm -rf / hoặc rm -rf * hoặc rm -rf ~\n- DROP DATABASE/TABLE/SCHEMA, TRUNCATE\n- npx prisma migrate reset\n- docker-compose down -v (xóa volumes)\n- mkfs, dd to raw disk, format drive\n\n## CẦN XÁC NHẬN (block nếu chưa có lý do rõ ràng):\n- git push --force / --force-with-lease\n- git reset --hard\n- git clean -fdx\n- flutter clean\n- npm/yarn/pnpm install <package> (thêm dependency mới)\n- flutter pub add / dart pub add\n- npx prisma db push / migrate deploy\n\n## TRUNK GUARD:\n- git commit khi đang trên branch: develop, main, master, deploy, production\n- git push khi đang trên trunk branch\n→ Block và yêu cầu tạo feature branch trước.\n\nNếu lệnh KHÔNG thuộc danh sách trên → cho phép thực thi bình thường.\nNếu lệnh BỊ BLOCK → báo rõ lý do và gợi ý cách an toàn hơn."
+  }
+}
