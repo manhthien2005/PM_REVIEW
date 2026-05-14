@@ -3,9 +3,10 @@
 -- Description: 
 --   1. Xác nhận cột blood_pressure_sys / blood_pressure_dia tồn tại trong bảng vitals
 --      (đã được tạo từ 04_create_tables_timeseries.sql)
---   2. Tạo bảng user_fcm_tokens để hỗ trợ push notification (Phase 8)
+--   2. Tạo bảng user_push_tokens để hỗ trợ push notification (Phase 8)
+--      [HS-009 Phase 4] Renamed from user_fcm_tokens to user_push_tokens per ADR-016.
 -- Author: HealthGuard Development Team
--- Date: 2026-03-24
+-- Date: 2026-03-24 (rev 2026-05-14: rename + add device_id, last_sync_at)
 -- ============================================================================
 
 -- ============================================================================
@@ -54,37 +55,45 @@ BEGIN
 END $$;
 
 -- ============================================================================
--- PART 2: Tạo bảng user_fcm_tokens (Phase 8 — Push Notification)
+-- PART 2: Tạo bảng user_push_tokens (Phase 8 — Push Notification)
+-- [HS-009 Phase 4] Renamed from user_fcm_tokens to user_push_tokens per ADR-016.
+-- Added: device_id (FK devices, nullable), last_sync_at (TIMESTAMPTZ).
 -- ============================================================================
 
-CREATE TABLE IF NOT EXISTS user_fcm_tokens (
+CREATE TABLE IF NOT EXISTS user_push_tokens (
     id          SERIAL PRIMARY KEY,
     user_id     INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
 
-    -- FCM token từ Firebase SDK (Flutter app gửi lên sau khi login)
+    -- Optional FK to devices: link push token to a specific device (nullable)
+    device_id   INT REFERENCES devices(id) ON DELETE SET NULL,
+
+    -- Push token từ Firebase SDK / APNs (mobile app gửi lên sau khi login)
     token       TEXT NOT NULL,
     platform    VARCHAR(10) DEFAULT 'android'
                     CHECK (platform IN ('android', 'ios', 'web')),
 
     -- Quản lý vòng đời token
     is_active   BOOLEAN DEFAULT TRUE,
+    last_sync_at TIMESTAMPTZ,
     created_at  TIMESTAMPTZ DEFAULT NOW(),
     updated_at  TIMESTAMPTZ DEFAULT NOW(),
 
     -- Mỗi (user, token) là duy nhất — tránh duplicate khi re-login
-    CONSTRAINT uq_user_fcm_token UNIQUE (user_id, token)
+    CONSTRAINT uq_user_push_token UNIQUE (user_id, token)
 );
 
 -- Index: query token hoạt động của 1 user
-CREATE INDEX IF NOT EXISTS idx_fcm_tokens_user_active
-    ON user_fcm_tokens (user_id)
+CREATE INDEX IF NOT EXISTS idx_push_tokens_user_active
+    ON user_push_tokens (user_id)
     WHERE is_active = TRUE;
 
 -- Comments
-COMMENT ON TABLE  user_fcm_tokens              IS 'FCM push notification tokens của từng user — ghi từ Flutter App sau khi login';
-COMMENT ON COLUMN user_fcm_tokens.token        IS 'FCM registration token từ Firebase SDK (hết hạn theo Firebase policy)';
-COMMENT ON COLUMN user_fcm_tokens.platform     IS 'Nền tảng thiết bị: android | ios | web';
-COMMENT ON COLUMN user_fcm_tokens.is_active    IS 'FALSE nếu token đã bị thu hồi hoặc user logout';
+COMMENT ON TABLE  user_push_tokens               IS 'Push notification tokens (FCM/APNs) của từng user — ghi từ mobile app sau khi login';
+COMMENT ON COLUMN user_push_tokens.device_id     IS 'Optional FK tới devices.id (nullable) — link token tới thiết bị cụ thể nếu biết';
+COMMENT ON COLUMN user_push_tokens.token         IS 'Push registration token từ Firebase SDK / APNs (hết hạn theo provider policy)';
+COMMENT ON COLUMN user_push_tokens.platform      IS 'Nền tảng thiết bị: android | ios | web';
+COMMENT ON COLUMN user_push_tokens.is_active     IS 'FALSE nếu token đã bị thu hồi hoặc user logout';
+COMMENT ON COLUMN user_push_tokens.last_sync_at  IS 'Timestamp lần cuối client đồng bộ token (heartbeat dùng để pruning stale token)';
 
 -- ============================================================================
 -- PART 3: Kiểm tra toàn bộ bảng cần thiết cho integration
@@ -98,7 +107,7 @@ DECLARE
         'users', 'devices', 'vitals', 'motion_data',
         'fall_events', 'sos_events', 'alerts',
         'sleep_sessions', 'risk_scores', 'risk_explanations',
-        'user_fcm_tokens'
+        'user_push_tokens'
     ];
 BEGIN
     RAISE NOTICE '';

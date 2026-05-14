@@ -617,6 +617,16 @@ CREATE INDEX IF NOT EXISTS idx_relationships_primary ON user_relationships(patie
 CREATE INDEX IF NOT EXISTS idx_devices_user ON devices(user_id);
 CREATE INDEX IF NOT EXISTS idx_devices_active ON devices(is_active) WHERE is_active = true;
 CREATE INDEX IF NOT EXISTS idx_devices_uuid ON devices(uuid);
+-- [HS-002 BR-040-01] Partial UNIQUE indexes: chan duplicate cross-user, exclude soft-deleted.
+CREATE UNIQUE INDEX IF NOT EXISTS devices_mac_active_uniq
+    ON devices(mac_address)
+    WHERE deleted_at IS NULL AND mac_address IS NOT NULL;
+CREATE UNIQUE INDEX IF NOT EXISTS devices_serial_active_uniq
+    ON devices(serial_number)
+    WHERE deleted_at IS NULL AND serial_number IS NOT NULL;
+CREATE UNIQUE INDEX IF NOT EXISTS devices_mqtt_active_uniq
+    ON devices(mqtt_client_id)
+    WHERE deleted_at IS NULL AND mqtt_client_id IS NOT NULL;
 
 -- vitals
 CREATE INDEX IF NOT EXISTS idx_vitals_device_time ON vitals(device_id, time DESC);
@@ -825,24 +835,29 @@ ALTER TABLE ai_model_versions ADD CONSTRAINT ai_model_versions_created_by_fkey
 
 
 -- ############################################################################
--- SECTION 16: verify_bp_columns_and_fcm_tokens.sql
--- Description: Xác nhận BP columns tồn tại + tạo bảng user_fcm_tokens
+-- SECTION 16: verify_bp_columns_and_push_tokens.sql
+-- Description: Xác nhận BP columns tồn tại + tạo bảng user_push_tokens
+-- Note (HS-009 Phase 4): Renamed from user_fcm_tokens to user_push_tokens
+-- per ADR-016 (production reality — supports FCM + APNs + future channels).
 -- ############################################################################
 
-CREATE TABLE IF NOT EXISTS user_fcm_tokens (
+CREATE TABLE IF NOT EXISTS user_push_tokens (
     id          SERIAL PRIMARY KEY,
     user_id     INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    -- Optional FK to devices: link push token to a specific device (nullable)
+    device_id   INT REFERENCES devices(id) ON DELETE SET NULL,
     token       TEXT NOT NULL,
     platform    VARCHAR(10) DEFAULT 'android'
                     CHECK (platform IN ('android', 'ios', 'web')),
     is_active   BOOLEAN DEFAULT TRUE,
+    last_sync_at TIMESTAMPTZ,
     created_at  TIMESTAMPTZ DEFAULT NOW(),
     updated_at  TIMESTAMPTZ DEFAULT NOW(),
-    CONSTRAINT uq_user_fcm_token UNIQUE (user_id, token)
+    CONSTRAINT uq_user_push_token UNIQUE (user_id, token)
 );
 
-CREATE INDEX IF NOT EXISTS idx_fcm_tokens_user_active
-    ON user_fcm_tokens (user_id)
+CREATE INDEX IF NOT EXISTS idx_push_tokens_user_active
+    ON user_push_tokens (user_id)
     WHERE is_active = TRUE;
 
 

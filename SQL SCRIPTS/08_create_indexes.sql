@@ -35,6 +35,17 @@ CREATE INDEX IF NOT EXISTS idx_devices_last_seen ON devices(last_seen_at DESC);
 CREATE INDEX IF NOT EXISTS idx_devices_uuid ON devices(uuid);
 CREATE INDEX IF NOT EXISTS idx_devices_mqtt_client ON devices(mqtt_client_id);
 
+-- [HS-002 BR-040-01] Partial UNIQUE indexes: chan duplicate cross-user, exclude soft-deleted.
+CREATE UNIQUE INDEX IF NOT EXISTS devices_mac_active_uniq
+    ON devices(mac_address)
+    WHERE deleted_at IS NULL AND mac_address IS NOT NULL;
+CREATE UNIQUE INDEX IF NOT EXISTS devices_serial_active_uniq
+    ON devices(serial_number)
+    WHERE deleted_at IS NULL AND serial_number IS NOT NULL;
+CREATE UNIQUE INDEX IF NOT EXISTS devices_mqtt_active_uniq
+    ON devices(mqtt_client_id)
+    WHERE deleted_at IS NULL AND mqtt_client_id IS NOT NULL;
+
 -- ============================================================================
 -- INDEXES FOR: vitals (hypertable)
 -- ============================================================================
