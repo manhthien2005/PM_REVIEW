@@ -37,9 +37,11 @@ CREATE TABLE IF NOT EXISTS devices (
     last_sync_at TIMESTAMPTZ,
     mqtt_client_id VARCHAR(100),
     
-    -- Calibration & Settings
-    calibration_data JSONB,  -- Store sensor calibration parameters
-    -- Example: {"heart_rate_offset": 0, "spo2_calibration": 1.02}
+    -- Settings (notification toggles + UI preferences)
+    -- [HS-003 ADR-012] Calibration offset keys (heart_rate_offset, spo2_calibration,
+    -- temperature_offset) removed: no consumer in mobile BE, IoT sim, or HealthGuard.
+    -- Remaining shape: {"notify_high_hr": bool, "notify_low_spo2": bool, "wear_side": "left|right", ...}
+    calibration_data JSONB,
     
     -- Metadata
     registered_at TIMESTAMPTZ DEFAULT NOW(),
@@ -50,7 +52,7 @@ CREATE TABLE IF NOT EXISTS devices (
 COMMENT ON TABLE devices IS 'Bảng quản lý thiết bị IoT của người dùng';
 COMMENT ON COLUMN devices.last_seen_at IS 'Timestamp lần cuối device gửi data (dùng để detect offline)';
 COMMENT ON COLUMN devices.mqtt_client_id IS 'Client ID để map với MQTT messages';
-COMMENT ON COLUMN devices.calibration_data IS 'Tham số hiệu chỉnh cảm biến (JSONB để flexible)';
+COMMENT ON COLUMN devices.calibration_data IS 'Settings JSONB: notification toggles + wear_side. Calibration offsets dropped per ADR-012 (HS-003).';
 COMMENT ON COLUMN devices.battery_level IS 'Mức pin (0-100%)';
 
 -- Add trigger for auto-update updated_at
