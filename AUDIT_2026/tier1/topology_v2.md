@@ -240,36 +240,6 @@ Pump scripts (CRON, manual) -----> HealthGuard BE
 
 ---
 
-### Path 9 (added 2026-05-13): IoT sim → shared Postgres (direct DB write) — per ADR-013
-
-**Direction:** IoT sim → shared DB (bypass BE for vitals tick)
-**Context:** ADR-013 accepts direct-DB INSERT for vitals + motion_data tick payloads. Original `transport_router.publish()` wiring in `dependencies.py:670-675` is **never called at runtime** (verified grep 0 hits 2026-05-13 during Phase 0.5 verify pass) and will be replaced by inline `session_scope()` batch INSERT per `Iot_Simulator_clean/plans/IOT_SIM_DIRECT_DB_WRITE.md` §6.
-
-**Tables written:**
-
-| Table | Source field in tick payload | Write frequency |
-|---|---|---|
-| `vitals` | `vitals.heart_rate`, `.spo2`, `.temperature`, `.blood_pressure_systolic/diastolic`, `.hrv`, `.respiratory_rate` | Per session tick (~5s) |
-| `motion_data` | `motion.accel_x/y/z`, `.gyro_x/y/z` + computed magnitude | Per session tick when motion samples present |
-| `devices.last_heartbeat_at` | `_update_device_heartbeat()` (existing precedent) | Per session tick |
-
-**Why not via `/mobile/telemetry/ingest`:**
-- TransportRouter path never active (`grep transport_router.publish` = 0).
-- BE ingest endpoint = thin proxy (no business validation beyond schema shape).
-- HTTP overhead ~2074ms vs DB ~10ms (200× improvement per plan §1).
-- Heartbeat precedent proven.
-
-**Alert / sleep / risk paths unchanged** — still go via HTTP to BE (business logic present: FCM push, sleep scoring, ML inference).
-
-**D-019 status update:** `/mobile/telemetry/ingest` drift becomes **less urgent** since vitals tick no longer uses HTTP path. Remaining HTTP endpoints (`alert`, `sleep`, `risk/calculate`) still subject to ADR-004 standardization but scope reduced.
-
-**See:**
-- `PM_REVIEW/ADR/013-iot-sim-direct-db-write-vitals.md`
-- `PM_REVIEW/BUGS/XR-001-topology-steering-endpoint-prefix-drift.md`
-- `PM_REVIEW/AUDIT_2026/tier1.5/verify/iot_simulator_clean/ETL_TRANSPORT_verify.md`
-
----
-
 ## Drift findings
 
 ### D-018 [Critical → IS-001]: `sleep_ai_client.py` posts to wrong path
