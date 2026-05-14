@@ -1,6 +1,4 @@
-# UC006 - XEM CHỈ SỐ SỨC KHỎE (v2 — Phase 0.5)
-
-> **v2 rationale (2026-05-13):** Step 3 "1 giờ" sang "24 giờ" (match code `VitalSignsProvider` render 24h trend chart). Alt 5.b liệt kê 24h/7d/30d (drop 1h/6h không có trong `_VITALS_TIMESERIES_RANGES`). NFR "chu kỳ 1 phút" sang "1 giây" (match vitals hypertable spec + IoT sim tick). BR-006-01 note FE thresholds source hardcode trong `vital_signs.dart` model, Phase 5+ centralize qua SettingsService.
+# UC006 - XEM CHỈ SỐ SỨC KHỎE
 
 ## Bảng đặc tả Use Case
 
@@ -8,11 +6,11 @@
 |------------|----------|
 | **Mã UC** | UC006 |
 | **Tên UC** | Xem chỉ số sức khỏe theo thời gian thực |
-| **Tác nhân chính** | User (bệnh nhân, người chăm sóc) |
-| **Mô tả** | Người dùng xem các chỉ số sức khỏe hiện tại (HR, SpO2, BP, Temp, RR) và nhận cảnh báo khi có bất thường. |
-| **Trigger** | Người dùng mở app hoặc truy cập Dashboard hoặc Vital Detail Screen. |
-| **Tiền điều kiện** | - Người dùng đã đăng nhập.<br>- Thiết bị IoT đã pair (UC040) và đang gửi vitals ingest. |
-| **Hậu điều kiện** | Người dùng nhìn thấy trạng thái sức khỏe hiện tại + lịch sử 24h. |
+| **Tác nhân chính** | User |
+| **Mô tả** | Người dùng xem các chỉ số sức khỏe hiện tại và nhận cảnh báo khi có bất thường |
+| **Trigger** | Người dùng mở ứng dụng hoặc truy cập Dashboard |
+| **Tiền điều kiện** | - Người dùng đã đăng nhập<br>- Thiết bị IoT đang kết nối và gửi dữ liệu |
+| **Hậu điều kiện** | Người dùng nhìn thấy trạng thái sức khỏe hiện tại |
 
 ---
 
@@ -20,46 +18,37 @@
 
 | Bước | Người thực hiện | Hành động |
 |------|----------------|-----------|
-| 1 | Người dùng | Truy cập màn hình "Sức khỏe" hoặc Vital Detail Screen. |
-| 2 | Hệ thống | Hiển thị các chỉ số hiện tại:<br>- Nhịp tim (BPM)<br>- SpO₂ (%)<br>- Huyết áp (mmHg)<br>- Nhiệt độ (°C)<br>- Nhịp thở (lần/phút)<br>Với màu sắc: Xanh (OK), Vàng (Cảnh báo), Đỏ (Nguy hiểm) — thresholds ở BR-006-01. |
-| 3 | Hệ thống | Hiển thị biểu đồ xu hướng 24 giờ gần nhất (bucket 15 phút, ~96 điểm, endpoint `/metrics/vitals/timeseries?range=24h`). |
-| 4 | Hệ thống | Polling 5s (FE `VitalSignsProvider`) gọi `/metrics/vital-signs/latest`. Cập nhật giá trị + status pill. |
-| 5 | Hệ thống | Nếu backend set `is_stale = TRUE` (>5 phút không nhận ingest), FE render "Thiết bị mất kết nối" + value "--" + status "Không rõ". Xem NFR stale handling. |
-| 6 | Hệ thống | Gửi push notification nếu phát hiện chỉ số bất thường, xem UC008 Alert Thresholds + `risk_alert_service`. |
+| 1 | Người dùng | Truy cập màn hình "Sức khỏe" |
+| 2 | Hệ thống | Hiển thị các chỉ số hiện tại:<br>- Nhịp tim (BPM)<br>- SpO₂ (%)<br>- Huyết áp (mmHg)<br>- Nhiệt độ (°C)<br>Với màu sắc: Xanh (OK), Vàng (Cảnh báo), Đỏ (Nguy hiểm) |
+| 3 | Hệ thống | Hiển thị biểu đồ xu hướng 1 giờ gần nhất |
+| 4 | Hệ thống | Cập nhật dữ liệu mỗi khi nhận được dữ liệu mới từ thiết bị (chu kỳ thu thập: 1 phút/lần theo SRS HG-FUNC-01, giao diện tự động refresh khi có data mới) |
+| 5 | Hệ thống | Gửi thông báo nếu phát hiện chỉ số bất thường |
 
 ---
 
 ## Luồng thay thế (Alternative Flows)
 
-### 2.a - Thiết bị offline / stale (>5 phút không ingest)
-
+### 2.a - Thiết bị offline
 | Bước | Người thực hiện | Hành động |
 |------|----------------|-----------|
-| 2.a.1 | Hệ thống (BE) | `VITALS_STALE_AFTER = timedelta(minutes=5)`. Nếu `now - latest.time > 5 phút` thì response `is_stale=TRUE`. |
-| 2.a.2 | Client | `VitalSignsProvider.isStale = TRUE` thì value "--", status `VitalStatus.unknown`. Banner "Thiết bị mất kết nối". |
-| 2.a.3 | Hệ thống | Hiển thị dữ liệu cuối cùng với timestamp để user biết sample cuối khi nào. |
+| 2.a.1 | Hệ thống | Hiển thị "Thiết bị không kết nối" |
+| 2.a.2 | Hệ thống | Hiển thị dữ liệu cuối cùng với timestamp |
 
 ### 5.a - Xem chi tiết chỉ số
-
 | Bước | Người thực hiện | Hành động |
 |------|----------------|-----------|
-| 5.a.1 | Người dùng | Tap vào tile chỉ số hoặc mở Vital Detail Screen cho 1 vital (hr/spo2/bp/temp/rr). |
-| 5.a.2 | Hệ thống | Mở `VitalDetailScreen` (UC007). Cascade flow sang UC007. |
+| 5.a.1 | Người dùng | Click vào biểu đồ chỉ số |
+| 5.a.2 | Hệ thống | Hiển thị thống kê chi tiết (min, max, trung bình) |
 
-### 5.b - Thay đổi khoảng thời gian biểu đồ
-
+### 5.b - Thay đổi khoảng thời gian
 | Bước | Người thực hiện | Hành động |
 |------|----------------|-----------|
-| 5.b.1 | Người dùng | Chọn khoảng: 24h / 7d / 30d (Phase 4 wire range tabs, D-MON-03). |
-| 5.b.2 | Client | Gọi lại `/metrics/vitals/timeseries?range=<key>`. BE trả 96/168/120 bucket tương ứng. |
-
-Note: UC cũ liệt kê "1h, 6h, 24h, 7 ngày". 1h/6h bị drop vì `_VITALS_TIMESERIES_RANGES` chỉ có 3 preset. Custom from/to range picker là Phase 5+ scope.
+| 5.b.1 | Người dùng | Chọn khoảng thời gian: 1h, 6h, 24h, 7 ngày |
+| 5.b.2 | Hệ thống | Cập nhật biểu đồ theo khoảng thời gian đã chọn |
 
 ---
 
-## Business Rules
-
-- **BR-006-01 (alert thresholds, FE hardcode source):**
+## Business Rules - Ngưỡng cảnh báo
 
 | Chỉ số | Bình thường (Xanh) | Cảnh báo (Vàng) | Nguy hiểm (Đỏ) |
 |--------|-------------------|----------------|----------------|
@@ -68,39 +57,25 @@ Note: UC cũ liệt kê "1h, 6h, 24h, 7 ngày". 1h/6h bị drop vì `_VITALS_TIM
 | **Huyết áp tâm thu** | 90-120 mmHg | 121-139 hoặc 70-89 | ≥140 hoặc <70 |
 | **Huyết áp tâm trương** | 60-80 mmHg | 81-89 hoặc 50-59 | ≥90 hoặc <50 |
 | **Nhiệt độ** | 36.1-37.2°C | 37.3-37.7 hoặc 35.5-36.0 | ≥37.8 hoặc <35.5 |
-| **Nhịp thở** | 12-20 lần/phút | 8-11 hoặc 21-24 | <8 hoặc >24 |
 
-  Thresholds hiện hardcode trong FE `lib/features/health_monitoring/models/vital_signs.dart` (`getHeartRateStatus`, `getSpo2Status`, `getTemperatureStatus`, `classifyBloodPressureStatus`, `getRespiratoryRateStatus`). Không có endpoint mobile BE serve thresholds cho FE. Alert evaluation phía BE (`risk_alert_service`) dùng thresholds khác (chưa verify trùng khít với bảng này, Phase 0.5 scope limit).
-
-  Phase 5+ parking: Centralize thresholds qua `SettingsService` (`system_settings` table đã có cho admin), expose endpoint `GET /mobile/settings/vitals-thresholds`. Đồ án 2 accept FE hardcode.
-
-- **BR-006-02:** SpO₂ < 92% gửi cảnh báo ngay lập tức (real-time alert pipeline, xem UC008).
-- **BR-006-03:** Nhiệt độ ≥ 37.8°C cảnh báo sốt.
-- **BR-006-04:** Nhịp tim bất thường kéo dài > 5 phút gửi thông báo (risk alert service aggregate).
-- **BR-006-05 (stale detection):** Backend `VITALS_STALE_AFTER = 5 phút`. FE render "--" + `VitalStatus.unknown` khi stale. Không hiển thị giá trị cũ làm user lầm tưởng còn live.
-
-## Business Rules - Phân quyền (Authorization)
-
-- **BR-Auth-01:** User A chỉ xem dữ liệu User B nếu `user_relationships.can_view_vitals = TRUE` (hoặc xem chính mình). Enforce ở `get_target_profile_id` dependency trong `monitoring.py`.
-
-## Yêu cầu phi chức năng
-
-- **Performance**:
-  - Độ trễ hiển thị giá trị mới < 5 giây (SRS HG-FUNC-02). FE polling 5s, BE stale check 5 phút.
-  - Chu kỳ thiết bị gửi: 1 giây (update v2 — match vitals hypertable comment "Frequency: 1 record/second/device" + IoT sim tick 1s). UC cũ nói "1 phút" là sai factual, continuous aggregates 5min/hourly/daily exists để handle volume 1s.
-- **Usability**:
-  - Responsive mobile.
-  - Font lớn (84sp hero value), tương phản cao cho người cao tuổi.
-  - Dark mode (app theme).
-- **Security**: Chỉ hiển thị dữ liệu user được ủy quyền (BR-Auth-01).
+**Quy tắc cảnh báo:**
+- SpO₂ < 92%: Gửi cảnh báo ngay lập tức
+- Nhiệt độ ≥ 37.8°C: Cảnh báo sốt
+- Nhịp tim bất thường kéo dài > 5 phút: Gửi thông báo
 
 ---
 
-## Implementation references
 
-- Route BE: `health_system/backend/app/api/routes/monitoring.py` — `get_latest_vital_signs`, `get_vitals_timeseries`
-- Service BE: `health_system/backend/app/services/monitoring_service.py` — `VITALS_STALE_AFTER`, `_VITALS_TIMESERIES_RANGES`
-- FE provider: `health_system/lib/features/health_monitoring/providers/vital_signs_provider.dart` — 5s polling + `isStale` + `chartData`
-- FE screen: `health_system/lib/features/health_monitoring/screens/vital_detail_screen.dart`
-- FE model: `health_system/lib/features/health_monitoring/models/vital_signs.dart` — BR-006-01 thresholds hardcode
-- Related UCs: UC007 (detail drill-down), UC008 (history longer range), UC040 (device pair precondition)
+## Business Rules - Phân quyền (Authorization)
+- **BR-Auth-01**: User A chỉ được phép truy vấn/xem dữ liệu y tế của User B nếu ID của cả hai tồn tại trong bảng `user_relationships` và có cờ `can_view_vitals = true` (hoặc User A xem dữ liệu của chính mình).
+
+## Yêu cầu phi chức năng
+
+- **Performance**: 
+   - Độ trễ hiển thị < 5 giây kể từ khi Server nhận dữ liệu (SRS HG-FUNC-02)
+  - Giao diện cập nhật tự động mỗi khi có dữ liệu mới (chu kỳ thiết bị gửi: 1 phút)
+- **Usability**: 
+  - Responsive (mobile + web)
+  - Font chữ lớn, tương phản cao cho người già
+  - Dark mode
+- **Security**: Chỉ hiển thị dữ liệu của người dùng được ủy quyền
