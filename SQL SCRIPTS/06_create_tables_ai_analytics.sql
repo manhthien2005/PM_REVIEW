@@ -45,7 +45,15 @@ CREATE TABLE IF NOT EXISTS risk_scores (
     -- Model Info
     model_version VARCHAR(20),
     algorithm VARCHAR(50),  -- 'random_forest', 'neural_network', 'gradient_boosting'
-    
+
+    -- ADR-018 data quality contract (Phase 7 S4) — promoted from features
+    -- JSONB blob to first-class columns so admin analytics, retraining
+    -- pipelines and audit reports can query them without parsing JSON.
+    is_synthetic_default BOOLEAN NOT NULL DEFAULT FALSE,
+    defaults_applied JSONB,
+    effective_confidence DECIMAL(5,4),
+    data_quality_warning TEXT,
+
     -- Metadata
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -55,6 +63,10 @@ COMMENT ON COLUMN risk_scores.risk_type IS 'Risk domain: general (vitals), strok
 COMMENT ON COLUMN risk_scores.score IS 'Điểm rủi ro (0-100)';
 COMMENT ON COLUMN risk_scores.risk_level IS 'Mức độ: low | medium | critical (không dùng high nữa — backfill thành medium)';
 COMMENT ON COLUMN risk_scores.features IS 'Input features dạng JSONB (để reproduce & explain)';
+COMMENT ON COLUMN risk_scores.is_synthetic_default IS 'ADR-018 / Phase 7 S4: TRUE khi ít nhất một soft field (BP, HRV, weight, height) bị default trong inference; FALSE trên record vitals đầy đủ và rule-based fallback.';
+COMMENT ON COLUMN risk_scores.defaults_applied IS 'ADR-018 / Phase 7 S4: ordered list các soft field name bị default (vd ["hrv","weight_kg"]); NULL khi không default. Mirror với features JSONB blob.';
+COMMENT ON COLUMN risk_scores.effective_confidence IS 'ADR-018 / Phase 7 S4: confidence consumer hiển thị (= raw confidence × 0.5 khi synthetic, = raw khi sạch); NULL trên rule-based fallback. Range 0.0000-1.0000.';
+COMMENT ON COLUMN risk_scores.data_quality_warning IS 'ADR-018 / Phase 7 S4: warning text từ model-api khi soft default applied; NULL trên record sạch và fallback path.';
 
 -- ============================================================================
 -- Table: risk_explanations

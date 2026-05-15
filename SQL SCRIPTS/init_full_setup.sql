@@ -478,7 +478,8 @@ END $$;
 -- SECTION 06: create_tables_ai_analytics.sql
 -- Description: Tạo bảng cho AI/ML (risk scores, XAI explanations, risk alert responses)
 -- Incorporated: 20260416_risk_alert_escalation, 20260424_shap_explanation_columns,
---              20260427_model_request_id, 20260427_audience_payload_json, 20260427_sleep_risk_type
+--              20260427_model_request_id, 20260427_audience_payload_json, 20260427_sleep_risk_type,
+--              20260516_risk_scores_synthetic_columns (Phase 7 S4 — ADR-018)
 -- ############################################################################
 
 CREATE TABLE IF NOT EXISTS risk_scores (
@@ -492,8 +493,17 @@ CREATE TABLE IF NOT EXISTS risk_scores (
     features JSONB NOT NULL,
     model_version VARCHAR(20),
     algorithm VARCHAR(50),
+    -- ADR-018 / Phase 7 S4 data quality contract columns
+    is_synthetic_default BOOLEAN NOT NULL DEFAULT FALSE,
+    defaults_applied JSONB,
+    effective_confidence DECIMAL(5,4),
+    data_quality_warning TEXT,
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+CREATE INDEX IF NOT EXISTS idx_risk_scores_is_synthetic_default
+    ON risk_scores (is_synthetic_default, calculated_at DESC)
+    WHERE is_synthetic_default = TRUE;
 
 CREATE TABLE IF NOT EXISTS risk_explanations (
     id SERIAL PRIMARY KEY,
