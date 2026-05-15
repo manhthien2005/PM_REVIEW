@@ -1,6 +1,6 @@
 # ADR-019: IoT Simulator No Direct Model-API Call — Route via Mobile BE
 
-**Status:** 🟡 Proposed (Redesign 2026-05-15)
+**Status:** � Approved (Redesign 2026-05-15)
 **Date:** 2026-05-15
 **Decision-maker:** ThienPDM (solo)
 **Tags:** [iot-sim, architecture, cross-repo, refactor]

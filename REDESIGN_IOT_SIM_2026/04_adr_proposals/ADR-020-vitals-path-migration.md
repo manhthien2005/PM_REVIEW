@@ -1,6 +1,6 @@
 # ADR-020: Vitals Path Migration — DB Direct → HTTP
 
-**Status:** 🟡 Proposed (Redesign 2026-05-15) — SUPERSEDES ADR-013
+**Status:** � Approved (Redesign 2026-05-15) — SUPERSEDES ADR-013
 **Date:** 2026-05-15
 **Decision-maker:** ThienPDM (solo)
 **Tags:** [iot-sim, architecture, vitals, refactor, supersedes-adr-013]

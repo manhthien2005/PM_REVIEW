@@ -6,9 +6,9 @@
 **Date:** 2026-05-15
 **Author:** Cascade
 **Reviewer:** ThienPDM (pending)
-**Status:** 🟡 v0.1 (5 contracts drafted)
+**Status:** ✅ v1.0 Approved (5 contracts, 2026-05-15)
 **Charter:** `../00_charter.md` v1.0
-**Target topology:** `../02_target_topology.md` v0.1
+**Target topology:** `../02_target_topology.md` v1.0
 
 ---
 

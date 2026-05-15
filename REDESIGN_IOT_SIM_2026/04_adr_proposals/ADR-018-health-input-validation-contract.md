@@ -1,6 +1,6 @@
 # ADR-018: Health Input Validation Contract — Fail-Closed with Synthetic Flag
 
-**Status:** 🟡 Proposed (Redesign 2026-05-15)
+**Status:** � Approved (Redesign 2026-05-15)
 **Date:** 2026-05-15
 **Decision-maker:** ThienPDM (solo)
 **Tags:** [validation, contract, cross-repo, mobile, model-api, bug-fix]

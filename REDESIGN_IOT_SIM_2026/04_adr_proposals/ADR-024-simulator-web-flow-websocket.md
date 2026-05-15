@@ -1,6 +1,6 @@
 # ADR-024: Simulator-web Flow Event WebSocket — Live Sequence Diagram
 
-**Status:** 🟡 Proposed (Redesign 2026-05-15)
+**Status:** � Approved (Redesign 2026-05-15)
 **Date:** 2026-05-15
 **Decision-maker:** ThienPDM (solo)
 **Tags:** [iot-sim, frontend, websocket, demo, ux]

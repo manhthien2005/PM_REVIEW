@@ -6,7 +6,7 @@
 **Date:** 2026-05-15
 **Author:** Cascade
 **Reviewer:** ThienPDM (pending)
-**Status:** 🟡 v0.1 (7 ADRs drafted)
+**Status:** ✅ v1.0 Approved (7 ADRs, 2026-05-15)
 **Charter:** `../00_charter.md` v1.0
 
 ---
@@ -15,13 +15,13 @@
 
 | ADR | Title | Status | Resolves |
 |---|---|---|---|
-| [ADR-018](./ADR-018-health-input-validation-contract.md) | Health Input Validation Contract — Fail-Closed with Synthetic Flag | 🟡 Proposed | HS-024, XR-003 |
-| [ADR-019](./ADR-019-iot-sim-no-direct-modelapi.md) | IoT Simulator No Direct Model-API Call | 🟡 Proposed | B2, OQ2, OQ5 |
-| [ADR-020](./ADR-020-vitals-path-migration.md) | Vitals Path Migration — DB Direct → HTTP (SUPERSEDES ADR-013) | 🟡 Proposed | B1, OQ5 |
-| [ADR-021](./ADR-021-endpoint-prefix-execution.md) | Endpoint Prefix Execution (EXECUTES ADR-004) | 🟡 Proposed | OQ1, XR-001 |
-| [ADR-022](./ADR-022-imu-window-persistence.md) | IMU Window Persistence — TimescaleDB Hypertable | 🟡 Proposed | OQ2 |
-| [ADR-023](./ADR-023-mobile-streaming-pattern.md) | Mobile Streaming Pattern — FCM Push + REST Polling | 🟡 Proposed | OQ3, OQ4, Charter section 3.2 |
-| [ADR-024](./ADR-024-simulator-web-flow-websocket.md) | Simulator-web Flow Event WebSocket — Live Sequence Diagram | 🟡 Proposed | B3 |
+| [ADR-018](./ADR-018-health-input-validation-contract.md) | Health Input Validation Contract — Fail-Closed with Synthetic Flag | � Approved | HS-024, XR-003 |
+| [ADR-019](./ADR-019-iot-sim-no-direct-modelapi.md) | IoT Simulator No Direct Model-API Call | � Approved | B2, OQ2, OQ5 |
+| [ADR-020](./ADR-020-vitals-path-migration.md) | Vitals Path Migration — DB Direct → HTTP (SUPERSEDES ADR-013) | � Approved | B1, OQ5 |
+| [ADR-021](./ADR-021-endpoint-prefix-execution.md) | Endpoint Prefix Execution (EXECUTES ADR-004) | � Approved | OQ1, XR-001 |
+| [ADR-022](./ADR-022-imu-window-persistence.md) | IMU Window Persistence — TimescaleDB Hypertable | � Approved | OQ2 |
+| [ADR-023](./ADR-023-mobile-streaming-pattern.md) | Mobile Streaming Pattern — FCM Push + REST Polling | � Approved | OQ3, OQ4, Charter section 3.2 |
+| [ADR-024](./ADR-024-simulator-web-flow-websocket.md) | Simulator-web Flow Event WebSocket — Live Sequence Diagram | � Approved | B3 |
 
 ---
 

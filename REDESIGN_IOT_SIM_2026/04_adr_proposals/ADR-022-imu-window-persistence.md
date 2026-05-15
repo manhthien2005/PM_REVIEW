@@ -1,6 +1,6 @@
 # ADR-022: IMU Window Persistence — TimescaleDB Hypertable with 7-day Retention
 
-**Status:** 🟡 Proposed (Redesign 2026-05-15)
+**Status:** � Approved (Redesign 2026-05-15)
 **Date:** 2026-05-15
 **Decision-maker:** ThienPDM (solo)
 **Tags:** [database, timescaledb, fall, audit, retention]

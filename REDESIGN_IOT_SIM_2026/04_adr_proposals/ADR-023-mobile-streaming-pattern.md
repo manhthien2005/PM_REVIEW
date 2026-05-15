@@ -1,6 +1,6 @@
 # ADR-023: Mobile Streaming Pattern — FCM Push + REST Polling
 
-**Status:** 🟡 Proposed (Redesign 2026-05-15)
+**Status:** � Approved (Redesign 2026-05-15)
 **Date:** 2026-05-15
 **Decision-maker:** ThienPDM (solo)
 **Tags:** [mobile, streaming, fcm, polling, ux, battery]

@@ -6,7 +6,7 @@
 **Date:** 2026-05-15
 **Author:** Cascade
 **Reviewer:** ThienPDM (pending)
-**Status:** 🟡 In Progress v0.1
+**Status:** ✅ v1.0 Approved (2026-05-15)
 **Charter:** `00_charter.md` v1.0
 **Inventory:** `01_current_state.md` v1.0
 **Brainstorm decisions:** B1 (HTTP migration) + B2 (Pattern Unified) + B3 (Mid scope simulator-web UX)

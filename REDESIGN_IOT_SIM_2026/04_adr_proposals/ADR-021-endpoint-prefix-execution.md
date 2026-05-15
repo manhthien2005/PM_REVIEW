@@ -1,6 +1,6 @@
 # ADR-021: Endpoint Prefix Execution — Execute ADR-004 Across 5 Repos
 
-**Status:** 🟡 Proposed (Redesign 2026-05-15) — EXECUTES ADR-004
+**Status:** � Approved (Redesign 2026-05-15) — EXECUTES ADR-004
 **Date:** 2026-05-15
 **Decision-maker:** ThienPDM (solo)
 **Tags:** [api, cross-repo, refactor, execution]
