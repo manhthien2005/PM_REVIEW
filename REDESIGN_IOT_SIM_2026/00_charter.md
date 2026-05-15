@@ -11,7 +11,7 @@
 - [XR-001](../BUGS/XR-001-topology-steering-endpoint-prefix-drift.md) — endpoint prefix drift
 - [XR-003](../BUGS/XR-003-model-api-input-validation-contract.md) — contract validation gap
 **Linked ADRs (existing):** ADR-004 (api prefix), ADR-013 (IoT direct DB), ADR-015 (severity vocab)
-**Status:** Draft v0.1 — chờ ThienPDM phê duyệt
+**Status:** ✅ Approved v1.0 — sẵn sàng Phase 1
 
 ---
 
@@ -176,13 +176,99 @@ Charter      Inv  Tgt  DataC  ADR  Gap  Test  Build
 
 ---
 
-## 7. Open questions cần resolve trước Phase 2
+## 7. Open questions — RESOLVED (2026-05-15)
 
-1. **Endpoint prefix final** — chọn `/mobile/*` (current local) hay `/api/v1/mobile/*` (ADR-004 target)? Nếu chọn target, migration plan ra sao? → Phase 4 ADR-021 sẽ chốt.
-2. **Mobile BE: lưu raw vs derived** — IoT sim emit motion (50Hz IMU). BE lưu raw window vào `imu_windows` table hay chỉ lưu derived `fall_events`? → Phase 3 contract spec.
-3. **Mobile elderly UI: native push hay in-app banner** — fall takeover dùng full-screen activity (Android) hay in-app dialog? → Phase 2 target topology.
-4. **Family view linking model** — UC020 đã chốt linked profile, nhưng demo của anh có cần show 2 user trong 1 simulator session không? → Phase 1 inventory clarify.
-5. **Risk inference trigger source of truth** — IoT sim trigger `/risk/calculate` (current) hay BE auto-trigger sau `/telemetry/ingest` (current cũng có)? Pick 1, dispose 1. → Phase 4 ADR.
+### OQ1 — Endpoint prefix final
+
+**Resolution:** Execute ADR-004 — standardize `/api/v1/mobile/*` cho 5 backend service.
+
+**Implications:**
+- Mobile app baseUrl `http://10.0.2.2:8000/api/v1/mobile` (giữ nguyên, đã đúng)
+- FastAPI mount: drop `root_path="/api/v1"`, change `api_router = APIRouter(prefix="/api/v1/mobile")`
+- IoT sim đổi 4 file:
+  - `Iot_Simulator_clean/api_server/dependencies.py` 3 method `_telemetry_*_endpoint` + `_risk_calculate_endpoint`
+  - `Iot_Simulator_clean/api_server/backend_admin_client.py:45`
+  - `Iot_Simulator_clean/api_server/services/sleep_service.py:581,638`
+- Steering `11-cross-repo-topology.md` 5 repo sync về `/api/v1/mobile/*`
+- Drop FastAPI `root_path` hack
+- Resolve XR-001 + D-019
+
+**Action ownership:** Phase 4 ADR-021 (execution-of-accepted-ADR, không tạo decision mới).
+
+### OQ2 — IMU raw window persistence
+
+**Resolution:** Option D — Lưu raw window vào TimescaleDB hypertable + retention policy 7 ngày + compression policy 10:1.
+
+**Implications:**
+- Tạo table `imu_windows` (timestamptz time, device_id, fall_event_id FK, accel/gyro/orientation arrays)
+- TimescaleDB hypertable: `create_hypertable('imu_windows', 'time', chunk_time_interval=>'1 day')`
+- Retention: `add_retention_policy('imu_windows', interval '7 days')`
+- Compression: `add_compression_policy('imu_windows', interval '1 day')`
+- BE persist trong `/telemetry/imu-window` endpoint (slice 2b wire vào)
+- Bounded growth: ~1.3GB/năm worst case (100 user × 100 event/day × 7 day × 10x compression)
+
+**Demo lợi thế:** Admin web có thể show motion chart cho operator review false-positive.
+
+**Action ownership:** Phase 3 contract `fall_imu_window.md` định nghĩa schema + Phase 4 ADR-019 (no direct model-api call).
+
+### OQ3 — Fall takeover UI
+
+**Resolution:** Option C Hybrid — critical = full-screen wake screen + ring; non-critical = notification thường.
+
+**Implications:**
+- Mobile (Android): `USE_FULL_SCREEN_INTENT` permission, `AndroidNotificationDetails(fullScreenIntent: true)` cho FCM message với `severity=critical`
+- AndroidManifest: `<activity android:showWhenLocked="true" android:turnScreenOn="true" />` cho SOSConfirmActivity
+- Onboarding step: request `USE_FULL_SCREEN_INTENT` permission từ Android 14+
+- iOS: dùng `UNNotificationSound.defaultCritical` + banner critical (Apple Critical Alert entitlement skip cho đồ án)
+- Severity discrimination:
+  - `severity=critical` (`fall_high_confidence`, `fall_no_response`): full-screen takeover
+  - `severity=high` (`fall_false_alarm` confidence 0.65): notification thường, no takeover
+
+**Risk flagged:**
+- Real Android device required cho demo (emulator hành vi khác)
+- Anh phải có 2 phone Android cho demo OQ4
+
+**Action ownership:** Phase 2 target topology + Phase 3 contract `alert_push.md` định nghĩa FCM payload structure.
+
+### OQ4 — Linked profile demo (elderly + family)
+
+**Resolution:** Option A — 2 mobile device chạy song song, mỗi device login 1 user khác.
+
+**Implications:**
+- Setup demo:
+  - Device 1 (Android phone hoặc emulator): login `elderly@test.com`, bind smartwatch sim qua admin
+  - Device 2 (Android phone hoặc emulator thứ 2): login `family@test.com`, linked với elderly qua `UserRelationship`
+- BE infra ĐÃ CÓ (em verify code):
+  - `PushNotificationService.send_fall_critical_alert` — fan out FCM tới user + caregivers
+  - `PushNotificationService.send_fall_followup_concern` — caregiver-only soft push
+  - `EmergencyRepository.get_alert_recipient_user_ids(db, patient_user_id)` — fetch linked caregivers
+- Phase 1 inventory verify: FCM token register cả 2 user, fanout logic chạy đúng
+- Phase 3 contract `alert_push.md` định nghĩa structure FCM payload phân biệt elderly vs family receiver
+
+**Demo flow target:**
+1. Anh trigger `fall_high_confidence` trên simulator-web
+2. Phone 1 (elderly): full-screen SOS takeover + ring + countdown 30s
+3. Phone 2 (family): notification banner "Bố/mẹ bạn vừa té ngã — tap để xem" + tap mở RiskReportDetailScreen
+4. Cả 2 phone update đồng bộ
+
+**Action ownership:** Phase 1 (verify FCM fanout) + Phase 3 (alert_push contract) + Phase 7 (build).
+
+### OQ5 — Risk inference trigger source of truth
+
+**Resolution:** Option B — BE auto-trigger sau `/telemetry/ingest`. IoT sim KHÔNG trigger risk inference nữa.
+
+**Implications:**
+- Bỏ method `_trigger_risk_inference` + `_risk_calculate_endpoint` từ IoT sim `dependencies.py`
+- Bỏ orchestrator wire R3 fix `_trigger_risk_inference` call
+- Endpoint `/api/v1/mobile/risk/calculate` (internal `X-Internal-Service`) **dispose** (em verify Phase 1, có consumer nào khác không)
+- Endpoint `/api/v1/mobile/risk/recalculate` (user-facing) **GIỮ** cho mobile app on-demand "Tính lại" button
+- BE flow: `/telemetry/ingest` → `calculate_device_risk(allow_cached=True, dispatch_alerts=True)` → cooldown `RISK_COOLDOWN_SECONDS=60` ngăn spam model-api
+
+**Trade-off accepted:**
+- IoT sim không control timing risk inference (nhường cho BE) — match production: smartwatch chỉ push raw
+- BE auto-trigger 100 device × ingest 12/phút = 1200 calls/phút → cooldown drop 99% → 100 model-api call/phút → OK
+
+**Action ownership:** Phase 4 ADR-019 (no direct model-api + no IoT trigger) + Phase 7 cleanup code IoT sim.
 
 ---
 
@@ -190,7 +276,7 @@ Charter      Inv  Tgt  DataC  ADR  Gap  Test  Build
 
 ```
 PM_REVIEW/REDESIGN_IOT_SIM_2026/
-├── 00_charter.md                         ← BẠN ĐANG ĐỌC (v0.1 draft)
+├── 00_charter.md                         ← BẠN ĐANG ĐỌC (v1.0 approved)
 ├── 01_current_state.md                   ← Phase 1 (pending)
 ├── 02_target_topology.md                 ← Phase 2 (pending)
 ├── 03_data_contracts/
@@ -216,8 +302,8 @@ PM_REVIEW/REDESIGN_IOT_SIM_2026/
 
 | Role | Name | Status | Date | Note |
 |---|---|---|---|---|
-| **Driver** | ThienPDM | ⏳ Pending review | — | Sửa scope/timeline nếu cần |
-| **Executor** | Cascade | ✅ Drafted v0.1 | 2026-05-15 | Sẵn sàng sang Phase 1 sau khi anh approve |
+| **Driver** | ThienPDM | ✅ Approved | 2026-05-15 | Đã chốt 5 Open Questions + scope mở rộng (IoT sim FE/BE + Mobile FE/BE + model-api validation) |
+| **Executor** | Cascade | ✅ Drafted v1.0 | 2026-05-15 | Sẵn sàng sang Phase 1: Current State Inventory |
 
 **Khi anh approve:**
 - Đổi status driver thành ✅
@@ -235,3 +321,4 @@ PM_REVIEW/REDESIGN_IOT_SIM_2026/
 | Version | Date | Author | Change |
 |---|---|---|---|
 | v0.1 | 2026-05-15 | Cascade | Initial draft sau brainstorm 5 câu với ThienPDM |
+| v1.0 | 2026-05-15 | Cascade | Resolve 5 Open Questions (OQ1-OQ5) + ThienPDM approve. Sang Phase 1. |
