@@ -6,7 +6,7 @@
 **Executor:** Cascade (pair programmer)
 **Driver:** ThienPDM
 **Estimated total effort:** ~74h (8 weeks @ ~9h/week per Charter)
-**Status:** 🟡 In Progress — S0 ✅, S1 ✅ (code), S2 ✅. S1.8 deferred. Starting S3.
+**Status:** 🟡 In Progress — S0 ✅, S1 ✅ (code), S2 ✅, S3 ✅. S1.8 deferred. Starting S4.
 
 ---
 
@@ -54,7 +54,7 @@ Status: ⏳ Pending | 🟡 In progress | ✅ Done | ❌ Blocked
 | **S0** | Bootstrap — verify baseline | ✅ Done | `chore/redesign-p7-bootstrap` (PM_REVIEW) | _to be filled_ | n/a (verify only) | health_system stashed; model-api XR-003 partial done; baseline = current HEAD per merged PRs |
 | **S1** | ADR-021 endpoint prefix migration (5 repos) | ✅ Done (code only) | `feat/redesign-s1-prefix-migration` (health_system + Iot_Simulator_clean) | `47913bb` (HS) + `8f9c4df` (IoT) | 6/6 + 5/5 smoke pass, baseline routing OK | S1.1-S1.7 done; **S1.8 steering sync 5 repos DEFERRED to S19** (infra path requires chore branch, batch with PM_REVIEW docs sync) |
 | **S2** | Model-API Field constraints + structured error (ADR-018 p1) | ✅ Done | `feat/redesign-s2-model-api-validation` (healthguard-model-api) | `4dd3b70` | 13/13 new + 75/75 baseline pass | Schema StandardPrediction +3 fields (effective_confidence, data_quality_warning, is_synthetic_default); service split raw vs effective; 422 handler `{error: {code, message, details}}`; codes VALIDATION_ERROR + MISSING_FIELDS. **XR-003 RESOLVED** |
-| **S3** | Mobile BE risk validation refactor (ADR-018 p2) | ⏳ Pending | _tbd_ | _tbd_ | _tbd_ | HS-024 critical fix path |
+| **S3** | Mobile BE risk validation refactor (ADR-018 p2) | ✅ Done | `feat/redesign-s3-mobile-be-validation` (health_system) | `0532e48` | 16 new + 624/641 baseline pass | `_build_inference_payload` fail-closed cho 4 critical fields; adapter track soft defaults (height/weight/hrv); HRV drift 50→40 aligned; route `/risk/calculate` + `/risk/recalculate` trả 422 INSUFFICIENT_VITALS. **HS-024 RESOLVED** |
 | **S4** | DB risk_scores synthetic columns migration (ADR-018 p3) | ⏳ Pending | _tbd_ | _tbd_ | _tbd_ | Additive migration only |
 | **S5** | Telemetry ingest strict schema (ADR-018 p4) | ⏳ Pending | _tbd_ | _tbd_ | _tbd_ | Breaking change for IoT sim fixtures |
 | **S6** | IoT sim HTTP vitals publisher (ADR-020 p1) | ⏳ Pending | _tbd_ | _tbd_ | _tbd_ | Vitals critical path |
@@ -84,7 +84,7 @@ Status: ⏳ Pending | 🟡 In progress | ✅ Done | ❌ Blocked
 - S1 ✅ code, S1.8 deferred
 
 ### Phase 7.B — Validation Layer
-- S2 ✅; S3, S4, S5 ⏳
+- S2 ✅, S3 ✅; S4, S5 ⏳
 
 ### Phase 7.C — Vitals Migration
 - S6, S7 ⏳
@@ -121,7 +121,7 @@ Status: ⏳ Pending | 🟡 In progress | ✅ Done | ❌ Blocked
 
 | Bug | Status now | Target |
 |---|---|---|
-| HS-024 | 🔴 Open | ✅ Resolved (after S3) |
+| HS-024 | ✅ Resolved (S3 merged 0532e48) | ✅ Done |
 | XR-001 | 🔴 Open | 🟡 Code fixed (S1), steering sync pending S19 |
 | XR-003 | ✅ Resolved (S2 merged 4dd3b70) | ✅ Done |
 
@@ -161,3 +161,4 @@ INDEX update batched ở S19.
 | 2026-05-15 | S0 Bootstrap ✅ Done — baseline snapshot 5 repos, health_system stashed, chore branch created |
 | 2026-05-16 | S1 ✅ Done (code S1.1-S1.7) — ADR-021 prefix /api/v1/mobile + /api/v1/sim merged to develop trunks (health_system 47913bb, Iot_Simulator_clean 8f9c4df). Smoke 11/11 pass. S1.8 steering sync deferred to S19. |
 | 2026-05-16 | S2 ✅ Done — ADR-018 model-api validation: effective_confidence + data_quality_warning + structured 422 (VALIDATION_ERROR/MISSING_FIELDS). Merged healthguard-model-api master 4dd3b70. 13/13 new tests + 75/75 baseline pass. **XR-003 RESOLVED**. |
+| 2026-05-16 | S3 ✅ Done — ADR-018 mobile BE fail-closed cho 4 critical vital fields, InsufficientVitalsError -> 422 INSUFFICIENT_VITALS, HRV adapter drift fixed. Merged health_system develop 0532e48. 16 new tests + 624/641 baseline pass. **HS-024 RESOLVED**. |
