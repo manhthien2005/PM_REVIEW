@@ -6,7 +6,7 @@
 **Executor:** Cascade (pair programmer)
 **Driver:** ThienPDM
 **Estimated total effort:** ~74h (8 weeks @ ~9h/week per Charter)
-**Status:** 🟡 In Progress — S0 ✅ Done, starting S1
+**Status:** 🟡 In Progress — S0 ✅, S1 ✅ (code), S1.8 deferred to S19. Starting S2.
 
 ---
 
@@ -52,7 +52,7 @@ Status: ⏳ Pending | 🟡 In progress | ✅ Done | ❌ Blocked
 | ID | Title | Status | Branch | Commit | Test result | Notes |
 |---|---|---|---|---|---|---|
 | **S0** | Bootstrap — verify baseline | ✅ Done | `chore/redesign-p7-bootstrap` (PM_REVIEW) | _to be filled_ | n/a (verify only) | health_system stashed; model-api XR-003 partial done; baseline = current HEAD per merged PRs |
-| **S1** | ADR-021 endpoint prefix migration (5 repos) | ⏳ Pending | _tbd_ | _tbd_ | _tbd_ | Cross-repo critical path |
+| **S1** | ADR-021 endpoint prefix migration (5 repos) | ✅ Done (code only) | `feat/redesign-s1-prefix-migration` (health_system + Iot_Simulator_clean) | `47913bb` (HS) + `8f9c4df` (IoT) | 6/6 + 5/5 smoke pass, baseline routing OK | S1.1-S1.7 done; **S1.8 steering sync 5 repos DEFERRED to S19** (infra path requires chore branch, batch with PM_REVIEW docs sync) |
 | **S2** | Model-API Field constraints + structured error (ADR-018 p1) | ⏳ Pending | _tbd_ | _tbd_ | _tbd_ | **Partial DONE** — chỉ cần add `effective_confidence`, `data_quality_warning`, structured 422 |
 | **S3** | Mobile BE risk validation refactor (ADR-018 p2) | ⏳ Pending | _tbd_ | _tbd_ | _tbd_ | HS-024 critical fix path |
 | **S4** | DB risk_scores synthetic columns migration (ADR-018 p3) | ⏳ Pending | _tbd_ | _tbd_ | _tbd_ | Additive migration only |
@@ -81,7 +81,7 @@ Status: ⏳ Pending | 🟡 In progress | ✅ Done | ❌ Blocked
 - S0 ✅
 
 ### Phase 7.A — Prefix + Steering
-- S1 ⏳
+- S1 ✅ code, S1.8 deferred
 
 ### Phase 7.B — Validation Layer
 - S2, S3, S4, S5 ⏳
@@ -105,7 +105,15 @@ Status: ⏳ Pending | 🟡 In progress | ✅ Done | ❌ Blocked
 
 ## Blockers log
 
-_(none yet)_
+### Deferred tasks (not blocking)
+
+- **S1.8 — Steering docs sync (5 repos)**: `.windsurf/rules/11-cross-repo-topology.md` cần update reality:
+  - Current drift: `/api/mobile/*` (wrong) → should be `/api/v1/mobile/*`
+  - Current drift: `/api/internal/*` (legacy) → should be `/api/v1/mobile/telemetry/*`
+  - Current drift: `/api/admin/*` (wrong) → should be `/api/v1/admin/*`
+  - Effort: ~15min update PM_REVIEW master + sync to 4 other repos via tooling
+  - Batched with S19 PM_REVIEW docs sync
+  - Risk if not done: only doc inconsistency, code is correct
 
 ---
 
@@ -114,7 +122,7 @@ _(none yet)_
 | Bug | Status now | Target |
 |---|---|---|
 | HS-024 | 🔴 Open | ✅ Resolved (after S3) |
-| XR-001 | 🔴 Open | ✅ Resolved (after S1) |
+| XR-001 | 🔴 Open | 🟡 Code fixed (S1), steering sync pending S19 |
 | XR-003 | 🔴 Open | ✅ Resolved (after S2) |
 
 ---
@@ -151,3 +159,4 @@ INDEX update batched ở S19.
 |---|---|
 | 2026-05-15 | Session start, PROGRESS.md initialized |
 | 2026-05-15 | S0 Bootstrap ✅ Done — baseline snapshot 5 repos, health_system stashed, chore branch created |
+| 2026-05-16 | S1 ✅ Done (code S1.1-S1.7) — ADR-021 prefix /api/v1/mobile + /api/v1/sim merged to develop trunks (health_system 47913bb, Iot_Simulator_clean 8f9c4df). Smoke 11/11 pass. S1.8 steering sync deferred to S19. |
