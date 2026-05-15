@@ -114,6 +114,10 @@ CREATE INDEX IF NOT EXISTS idx_risk_scores_user ON risk_scores(user_id, calculat
 CREATE INDEX IF NOT EXISTS idx_risk_scores_high ON risk_scores(user_id, calculated_at DESC) 
     WHERE risk_level IN ('high', 'critical');
 CREATE INDEX IF NOT EXISTS idx_risk_scores_type ON risk_scores(risk_type, calculated_at DESC);
+-- ADR-018 / Phase 7 S4 — partial index for synthetic-default analytics
+CREATE INDEX IF NOT EXISTS idx_risk_scores_is_synthetic_default
+    ON risk_scores (is_synthetic_default, calculated_at DESC)
+    WHERE is_synthetic_default = TRUE;
 
 -- ============================================================================
 -- INDEXES FOR: risk_explanations
