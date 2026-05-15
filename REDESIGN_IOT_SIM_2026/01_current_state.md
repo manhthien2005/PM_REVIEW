@@ -6,7 +6,7 @@
 **Date:** 2026-05-15
 **Author:** Cascade
 **Reviewer:** ThienPDM (pending)
-**Status:** 🟡 In Progress
+**Status:** ✅ Complete v1.0 (5 follow-up resolved)
 **Charter:** `00_charter.md` v1.0
 
 ---
@@ -74,7 +74,7 @@ app.include_router(settings_router, prefix="/api/sim")
 | **`FallAIClient`** | `simulator_core/fall_ai_client.py:391` | `POST :8001/api/v1/fall/predict` **DIRECT** | **DISPOSE** (OQ2 + ADR-019 — qua BE) |
 | **`SleepAIClient`** | `simulator_core/sleep_ai_client.py:69` | `POST :8001/api/v1/sleep/predict` **DIRECT** | **DISPOSE** (qua BE thông qua `/telemetry/sleep`) |
 | **`BackendAdminClient`** | `backend_admin_client.py:45` | `POST /mobile/admin/*` | KEEP — migrate `/api/v1/mobile/admin/*` |
-| **`MobileTelemetryClient`** (slice 2b) | `?` (em chưa locate) | `/api/v1/mobile/telemetry/imu-window`, `/sleep-risk` | **ORPHAN — WIRE vào** (resolve dead code, dùng cho fall flow target) |
+| **`MobileTelemetryClient`** (slice 2b) | `pre_model_trigger/mobile_telemetry_client.py:68-236` | `/api/v1/mobile/telemetry/imu-window`, `/sleep-risk` | **ORPHAN xác nhận** (0 caller trong api_server) — **WIRE Phase 7** |
 
 **Issue inventory:**
 - Vitals dual-path: Direct DB write + HttpPublisher cùng tồn tại → em verify Phase 1.x
@@ -195,9 +195,9 @@ app.include_router(settings_router, prefix="/api/sim")
 | `health` | `routes/health.py` (0.2KB) | Health check | ⚠️ Limited |
 | `profile` | `routes/profile.py` (1.5KB) | User profile | ⚠️ Limited |
 | `settings` | `routes/settings.py` (1.8KB) | User settings | ⚠️ Limited |
-| `analysis` | `?` (em chưa locate) | `/analysis/risk-reports`, `/analysis/risk-history` (gọi từ mobile) | ⚠️ Locate Phase 1.x |
+| `analysis` (sub-router của `monitoring`) | `routes/monitoring.py:22` (`APIRouter(prefix="/analysis")`) | `/analysis/risk-reports`, `/analysis/risk-history`, `/analysis/risk-reports/{id}` | ✅ Verified Phase 1.x |
 
-**Drift:** Mobile gọi `/analysis/*` nhưng em chưa tìm thấy router file `analysis.py` — em verify Phase 1.x
+**Resolved Phase 1.x:** Mobile gọi `/analysis/*` → BE route nested trong `monitoring.py:22` (`analysis_router = APIRouter(prefix="/analysis")`). KHÔNG có file `analysis.py` riêng.
 
 ### 4.3 Telemetry endpoints chi tiết (CORE redesign)
 
@@ -293,7 +293,7 @@ Em đã verify qua grep:
 | `POST /notifications/push-token` | `routes/notifications.py:86` | `notifications/services/notification_runtime_service.dart:891` |
 | `POST /notifications/push-token/unregister` | `routes/notifications.py:105` | `notification_runtime_service.dart:919` |
 
-**Drift cần verify:** mobile gọi `/analysis/*` nhưng `app/api/router.py` không list analysis router. → Em check Phase 1.x
+**Resolved Phase 1.x:** `/analysis/*` route nested trong `monitoring.py` (sub-router pattern), không cần include riêng trong `app/api/router.py`.
 
 ### 5.4 Mobile screens map theo simulation trigger
 
@@ -422,20 +422,21 @@ Em đã verify qua grep:
 
 | Code | Location | Reason orphan | Action redesign |
 |---|---|---|---|
-| `MobileTelemetryClient` (slice 2b) | Em chưa locate file | Em grep `MobileTelemetryClient` trong `api_server/` không match → có thể trong `pre_model_trigger/` hoặc test fixtures | **WIRE** thay vì delete — đây là path chuẩn `/api/v1/mobile/telemetry/imu-window` |
-| `SleepRiskDispatcher` | `pre_model_trigger/sleep_dispatch.py:133-159` | Không có caller wire vào runtime | Verify Phase 2 — wire vào hoặc dispose |
+| `MobileTelemetryClient` (slice 2b) | `pre_model_trigger/mobile_telemetry_client.py:68` | 0 caller trong `api_server/` (verified Phase 1.x) — implementation + tests đầy đủ nhưng không wire | **WIRE Phase 7** — thay `FallAIClient` direct call bằng `mobile_telemetry_client.post_imu_window()` |
+| `SleepRiskDispatcher` | `pre_model_trigger/sleep_dispatch.py:167` | 0 caller trong `api_server/` (verified Phase 1.x) — clả dispatcher + tests đầy đủ | **WIRE Phase 7** — thay `SleepAIClient` direct call qua `/api/v1/mobile/telemetry/sleep-risk` |
+| `HttpPublisher` + `transport_router.http` | `dependencies.py:670-675` | Wired nhưng KHÔNG invoke trong tick flow (verified Phase 1.x) — vitals 100% qua DB direct | **DISPOSE Phase 7** hoặc switch sang HTTP path (Phase 4 ADR-020) |
 | `_trigger_risk_inference` | `dependencies.py:1206-1237` | OQ5 chốt dispose | **DISPOSE** Phase 7 |
 | `_risk_calculate_endpoint` | `dependencies.py:921-923` | OQ5 chốt dispose | **DISPOSE** Phase 7 |
 | Direct `FallAIClient` call | `dependencies.py:1570` | OQ2 chốt dispose | **DISPOSE** Phase 7, thay bằng `/telemetry/imu-window` |
 | Direct `SleepAIClient` call | `sleep_service.py` | Sleep flow chuyển qua BE | **DISPOSE** Phase 7 |
 | FastAPI `root_path="/api/v1"` | `health_system/backend/app/main.py:28` | OQ1 chốt drop hack | **DROP** Phase 7 |
 
-### 9.2 Vitals dual-path uncertainty (cần verify Phase 1.x)
+### 9.2 Vitals path ✅ RESOLVED Phase 1.x
 
-- `_execute_pending_tick_publish` DB direct write (ADR-013) — line 1011-1056
-- `HttpPublisher` wired trong `transport_router` — line 670-674
+- `_execute_pending_tick_publish` DB direct write (ADR-013) — line 1011-1056 — **ACTIVE** ✅
+- `HttpPublisher` wired trong `transport_router` — line 670-674 — **DEAD CODE** ⛔ (không invoke trong tick flow)
 
-Cả 2 path đều có endpoint setup. Em chưa clear path nào active. → Phase 1.x verify, Phase 4 ADR-020 chốt.
+→ Phase 4 ADR-020 chốt: giữ DB direct (option A) hoặc migrate sang HTTP (option B). Trade-off performance vs production-realism.
 
 ---
 
@@ -583,15 +584,96 @@ sequenceDiagram
 
 ---
 
-## 12. Open items for Phase 1.x (follow-up verify)
+## 12. Phase 1.x follow-up verification — RESOLVED
 
-1. **Locate `/analysis/*` BE router** — mobile consume nhưng em chưa thấy router file. Có thể nested trong `routes/` chưa scan hết.
-2. **Locate `MobileTelemetryClient` file** — slice 2b dead code, cần biết file path để Phase 7 wire.
-3. **Verify `SleepRiskDispatcher` caller** — có ai gọi `filter_to_sleep_record` không, hay orphan hoàn toàn.
-4. **Verify vitals dual-path** — direct DB INSERT và HttpPublisher cùng chạy hay 1 trong 2 disabled.
-5. **Verify FastAPI `root_path` behavior local** — confirm rằng path matching strip `/api/v1` khi request có prefix này, để biết mobile app `/api/v1/mobile/*` thực sự work qua mechanism nào.
+### Item 1 — `/analysis/*` BE router ✅ RESOLVED
 
-→ Phase 1.x sẽ verify 5 items trên. Sau đó Phase 2 brainstorm.
+**Finding:** Sub-router trong file `monitoring.py`, không phải file `analysis.py` riêng.
+
+```python
+# @d:\DoAn2\VSmartwatch\health_system\backend\app\api\routes\monitoring.py:22
+analysis_router = APIRouter(prefix="/analysis", tags=["mobile-analysis"])
+```
+
+**Implication:** Inventory section 4.2 row `analysis` được update — router thực ra nested trong `monitoring.py` (8KB). Phase 3 contract `vitals_ingest.md` + `risk_trigger.md` sẽ cover cả monitoring + analysis sub-routes.
+
+### Item 2 — `MobileTelemetryClient` location ✅ RESOLVED
+
+**Finding:**
+- File: `@d:\DoAn2\VSmartwatch\Iot_Simulator_clean\pre_model_trigger\mobile_telemetry_client.py` (236 dòng)
+- Tests: `pre_model_trigger\tests\test_mobile_telemetry_client.py` tồn tại
+- Paths defined:
+  - `_IMU_WINDOW_PATH = "/api/v1/mobile/telemetry/imu-window"` (đúng ADR-004)
+  - `_SLEEP_RISK_PATH = "/api/v1/mobile/telemetry/sleep-risk"` (đúng ADR-004)
+- Internal secret support: có (`internal_secret` constructor param)
+
+**Caller verification:**
+```
+grep MobileTelemetryClient trong api_server/ = 0 hit
+```
+
+**Status: ⛔ ORPHAN xác nhận.** Class đã implement đầy đủ (post + parse JSON body), tests đầy đủ, nhưng KHÔNG có caller wire vào `api_server/dependencies.py` runtime.
+
+**Implication redesign:** Phase 7 wire vào `SimulatorRuntime.__init__` + replace `FallAIClient` direct call bằng `mobile_telemetry_client.post_imu_window(...)`. Class đã sẵn sàng, chỉ cần khởi tạo + invoke.
+
+### Item 3 — `SleepRiskDispatcher` caller ✅ RESOLVED
+
+**Finding:**
+- File: `@d:\DoAn2\VSmartwatch\Iot_Simulator_clean\pre_model_trigger\sleep_dispatch.py:167-300` (`class SleepRiskDispatcher`)
+- Tests: `pre_model_trigger\tests\test_sleep_dispatch.py` (16 test cases pass)
+- Required pattern: `dispatcher = SleepRiskDispatcher(client=MobileTelemetryClient(...))`
+
+**Caller verification:**
+```
+grep sleep_dispatch|SleepRiskDispatcher trong api_server/ = 0 hit
+```
+
+**Status: ⛔ ORPHAN xác nhận.** Implementation + tests đầy đủ, nhưng không có wire vào runtime.
+
+**Implication redesign:** Phase 7 wire vào `services/sleep_service.py` thay cho `SleepAIClient` direct call:
+- Hiện: `SleepAIClient.predict()` → `/mobile/telemetry/sleep` (DB persistence)  
+- Target: `SleepRiskDispatcher.dispatch()` → `/api/v1/mobile/telemetry/sleep-risk` (BE gọi model-api + persist)
+
+### Item 4 — Vitals dual-path active status ✅ RESOLVED
+
+**Finding:**
+- `HttpPublisher` tạo trong `dependencies.py:670-674`:
+  ```python
+  http = HttpPublisher(
+      endpoint=self._telemetry_ingest_endpoint(self._health_backend_url),
+      sender=self._http_sender,
+      headers={"X-Internal-Service": "iot-simulator"},
+  )
+  self.transport_router = TransportRouter(mqtt, http)
+  ```
+- `_tick_session_locked` (line 2603-2839) chuỗi flow tiếp theo:
+  - `_publish_tick_buffer_locked()` → set vào `effects.pending_publish` (line 2640)
+  - `_execute_pending_tick_publish` (line 1003-1056) — **DB direct INSERT với `session_scope()`** (ADR-013)
+- `transport_router.publish(...)` KHÔNG được invoke trong tick flow
+
+**Status: ⚠️ `HttpPublisher` + `transport_router` = DEAD CODE.** Wired nhưng không invoke. Vitals 100% qua DB direct.
+
+**Implication redesign:** Phase 4 ADR-020 chốt — nhất quán 1 path duy nhất:
+- **Option A (recommend):** Giữ DB direct (ADR-013), dispose `HttpPublisher` + `transport_router`. Lý do: performance (skip HTTP round-trip), match high-frequency tick.
+- **Option B (alternative):** Migrate sang HTTP `/api/v1/mobile/telemetry/ingest`. Lý do: production-realistic, BE có cơ hội validate + audit. Cost: extra HTTP latency mỗi tick.
+
+ADR-020 sẽ weigh trade-off.
+
+### Item 5 — FastAPI `root_path` behavior ⚠️ SKIP
+
+**Reason:** OQ1 đã chốt Execute ADR-004 → drop `root_path` hack hoàn toàn. Verify behavior local nữa không còn cần thiết. Phase 7 migration sẽ direct mount router `prefix="/api/v1/mobile"` và test smoke.
+
+### Summary 5 follow-ups
+
+| # | Item | Status | Action redesign |
+|---|---|---|---|
+| 1 | `/analysis/*` router | ✅ Resolved | Update inventory (sub-router của monitoring.py) |
+| 2 | `MobileTelemetryClient` | ✅ Resolved | ORPHAN — Phase 7 wire vào runtime |
+| 3 | `SleepRiskDispatcher` | ✅ Resolved | ORPHAN — Phase 7 wire thay SleepAIClient direct |
+| 4 | Vitals dual-path | ✅ Resolved | `HttpPublisher` DEAD CODE — Phase 4 ADR-020 chốt direct DB vs HTTP migration |
+| 5 | FastAPI root_path | ⚠️ Skip | OQ1 đã chốt drop hack |
+
+→ Phase 1 ✅ **COMPLETE**. Sang Phase 2 (Target Topology + Brainstorm).
 
 ---
 
@@ -600,3 +682,4 @@ sequenceDiagram
 | Version | Date | Author | Change |
 |---|---|---|---|
 | v0.1 | 2026-05-15 | Cascade | Initial inventory — 10 sections, focus redesign-relevant scope. 5 follow-up items để verify Phase 1.x. |
+| v1.0 | 2026-05-15 | Cascade | Resolve 5 follow-up items: `/analysis` sub-router, MobileTelemetryClient orphan, SleepRiskDispatcher orphan, HttpPublisher dead code, root_path skip. Phase 1 complete. |
