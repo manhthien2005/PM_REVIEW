@@ -6,7 +6,7 @@
 **Executor:** Cascade (pair programmer)
 **Driver:** ThienPDM
 **Estimated total effort:** ~74h (8 weeks @ ~9h/week per Charter)
-**Status:** 🟡 In Progress — S0 ✅, S1 ✅ (code), S2 ✅, S3 ✅, S4 ✅, S5 ✅, S6 ✅, S7 ✅. S1.8 deferred. Phase 7.B Validation Layer COMPLETE. Phase 7.C Vitals Migration COMPLETE. Starting Phase 7.D (S8).
+**Status:** 🟡 In Progress — S0 ✅, S1 ✅ (code), S2 ✅, S3 ✅, S4 ✅, S5 ✅, S6 ✅, S7 ✅, S8 ✅. S1.8 deferred. Phase 7.B Validation Layer COMPLETE. Phase 7.C Vitals Migration COMPLETE. Phase 7.D Fall+Sleep Refactor in progress (S8 done, S9/S10 next).
 
 ---
 
@@ -59,7 +59,7 @@ Status: ⏳ Pending | 🟡 In progress | ✅ Done | ❌ Blocked
 | **S5** | Telemetry ingest strict schema (ADR-018 p4) | ✅ Done | `feat/redesign-s5-telemetry-strict-schema` (health_system) | `b2edd63` (HS merge) | 41 new + 66 adjacent baseline pass | `VitalIngestVitals` extra=forbid + Field(ge,le) cho 9 fields; `VitalIngestRequest` length 1-50; per-item `INSUFFICIENT_VITALS` (HR AND SpO2 cùng NULL → reject ở boundary); `IngestError` + `VitalIngestResponse` model mới; `risk_evaluated_devices` track unique device_ids; `Idempotency-Key` header + in-memory TTL cache 5min + defensive isinstance(str) check. Alert/sleep endpoint giữ `IngestResponse` cũ. Breaking change cho `errors[]` consumer (dict[str,str] → IngestError). |
 | **S6** | IoT sim HTTP vitals publisher (ADR-020 p1) | ✅ Done | `feat/redesign-s6-iot-http-vitals` (Iot_Simulator_clean) | `437167e` (IoT merge) | 12 new + 3 existing pinned + 34 adjacent baseline pass | Feature flag `USE_HTTP_VITALS_PUBLISH` default true. `_publish_vitals_http` build VitalIngestRequest payload (S5 strict 9 keys, drop None) + httpx POST + parse `ingested`/`risk_evaluated_devices`. `_publish_vitals_db_direct` extract logic cũ (dispose tracked S7). `_execute_pending_tick_publish` branch flag, share publish_ok/lock/buffer cleanup. 3 existing DB-path tests force flag=false (preserve regression coverage). Headers: `X-Internal-Service: iot-simulator` + optional `X-Internal-Secret`. **ADR-013 SUPERSEDED** by ADR-020 in flow. |
 | **S7** | BE auto-trigger risk + dispose IoT risk path (OQ5) | ✅ Done | `feat/redesign-s7-dispose-iot-risk-path` (Iot_Simulator_clean) | `585a17b` (IoT merge) | 2 S7 + 12 S6 + 34 adjacent baseline pass | Verified BE auto-trigger ở `routes/telemetry.py:504` (`calculate_device_risk` w/ allow_cached=True) + `RISK_COOLDOWN_SECONDS=60s`. Disposed: `_risk_calculate_endpoint`, `_trigger_risk_inference`, `trigger_risk_calculation`, `RiskTriggerRequest` schema, `POST /analytics/risk/trigger` router, orch R3 active wire (firing on URGENT). Kept: `_orch_enable_model_calls` flag (deprecated, S18 cleanup), shadow orchestrator, `force_health_prediction` utility. **OQ5 RESOLVED**. **ADR-013 fully superseded by ADR-020**. |
-| **S8** | imu_windows hypertable (ADR-022) | ⏳ Pending | _tbd_ | _tbd_ | _tbd_ | TimescaleDB hypertable + retention |
+| **S8** | imu_windows hypertable (ADR-022) | ✅ Done | `feat/redesign-s8-imu-windows-hypertable` (health_system) + `chore/redesign-p7-bootstrap` (PM_REVIEW) | `d6fa3a8` (HS merge) | 90 pass (14 adapter new + 7 route + 41 telemetry + 10 risk + 18 fall baseline) | Migration `20260516_imu_windows_hypertable.sql` additive. TimescaleDB hypertable composite PK `(id, time)` + indexes (device_id+time, fall_event_id partial) + compression policy 1d + retention policy 7d. `ImuWindow` SQLAlchemy model (BIGSERIAL id, JSONB accel/gyro/orientation, sample_rate_hz/duration_seconds CHECK). `FallEvent` +2 cot `imu_window_id` BIGINT + `imu_window_time` TIMESTAMPTZ. Composite FK `fk_fall_events_imu_window` (cannot single-col FK to hypertable PK). `ImuPersistenceAdapter` projection helpers (orientation skip when all-zero). Handler ingest_imu_window persist window AFTER fall_event + back-link try/except non-fatal. **OQ2 RESOLVED**. |
 | **S9** | Wire MobileTelemetryClient — fall (ADR-019) | ⏳ Pending | _tbd_ | _tbd_ | _tbd_ | Fall flow critical for demo |
 | **S10** | Wire SleepRiskDispatcher — sleep (ADR-019) | ⏳ Pending | _tbd_ | _tbd_ | _tbd_ | |
 | **S11** | Mobile risk parser + warning banner (ADR-018 p5) | ⏳ Pending | _tbd_ | _tbd_ | _tbd_ | Additive UI |
@@ -90,7 +90,7 @@ Status: ⏳ Pending | 🟡 In progress | ✅ Done | ❌ Blocked
 - S6 ✅, S7 ✅ — **COMPLETE** (OQ5 resolved, ADR-013 superseded by ADR-020)
 
 ### Phase 7.D — Fall + Sleep Refactor
-- S8, S9, S10 ⏳
+- S8 ✅, S9 ⏳, S10 ⏳
 
 ### Phase 7.E — Mobile UX
 - S11, S12, S13 ⏳
@@ -136,7 +136,7 @@ Status: ⏳ Pending | 🟡 In progress | ✅ Done | ❌ Blocked
 | ADR-019 | _not registered_ | 🟢 Accepted (after S9, S10) |
 | ADR-020 | _not registered_ — IoT HTTP vitals ✅ (S6), risk-trigger dispose ✅ (S7) | 🟢 Accepted (Phase 7.C complete — register in INDEX at S19 batch) |
 | ADR-021 | _not registered_ | 🟢 Accepted (after S1) |
-| ADR-022 | _not registered_ | 🟢 Accepted (after S8) |
+| ADR-022 | _not registered_ — imu_windows hypertable + FK ✅ (S8) | 🟢 Accepted (register in INDEX at S19 batch) |
 | ADR-023 | _not registered_ | 🟢 Accepted (after S12, S13) |
 | ADR-024 | _not registered_ | 🟢 Accepted (after S14, S15) |
 
@@ -166,3 +166,4 @@ INDEX update batched ở S19.
 | 2026-05-16 | S5 ✅ Done — ADR-018 part 4 telemetry ingest strict schema. `/telemetry/ingest` extra=forbid + Field(ge,le) cho 9 vital fields; per-item INSUFFICIENT_VITALS (HR+SpO2 cung NULL → reject); IngestError + VitalIngestResponse (rejected count + risk_evaluated_devices); Idempotency-Key header + in-memory TTL cache 5min. Merged health_system develop b2edd63. 41 new + 66 adjacent baseline pass. **Phase 7.B Validation Layer COMPLETE**. |
 | 2026-05-16 | S6 ✅ Done — ADR-020 part 1 IoT sim HTTP vitals publisher. Feature flag `USE_HTTP_VITALS_PUBLISH` default true. `_publish_vitals_http` build VitalIngestRequest (S5 schema) + httpx POST + parse response. `_publish_vitals_db_direct` extract lần làm fallback transitional. Merged Iot_Simulator_clean develop 437167e. 12 new + 3 existing pinned + 34 adjacent baseline pass. **ADR-013 superseded in flow** (status update batched S19). pyarrow installed in shared venv để fix parquet load. |
 | 2026-05-16 | S7 ✅ Done — ADR-020 part 2 dispose IoT risk trigger code + public surface. Verified BE auto-trigger ở `routes/telemetry.py:504` + `RISK_COOLDOWN_SECONDS=60s`. Disposed: `_risk_calculate_endpoint`, `_trigger_risk_inference`, `trigger_risk_calculation`, `RiskTriggerRequest`, `POST /analytics/risk/trigger`, orch R3 active wire. Merged Iot_Simulator_clean develop 585a17b. **OQ5 RESOLVED**. **ADR-013 fully superseded by ADR-020**. **Phase 7.C Vitals Migration COMPLETE**. |
+| 2026-05-16 | S8 ✅ Done — ADR-022 (OQ2) imu_windows hypertable + raw IMU persistence. Migration 20260516 additive: TimescaleDB hypertable composite PK `(id, time)` + 7-day retention + 1-day compression + composite FK `fall_events.(imu_window_id, imu_window_time) -> imu_windows(id, time)` (single-col FK không valid với hypertable). SQLAlchemy `ImuWindow` model + `ImuPersistenceAdapter` (projection helpers + orientation skip-when-zero). Handler `ingest_imu_window` persist window AFTER fall_event + back-link try/except non-fatal. Merged health_system develop d6fa3a8. 90 pass (14 adapter + 7 route + 41 telemetry + 10 risk + 18 fall baseline). **OQ2 RESOLVED**. |

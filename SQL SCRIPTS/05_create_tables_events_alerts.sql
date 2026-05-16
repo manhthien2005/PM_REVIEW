@@ -55,6 +55,115 @@ COMMENT ON COLUMN fall_events.user_cancelled IS 'True nếu user cancel trong 30
 COMMENT ON COLUMN fall_events.features IS 'Input features cho XAI explanation (JSONB)';
 
 -- ============================================================================
+-- Hypertable: imu_windows (ADR-022 / Phase 7 S8)
+-- Purpose: Lưu raw IMU window mobile/simulator push qua /telemetry/imu-window
+--   để admin web replay false-positive case + future retrain dataset.
+-- Source: ADR-022 (OQ2) — migration 20260516_imu_windows_hypertable.sql
+-- Frequency: ~1 window per fall detection candidate (rare).
+-- Retention: 7 ngày (auto drop) + compression 1 ngày (~10:1).
+-- Placement note: defined here (not in 04_create_tables_timeseries.sql)
+--   so the FK ``imu_windows.fall_event_id -> fall_events(id)`` resolves
+--   at CREATE time. The reverse FK on ``fall_events`` is added below.
+-- ============================================================================
+CREATE TABLE IF NOT EXISTS imu_windows (
+    id BIGSERIAL,
+    time TIMESTAMPTZ NOT NULL,
+    device_id INT NOT NULL REFERENCES devices(id) ON DELETE CASCADE,
+    fall_event_id INT REFERENCES fall_events(id) ON DELETE SET NULL,
+
+    -- Raw signal — kept verbatim from model-api payload for replay.
+    accel JSONB NOT NULL,       -- [{t, x, y, z}, ...]
+    gyro JSONB NOT NULL,        -- [{t, x, y, z}, ...]
+    orientation JSONB,          -- [{t, pitch, roll, yaw}, ...] (optional)
+
+    -- Window metadata so consumers can replot without recomputing.
+    sample_rate_hz INT NOT NULL DEFAULT 50
+        CHECK (sample_rate_hz > 0 AND sample_rate_hz <= 200),
+    duration_seconds REAL NOT NULL DEFAULT 2.0
+        CHECK (duration_seconds > 0 AND duration_seconds <= 60),
+
+    -- Free-form tags from simulator: scenario_id, variant, model_request_id.
+    context JSONB,
+
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+SELECT create_hypertable(
+    'imu_windows',
+    'time',
+    chunk_time_interval => INTERVAL '1 day',
+    if_not_exists => TRUE
+);
+
+-- Composite PK (id, time) — TimescaleDB requires partitioning column
+-- in every unique constraint on the hypertable. ``id`` carried alone
+-- on ``fall_events.imu_window_id`` lets downstream code keep a single
+-- BIGINT pointer; the matching ``time`` is duplicated onto
+-- ``fall_events.imu_window_time`` so the composite FK stays valid.
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_constraint
+        WHERE conrelid = 'imu_windows'::regclass
+          AND contype = 'p'
+    ) THEN
+        ALTER TABLE imu_windows ADD PRIMARY KEY (id, time);
+    END IF;
+END$$;
+
+CREATE INDEX IF NOT EXISTS idx_imu_windows_device_time
+    ON imu_windows (device_id, time DESC);
+CREATE INDEX IF NOT EXISTS idx_imu_windows_fall_event
+    ON imu_windows (fall_event_id)
+    WHERE fall_event_id IS NOT NULL;
+
+ALTER TABLE imu_windows SET (
+    timescaledb.compress,
+    timescaledb.compress_segmentby = 'device_id',
+    timescaledb.compress_orderby = 'time DESC'
+);
+SELECT add_compression_policy('imu_windows', INTERVAL '1 day', if_not_exists => TRUE);
+SELECT add_retention_policy('imu_windows', INTERVAL '7 days', if_not_exists => TRUE);
+
+COMMENT ON TABLE imu_windows IS
+    'ADR-022 Phase 7 S8: raw IMU window persistence cho fall replay + retrain. TimescaleDB hypertable, 7-day retention, compress after 1 day.';
+COMMENT ON COLUMN imu_windows.accel IS
+    'Mảng samples accelerometer {t, x, y, z} - JSONB. Length = sample_rate_hz × duration_seconds.';
+COMMENT ON COLUMN imu_windows.gyro IS
+    'Mảng samples gyroscope {t, x, y, z} - JSONB. Same length as accel.';
+COMMENT ON COLUMN imu_windows.orientation IS
+    'Mảng samples orientation {t, pitch, roll, yaw} - optional, NULL nếu device không có fused-orientation channel.';
+COMMENT ON COLUMN imu_windows.context IS
+    'Free-form metadata: scenario_id, variant, activity_before, model_request_id (cho admin replay viewer).';
+
+-- Reverse link: fall_events back to imu_windows via composite FK.
+-- Both columns nullable — pre-S8 fall_events rows + events without a
+-- raw window (e.g. simulator-only injected events) stay valid.
+ALTER TABLE fall_events
+    ADD COLUMN IF NOT EXISTS imu_window_id BIGINT;
+ALTER TABLE fall_events
+    ADD COLUMN IF NOT EXISTS imu_window_time TIMESTAMPTZ;
+
+COMMENT ON COLUMN fall_events.imu_window_id IS
+    'ADR-022: surrogate id của imu_windows row mà event này được derive từ. NULL khi event predates Phase 7 S8 hoặc arrived without raw window.';
+COMMENT ON COLUMN fall_events.imu_window_time IS
+    'ADR-022: matching imu_windows.time partition value — required by composite FK vì imu_windows là hypertable.';
+
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_constraint
+        WHERE conname = 'fk_fall_events_imu_window'
+    ) THEN
+        ALTER TABLE fall_events
+            ADD CONSTRAINT fk_fall_events_imu_window
+            FOREIGN KEY (imu_window_id, imu_window_time)
+            REFERENCES imu_windows (id, time)
+            ON DELETE SET NULL;
+    END IF;
+END$$;
+
+-- ============================================================================
 -- Table: sos_events
 -- Purpose: Tracking các cuộc gọi cứu hộ khẩn cấp
 -- ============================================================================
