@@ -88,6 +88,19 @@ CREATE INDEX IF NOT EXISTS idx_fall_events_sos ON fall_events(sos_triggered, sos
 CREATE INDEX IF NOT EXISTS idx_fall_events_confidence ON fall_events(confidence DESC);
 
 -- ============================================================================
+-- INDEXES FOR: imu_windows (hypertable) — ADR-022 / Phase 7 S8
+-- Note: the indexes are also declared inline in
+-- 05_create_tables_events_alerts.sql so a fresh init has them right
+-- after the CREATE TABLE. Mirrored here so the index audit catalog
+-- stays exhaustive.
+-- ============================================================================
+CREATE INDEX IF NOT EXISTS idx_imu_windows_device_time
+    ON imu_windows (device_id, time DESC);
+CREATE INDEX IF NOT EXISTS idx_imu_windows_fall_event
+    ON imu_windows (fall_event_id)
+    WHERE fall_event_id IS NOT NULL;
+
+-- ============================================================================
 -- INDEXES FOR: sos_events
 -- ============================================================================
 CREATE INDEX IF NOT EXISTS idx_sos_events_user ON sos_events(user_id, triggered_at DESC);
@@ -154,6 +167,7 @@ BEGIN
     RAISE NOTICE '✓ Created indexes for vitals (7 indexes, including partial indexes)';
     RAISE NOTICE '✓ Created indexes for motion_data (2 indexes)';
     RAISE NOTICE '✓ Created indexes for fall_events (4 indexes)';
+    RAISE NOTICE '✓ Created indexes for imu_windows (2 indexes: device_time + fall_event partial)';
     RAISE NOTICE '✓ Created indexes for sos_events (4 indexes)';
     RAISE NOTICE '✓ Created indexes for alerts (6 indexes)';
     RAISE NOTICE '✓ Created indexes for risk_scores (3 indexes)';

@@ -402,6 +402,78 @@ CREATE TABLE IF NOT EXISTS fall_events (
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- ADR-022 Phase 7 S8: imu_windows hypertable + reverse FK on fall_events.
+-- Migration source: migrations/20260516_imu_windows_hypertable.sql.
+CREATE TABLE IF NOT EXISTS imu_windows (
+    id BIGSERIAL,
+    time TIMESTAMPTZ NOT NULL,
+    device_id INT NOT NULL REFERENCES devices(id) ON DELETE CASCADE,
+    fall_event_id INT REFERENCES fall_events(id) ON DELETE SET NULL,
+    accel JSONB NOT NULL,
+    gyro JSONB NOT NULL,
+    orientation JSONB,
+    sample_rate_hz INT NOT NULL DEFAULT 50
+        CHECK (sample_rate_hz > 0 AND sample_rate_hz <= 200),
+    duration_seconds REAL NOT NULL DEFAULT 2.0
+        CHECK (duration_seconds > 0 AND duration_seconds <= 60),
+    context JSONB,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+SELECT create_hypertable(
+    'imu_windows',
+    'time',
+    chunk_time_interval => INTERVAL '1 day',
+    if_not_exists => TRUE
+);
+
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_constraint
+        WHERE conrelid = 'imu_windows'::regclass
+          AND contype = 'p'
+    ) THEN
+        ALTER TABLE imu_windows ADD PRIMARY KEY (id, time);
+    END IF;
+END$$;
+
+CREATE INDEX IF NOT EXISTS idx_imu_windows_device_time
+    ON imu_windows (device_id, time DESC);
+CREATE INDEX IF NOT EXISTS idx_imu_windows_fall_event
+    ON imu_windows (fall_event_id)
+    WHERE fall_event_id IS NOT NULL;
+
+ALTER TABLE imu_windows SET (
+    timescaledb.compress,
+    timescaledb.compress_segmentby = 'device_id',
+    timescaledb.compress_orderby = 'time DESC'
+);
+SELECT add_compression_policy('imu_windows', INTERVAL '1 day', if_not_exists => TRUE);
+SELECT add_retention_policy('imu_windows', INTERVAL '7 days', if_not_exists => TRUE);
+
+COMMENT ON TABLE imu_windows IS
+    'ADR-022 Phase 7 S8: raw IMU window persistence cho fall replay + retrain. TimescaleDB hypertable, 7-day retention, compress after 1 day.';
+
+ALTER TABLE fall_events
+    ADD COLUMN IF NOT EXISTS imu_window_id BIGINT;
+ALTER TABLE fall_events
+    ADD COLUMN IF NOT EXISTS imu_window_time TIMESTAMPTZ;
+
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_constraint
+        WHERE conname = 'fk_fall_events_imu_window'
+    ) THEN
+        ALTER TABLE fall_events
+            ADD CONSTRAINT fk_fall_events_imu_window
+            FOREIGN KEY (imu_window_id, imu_window_time)
+            REFERENCES imu_windows (id, time)
+            ON DELETE SET NULL;
+    END IF;
+END$$;
+
 CREATE TABLE IF NOT EXISTS sos_events (
     id SERIAL PRIMARY KEY,
     uuid UUID UNIQUE NOT NULL DEFAULT gen_random_uuid(),

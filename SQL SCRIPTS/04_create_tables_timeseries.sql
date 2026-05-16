@@ -172,6 +172,12 @@ WITH NO DATA;
 
 COMMENT ON VIEW vitals_daily IS 'Continuous aggregate: vitals theo ngày (dùng cho trends dài hạn)';
 
+-- Note: hypertable ``imu_windows`` (ADR-022 / Phase 7 S8) lives in
+-- 05_create_tables_events_alerts.sql so it can declare the FK to
+-- ``fall_events`` directly. The FK back from ``fall_events`` to
+-- ``imu_windows(id, time)`` is added in the same file once both tables
+-- exist (avoids the circular CREATE-time dependency).
+
 -- ============================================================================
 -- Table: sleep_sessions
 -- Purpose: Lưu trữ dữ liệu phân tích giấc ngủ (aggregated từ vitals/motion)
@@ -210,5 +216,6 @@ BEGIN
     RAISE NOTICE '✓ Created continuous aggregate: vitals_hourly';
     RAISE NOTICE '✓ Created continuous aggregate: vitals_daily';
     RAISE NOTICE '✓ Created table: sleep_sessions';
+    RAISE NOTICE '→ imu_windows hypertable lives in 05_create_tables_events_alerts.sql';
     RAISE NOTICE '→ Aggregates will auto-refresh based on policies (setup in 09_create_policies.sql)';
 END $$;
